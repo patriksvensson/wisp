@@ -1,5 +1,7 @@
 <Project>
   <PropertyGroup Label="Settings">
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <Deterministic>true</Deterministic>
     <LangVersion>12</LangVersion>
     <DebugSymbols>true</DebugSymbols>

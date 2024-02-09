@@ -99,3 +99,12 @@ dotnet_diagnostic.RCS1047.severity = none
 
 # RCS1090: Call 'ConfigureAwait(false)'.
 dotnet_diagnostic.RCS1090.severity = warning
+
+# SA1600: Missing XML comment for publicly visible type or member
+dotnet_diagnostic.SA1600.severity = none
+
+# CS1591: Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = none
+
+# SA1602: Enumeration items should be documented
+dotnet_diagnostic.SA1602.severity = none
