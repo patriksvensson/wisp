@@ -1,6 +1,6 @@
 namespace Wisp.Tests;
 
-public sealed class ParserTests
+public sealed class PdfObjectParserTests
 {
     [Theory]
     [InlineData("true", true)]
@@ -8,8 +8,8 @@ public sealed class ParserTests
     public void Should_Parse_Boolean(string input, bool expected)
     {
         // Given
-        var lexer = new Lexer(input.ToStream());
-        var parser = new Parser(lexer);
+        var lexer = new PdfObjectLexer(input.ToStream());
+        var parser = new PdfObjectParser(lexer);
 
         // When
         var result = parser.ReadObject();
@@ -26,8 +26,8 @@ public sealed class ParserTests
     public void Should_Parse_Integer(string input, int expected)
     {
         // Given
-        var lexer = new Lexer(input.ToStream());
-        var parser = new Parser(lexer);
+        var lexer = new PdfObjectLexer(input.ToStream());
+        var parser = new PdfObjectParser(lexer);
 
         // When
         var result = parser.ReadObject();
@@ -46,8 +46,8 @@ public sealed class ParserTests
     public void Should_Parse_Real(string input, double expected)
     {
         // Given
-        var lexer = new Lexer(input.ToStream());
-        var parser = new Parser(lexer);
+        var lexer = new PdfObjectLexer(input.ToStream());
+        var parser = new PdfObjectParser(lexer);
 
         // When
         var result = parser.ReadObject();
@@ -61,8 +61,8 @@ public sealed class ParserTests
     public void Should_Parse_Null()
     {
         // Given
-        var lexer = new Lexer("null".ToStream());
-        var parser = new Parser(lexer);
+        var lexer = new PdfObjectLexer("null".ToStream());
+        var parser = new PdfObjectParser(lexer);
 
         // When
         var result = parser.ReadObject();
@@ -81,8 +81,8 @@ public sealed class ParserTests
     public void Should_Parse_String_Literals(string input, string expected)
     {
         // Given
-        var lexer = new Lexer(input.ToStream());
-        var parser = new Parser(lexer);
+        var lexer = new PdfObjectLexer(input.ToStream());
+        var parser = new PdfObjectParser(lexer);
 
         // When
         var result = parser.ReadObject();
@@ -99,8 +99,8 @@ public sealed class ParserTests
     public void Should_Parse_Hex_String_Literals(string input, string expected)
     {
         // Given
-        var lexer = new Lexer(input.ToStream());
-        var parser = new Parser(lexer);
+        var lexer = new PdfObjectLexer(input.ToStream());
+        var parser = new PdfObjectParser(lexer);
 
         // When
         var result = parser.ReadObject();
@@ -126,8 +126,8 @@ public sealed class ParserTests
     public void Should_Parse_Name(string input, string expected)
     {
         // Given
-        var lexer = new Lexer(input.ToStream());
-        var parser = new Parser(lexer);
+        var lexer = new PdfObjectLexer(input.ToStream());
+        var parser = new PdfObjectParser(lexer);
 
         // When
         var result = parser.ReadObject();
@@ -142,8 +142,8 @@ public sealed class ParserTests
     {
         // Given
         var input = "<</Foo 1 /Bar 2.1>>";
-        var lexer = new Lexer(input.ToStream());
-        var parser = new Parser(lexer);
+        var lexer = new PdfObjectLexer(input.ToStream());
+        var parser = new PdfObjectParser(lexer);
 
         // When
         var result = parser.ReadObject();
@@ -166,8 +166,8 @@ public sealed class ParserTests
     {
         // Given
         var input = "[ 1 2.1 ]";
-        var lexer = new Lexer(input.ToStream());
-        var parser = new Parser(lexer);
+        var lexer = new PdfObjectLexer(input.ToStream());
+        var parser = new PdfObjectParser(lexer);
 
         // When
         var result = parser.ReadObject();
@@ -188,8 +188,8 @@ public sealed class ParserTests
     {
         // Given
         var input = "<</Length 1 >>\nstream\n1\nendstream";
-        var lexer = new Lexer(input.ToStream());
-        var parser = new Parser(lexer);
+        var lexer = new PdfObjectLexer(input.ToStream());
+        var parser = new PdfObjectParser(lexer);
 
         // When
         var result = parser.ReadObject();
@@ -207,8 +207,8 @@ public sealed class ParserTests
     {
         // Given
         var input = "3 7 R";
-        var lexer = new Lexer(input.ToStream());
-        var parser = new Parser(lexer);
+        var lexer = new PdfObjectLexer(input.ToStream());
+        var parser = new PdfObjectParser(lexer);
 
         // When
         var result = parser.ReadObject();
@@ -226,8 +226,8 @@ public sealed class ParserTests
     {
         // Given
         var input = "3 7 obj\n<</Length 1 >>\nstream\n1\nendstream";
-        var lexer = new Lexer(input.ToStream());
-        var parser = new Parser(lexer);
+        var lexer = new PdfObjectLexer(input.ToStream());
+        var parser = new PdfObjectParser(lexer);
 
         // When
         var result = parser.ReadObject();

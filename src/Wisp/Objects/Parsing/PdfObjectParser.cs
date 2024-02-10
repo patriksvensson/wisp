@@ -1,22 +1,22 @@
 namespace Wisp;
 
-public sealed class Parser
+public sealed class PdfObjectParser
 {
-    private readonly Lexer _lexer;
+    private readonly PdfObjectLexer _lexer;
 
-    public Parser(IBufferReader reader)
+    public PdfObjectParser(IBufferReader reader)
     {
-        _lexer = new Lexer(reader);
+        _lexer = new PdfObjectLexer(reader);
     }
 
-    public Parser(Lexer lexer)
+    public PdfObjectParser(PdfObjectLexer lexer)
     {
         _lexer = lexer ?? throw new ArgumentNullException(nameof(lexer));
     }
 
     public PdfObject ReadObject()
     {
-        while (_lexer.Check(TokenKind.Comment))
+        while (_lexer.Check(PdfObjectTokenKind.Comment))
         {
             _lexer.Read();
         }
@@ -28,22 +28,22 @@ public sealed class Parser
 
         return token.Kind switch
         {
-            TokenKind.Null => ReadNull(),
-            TokenKind.Boolean => ReadBoolean(),
-            TokenKind.Integer => ReadInteger(),
-            TokenKind.Real => ReadReal(),
-            TokenKind.StringLiteral => ReadStringLiteral(),
-            TokenKind.HexStringLiteral => ReadHexStringLiteral(),
-            TokenKind.Name => ReadName(),
-            TokenKind.BeginDictionary => ReadDictionary(),
-            TokenKind.BeginArray => ReadArray(),
+            PdfObjectTokenKind.Null => ReadNull(),
+            PdfObjectTokenKind.Boolean => ReadBoolean(),
+            PdfObjectTokenKind.Integer => ReadInteger(),
+            PdfObjectTokenKind.Real => ReadReal(),
+            PdfObjectTokenKind.StringLiteral => ReadStringLiteral(),
+            PdfObjectTokenKind.HexStringLiteral => ReadHexStringLiteral(),
+            PdfObjectTokenKind.Name => ReadName(),
+            PdfObjectTokenKind.BeginDictionary => ReadDictionary(),
+            PdfObjectTokenKind.BeginArray => ReadArray(),
             _ => throw new InvalidOperationException($"Unknown token {token.Kind} encountered in stream"),
         };
     }
 
     private PdfObject ReadBoolean()
     {
-        var token = _lexer.Expect(TokenKind.Boolean);
+        var token = _lexer.Expect(PdfObjectTokenKind.Boolean);
         return (token.Text == "true")
             ? new PdfBoolean(true)
             : new PdfBoolean(false);
@@ -51,26 +51,26 @@ public sealed class Parser
 
     private PdfObject ReadInteger()
     {
-        var value = _lexer.Expect(TokenKind.Integer).ParseInteger();
+        var value = _lexer.Expect(PdfObjectTokenKind.Integer).ParseInteger();
         var position = _lexer.Reader.Position;
 
         // Got an integer next?
-        if (_lexer.Peek(out var token) && token.Kind == TokenKind.Integer)
+        if (_lexer.Peek(out var token) && token.Kind == PdfObjectTokenKind.Integer)
         {
-            var generation = _lexer.Expect(TokenKind.Integer).ParseInteger();
+            var generation = _lexer.Expect(PdfObjectTokenKind.Integer).ParseInteger();
 
             if (_lexer.Peek(out token))
             {
-                if (token.Kind == TokenKind.Reference)
+                if (token.Kind == PdfObjectTokenKind.Reference)
                 {
                     // Reference means object ID
-                    _lexer.Expect(TokenKind.Reference);
+                    _lexer.Expect(PdfObjectTokenKind.Reference);
                     return new PdfObjectId(value, generation);
                 }
-                else if (token.Kind == TokenKind.BeginObject)
+                else if (token.Kind == PdfObjectTokenKind.BeginObject)
                 {
                     // Object definition
-                    _lexer.Expect(TokenKind.BeginObject);
+                    _lexer.Expect(PdfObjectTokenKind.BeginObject);
                     return new PdfObjectDefinition(
                         new PdfObjectId(value, generation),
                         ReadObject());
@@ -86,13 +86,13 @@ public sealed class Parser
 
     private PdfObject ReadReal()
     {
-        var value = _lexer.Expect(TokenKind.Real).ParseReal();
+        var value = _lexer.Expect(PdfObjectTokenKind.Real).ParseReal();
         return new PdfReal(value);
     }
 
     private PdfObject ReadNull()
     {
-        _lexer.Expect(TokenKind.Null);
+        _lexer.Expect(PdfObjectTokenKind.Null);
         return new PdfNull();
     }
 
@@ -125,7 +125,7 @@ public sealed class Parser
             return true;
         }
 
-        var token = _lexer.Expect(TokenKind.StringLiteral);
+        var token = _lexer.Expect(PdfObjectTokenKind.StringLiteral);
         if (token.Lexeme == null)
         {
             throw new InvalidOperationException("String literal token had no byte content");
@@ -141,24 +141,24 @@ public sealed class Parser
 
     private PdfObject ReadHexStringLiteral()
     {
-        var token = _lexer.Expect(TokenKind.HexStringLiteral);
+        var token = _lexer.Expect(PdfObjectTokenKind.HexStringLiteral);
         return new PdfString(token.Text!, PdfStringEncoding.HexLiteral);
     }
 
     private PdfObject ReadName()
     {
-        var token = _lexer.Expect(TokenKind.Name);
+        var token = _lexer.Expect(PdfObjectTokenKind.Name);
         return new PdfName(token.Text!);
     }
 
     private PdfObject ReadDictionary()
     {
-        _lexer.Expect(TokenKind.BeginDictionary);
+        _lexer.Expect(PdfObjectTokenKind.BeginDictionary);
 
         var result = new PdfDictionary();
         while (_lexer.Peek(out var token))
         {
-            if (token.Kind == TokenKind.EndDictionary)
+            if (token.Kind == PdfObjectTokenKind.EndDictionary)
             {
                 break;
             }
@@ -173,7 +173,7 @@ public sealed class Parser
             result.Set(key, value);
         }
 
-        _lexer.Expect(TokenKind.EndDictionary);
+        _lexer.Expect(PdfObjectTokenKind.EndDictionary);
 
         // Is there a stream as well?
         var stream = ParseStream(result);
@@ -187,12 +187,12 @@ public sealed class Parser
 
     private PdfArray ReadArray()
     {
-        _lexer.Expect(TokenKind.BeginArray);
+        _lexer.Expect(PdfObjectTokenKind.BeginArray);
 
         var result = new PdfArray();
         while (_lexer.Peek(out var token))
         {
-            if (token.Kind == TokenKind.EndArray)
+            if (token.Kind == PdfObjectTokenKind.EndArray)
             {
                 break;
             }
@@ -200,7 +200,7 @@ public sealed class Parser
             result.Add(ReadObject());
         }
 
-        _lexer.Expect(TokenKind.EndArray);
+        _lexer.Expect(PdfObjectTokenKind.EndArray);
 
         return result;
     }
@@ -208,7 +208,7 @@ public sealed class Parser
     private PdfObject? ParseStream(PdfDictionary metadata)
     {
         // Not a stream?
-        if (!_lexer.Peek(out var streamToken) || streamToken.Kind != TokenKind.BeginStream)
+        if (!_lexer.Peek(out var streamToken) || streamToken.Kind != PdfObjectTokenKind.BeginStream)
         {
             return null;
         }
@@ -220,10 +220,10 @@ public sealed class Parser
         }
 
         // Read the stream data
-        _lexer.Expect(TokenKind.BeginStream);
+        _lexer.Expect(PdfObjectTokenKind.BeginStream);
         _lexer.EatNewlines();
         var data = _lexer.ReadBytes(length.Value);
-        _lexer.Expect(TokenKind.EndStream);
+        _lexer.Expect(PdfObjectTokenKind.EndStream);
 
         var stream = new PdfStream(metadata, data.ToArray());
 

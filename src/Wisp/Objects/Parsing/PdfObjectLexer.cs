@@ -1,15 +1,15 @@
 namespace Wisp;
 
-public sealed class Lexer
+public sealed class PdfObjectLexer
 {
     public IBufferReader Reader { get; }
 
-    public Lexer(Stream stream)
+    public PdfObjectLexer(Stream stream)
     {
         Reader = new BufferReader(stream);
     }
 
-    public Lexer(IBufferReader reader)
+    public PdfObjectLexer(IBufferReader reader)
     {
         Reader = reader ?? throw new ArgumentNullException(nameof(reader));
     }
@@ -36,7 +36,7 @@ public sealed class Lexer
         return Reader.ReadBytes(length);
     }
 
-    public bool Peek([NotNullWhen(true)] out Token? token)
+    public bool Peek([NotNullWhen(true)] out PdfObjectToken? token)
     {
         var position = Reader.Position;
 
@@ -51,7 +51,7 @@ public sealed class Lexer
         }
     }
 
-    public bool Check(TokenKind kind)
+    public bool Check(PdfObjectTokenKind kind)
     {
         if (Peek(out var token))
         {
@@ -61,7 +61,7 @@ public sealed class Lexer
         return false;
     }
 
-    public Token Expect(TokenKind kind)
+    public PdfObjectToken Expect(PdfObjectTokenKind kind)
     {
         var token = Read();
         if (token.Kind != kind)
@@ -73,7 +73,7 @@ public sealed class Lexer
         return token;
     }
 
-    public Token Read()
+    public PdfObjectToken Read()
     {
         if (!TryRead(out var token))
         {
@@ -83,7 +83,7 @@ public sealed class Lexer
         return token;
     }
 
-    public bool TryRead([NotNullWhen(true)] out Token? token)
+    public bool TryRead([NotNullWhen(true)] out PdfObjectToken? token)
     {
         EatWhitespace();
 
@@ -159,11 +159,10 @@ public sealed class Lexer
         }
     }
 
-    private Token ReadComment()
+    private PdfObjectToken ReadComment()
     {
         Reader.Discard('%');
 
-        var start = Reader.Position;
         while (Reader.CanRead)
         {
             var current = Reader.PeekChar();
@@ -175,14 +174,11 @@ public sealed class Lexer
             Reader.ReadByte();
         }
 
-        return new Token(
-            TokenKind.Comment,
-            Encoding.UTF8.GetString(
-                Reader.ReadBytes(
-                    start, Reader.Position - start)));
+        return new PdfObjectToken(
+            PdfObjectTokenKind.Comment);
     }
 
-    private Token ReadName()
+    private PdfObjectToken ReadName()
     {
         Reader.Discard('/');
 
@@ -209,12 +205,12 @@ public sealed class Lexer
             }
         }
 
-        return new Token(
-            TokenKind.Name,
+        return new PdfObjectToken(
+            PdfObjectTokenKind.Name,
             accumulator.ToString());
     }
 
-    private Token ReadStringLiteral()
+    private PdfObjectToken ReadStringLiteral()
     {
         Reader.Discard('(');
 
@@ -259,26 +255,26 @@ public sealed class Lexer
             }
         }
 
-        return new Token(
-            TokenKind.StringLiteral,
+        return new PdfObjectToken(
+            PdfObjectTokenKind.StringLiteral,
             text: null,
             lexeme: accumulator.ToArray());
     }
 
-    private Token ReadBeginDictionaryOrHexStringLiteral()
+    private PdfObjectToken ReadBeginDictionaryOrHexStringLiteral()
     {
         Reader.Discard('<');
 
         if (Reader.PeekChar() == '<')
         {
             Reader.Discard('<');
-            return new Token(TokenKind.BeginDictionary);
+            return new PdfObjectToken(PdfObjectTokenKind.BeginDictionary);
         }
 
         return ReadHexStringLiteral();
     }
 
-    private Token ReadHexStringLiteral()
+    private PdfObjectToken ReadHexStringLiteral()
     {
         var accumulator = new StringBuilder();
         while (true)
@@ -305,31 +301,31 @@ public sealed class Lexer
             accumulator.Append(Reader.ReadChar());
         }
 
-        return new Token(
-            TokenKind.HexStringLiteral,
+        return new PdfObjectToken(
+            PdfObjectTokenKind.HexStringLiteral,
             HexUtility.FromHex(accumulator.ToString()));
     }
 
-    private Token ReadBeginArray()
+    private PdfObjectToken ReadBeginArray()
     {
         Reader.Discard('[');
-        return new Token(TokenKind.BeginArray);
+        return new PdfObjectToken(PdfObjectTokenKind.BeginArray);
     }
 
-    private Token ReadEndArray()
+    private PdfObjectToken ReadEndArray()
     {
         Reader.Discard(']');
-        return new Token(TokenKind.EndArray);
+        return new PdfObjectToken(PdfObjectTokenKind.EndArray);
     }
 
-    private Token ReadEndDictionary()
+    private PdfObjectToken ReadEndDictionary()
     {
         Reader.Discard('>');
         Reader.Discard('>');
-        return new Token(TokenKind.EndDictionary);
+        return new PdfObjectToken(PdfObjectTokenKind.EndDictionary);
     }
 
-    private Token ReadNumber()
+    private PdfObjectToken ReadNumber()
     {
         var accumulator = new StringBuilder();
         var encounteredPeriod = false;
@@ -382,12 +378,12 @@ public sealed class Lexer
             number = "-0." + number.TrimStart('-', '.');
         }
 
-        return new Token(
-            encounteredPeriod ? TokenKind.Real : TokenKind.Integer,
+        return new PdfObjectToken(
+            encounteredPeriod ? PdfObjectTokenKind.Real : PdfObjectTokenKind.Integer,
             number);
     }
 
-    private Token ReadKeyword()
+    private PdfObjectToken ReadKeyword()
     {
         var accumulator = new StringBuilder();
         while (Reader.CanRead)
@@ -405,29 +401,29 @@ public sealed class Lexer
         switch (keyword)
         {
             case "true":
-                return new Token(TokenKind.Boolean, "true");
+                return new PdfObjectToken(PdfObjectTokenKind.Boolean, "true");
             case "false":
-                return new Token(TokenKind.Boolean, "false");
+                return new PdfObjectToken(PdfObjectTokenKind.Boolean, "false");
             case "trailer":
-                return new Token(TokenKind.Trailer);
+                return new PdfObjectToken(PdfObjectTokenKind.Trailer);
             case "obj":
-                return new Token(TokenKind.BeginObject);
+                return new PdfObjectToken(PdfObjectTokenKind.BeginObject);
             case "endobj":
-                return new Token(TokenKind.EndObject);
+                return new PdfObjectToken(PdfObjectTokenKind.EndObject);
             case "stream":
-                return new Token(TokenKind.BeginStream);
+                return new PdfObjectToken(PdfObjectTokenKind.BeginStream);
             case "endstream":
-                return new Token(TokenKind.EndStream);
+                return new PdfObjectToken(PdfObjectTokenKind.EndStream);
             case "null":
-                return new Token(TokenKind.Null);
+                return new PdfObjectToken(PdfObjectTokenKind.Null);
             case "R":
-                return new Token(TokenKind.Reference);
+                return new PdfObjectToken(PdfObjectTokenKind.Reference);
             case "startxref":
-                return new Token(TokenKind.StartXRef);
+                return new PdfObjectToken(PdfObjectTokenKind.StartXRef);
             case "xref":
-                return new Token(TokenKind.XRef);
+                return new PdfObjectToken(PdfObjectTokenKind.XRef);
             default:
-                return new Token(TokenKind.Keyword, keyword);
+                return new PdfObjectToken(PdfObjectTokenKind.Keyword, keyword);
         }
     }
 }
