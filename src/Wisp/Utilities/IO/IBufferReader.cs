@@ -11,5 +11,4 @@ public interface IBufferReader
     int ReadByte();
 
     ReadOnlySpan<byte> ReadBytes(int count);
-    ReadOnlySpan<byte> ReadBytes(int start, int count);
 }

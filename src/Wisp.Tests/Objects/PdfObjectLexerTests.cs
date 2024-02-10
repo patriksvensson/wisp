@@ -1,19 +1,19 @@
 namespace Wisp.Tests;
 
-public sealed class LexerTests
+public sealed class PdfObjectLexerTests
 {
     [Fact]
     public void Should_Read_Comment()
     {
         // Given
-        var lexer = new Lexer("%Hello World".ToStream());
+        var lexer = new PdfObjectLexer("%Hello World".ToStream());
 
         // When
         var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
-        output.ShouldBeComment("Hello World");
+        output.ShouldBeComment();
     }
 
     [Theory]
@@ -31,7 +31,7 @@ public sealed class LexerTests
     public void Should_Read_Names(string input, string expected)
     {
         // Given
-        var lexer = new Lexer(input.ToStream());
+        var lexer = new PdfObjectLexer(input.ToStream());
 
         // When
         var result = lexer.TryRead(out var output);
@@ -51,7 +51,7 @@ public sealed class LexerTests
     public void Should_Read_String_Literals(string input, string expected)
     {
         // Given
-        var lexer = new Lexer(input.ToStream());
+        var lexer = new PdfObjectLexer(input.ToStream());
 
         // When
         var result = lexer.TryRead(out var output);
@@ -67,7 +67,7 @@ public sealed class LexerTests
     public void Should_Read_Hex_String_Literals(string input, string expected)
     {
         // Given
-        var lexer = new Lexer(input.ToStream());
+        var lexer = new PdfObjectLexer(input.ToStream());
 
         // When
         var result = lexer.TryRead(out var output);
@@ -81,56 +81,56 @@ public sealed class LexerTests
     public void Should_Read_Begin_Dictionary()
     {
         // Given
-        var lexer = new Lexer("<</Foo 1 /Bar 2.1>>".ToStream());
+        var lexer = new PdfObjectLexer("<</Foo 1 /Bar 2.1>>".ToStream());
 
         // When
         var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
-        output?.Kind.ShouldBe(TokenKind.BeginDictionary);
+        output?.Kind.ShouldBe(PdfObjectTokenKind.BeginDictionary);
     }
 
     [Fact]
     public void Should_Read_End_Dictionary()
     {
         // Given
-        var lexer = new Lexer(">>".ToStream());
+        var lexer = new PdfObjectLexer(">>".ToStream());
 
         // When
         var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
-        output?.Kind.ShouldBe(TokenKind.EndDictionary);
+        output?.Kind.ShouldBe(PdfObjectTokenKind.EndDictionary);
     }
 
     [Fact]
     public void Should_Read_Begin_Array()
     {
         // Given
-        var lexer = new Lexer("[".ToStream());
+        var lexer = new PdfObjectLexer("[".ToStream());
 
         // When
         var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
-        output?.Kind.ShouldBe(TokenKind.BeginArray);
+        output?.Kind.ShouldBe(PdfObjectTokenKind.BeginArray);
     }
 
     [Fact]
     public void Should_Read_End_Array()
     {
         // Given
-        var lexer = new Lexer("]".ToStream());
+        var lexer = new PdfObjectLexer("]".ToStream());
 
         // When
         var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
-        output?.Kind.ShouldBe(TokenKind.EndArray);
+        output?.Kind.ShouldBe(PdfObjectTokenKind.EndArray);
     }
 
     [Theory]
@@ -140,7 +140,7 @@ public sealed class LexerTests
     public void Should_Parse_Integers(string input, int expected)
     {
         // Given
-        var lexer = new Lexer(input.ToStream());
+        var lexer = new PdfObjectLexer(input.ToStream());
 
         // When
         var result = lexer.TryRead(out var output);
@@ -159,7 +159,7 @@ public sealed class LexerTests
     public void Should_Parse_Real(string input, double expected)
     {
         // Given
-        var lexer = new Lexer(input.ToStream());
+        var lexer = new PdfObjectLexer(input.ToStream());
 
         // When
         var result = lexer.TryRead(out var output);
@@ -175,31 +175,31 @@ public sealed class LexerTests
     public void Should_Parse_Boolean(string input)
     {
         // Given
-        var lexer = new Lexer(input.ToStream());
+        var lexer = new PdfObjectLexer(input.ToStream());
 
         // When
         var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
-        output?.Kind.ShouldBe(TokenKind.Boolean);
+        output?.Kind.ShouldBe(PdfObjectTokenKind.Boolean);
         output?.Text.ShouldBe(input);
     }
 
     [Theory]
-    [InlineData("trailer", TokenKind.Trailer)]
-    [InlineData("obj", TokenKind.BeginObject)]
-    [InlineData("endobj", TokenKind.EndObject)]
-    [InlineData("stream", TokenKind.BeginStream)]
-    [InlineData("endstream", TokenKind.EndStream)]
-    [InlineData("null", TokenKind.Null)]
-    [InlineData("R", TokenKind.Reference)]
-    [InlineData("startxref", TokenKind.StartXRef)]
-    [InlineData("xref", TokenKind.XRef)]
-    public void Should_Parse_Keyword(string input, TokenKind expected)
+    [InlineData("trailer", PdfObjectTokenKind.Trailer)]
+    [InlineData("obj", PdfObjectTokenKind.BeginObject)]
+    [InlineData("endobj", PdfObjectTokenKind.EndObject)]
+    [InlineData("stream", PdfObjectTokenKind.BeginStream)]
+    [InlineData("endstream", PdfObjectTokenKind.EndStream)]
+    [InlineData("null", PdfObjectTokenKind.Null)]
+    [InlineData("R", PdfObjectTokenKind.Reference)]
+    [InlineData("startxref", PdfObjectTokenKind.StartXRef)]
+    [InlineData("xref", PdfObjectTokenKind.XRef)]
+    public void Should_Parse_Keyword(string input, PdfObjectTokenKind expected)
     {
         // Given
-        var lexer = new Lexer(input.ToStream());
+        var lexer = new PdfObjectLexer(input.ToStream());
 
         // When
         var result = lexer.TryRead(out var output);

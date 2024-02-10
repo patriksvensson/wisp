@@ -1,6 +1,6 @@
 namespace Wisp;
 
-public enum TokenKind
+public enum PdfObjectTokenKind
 {
     Unknown = 0,
     Comment,

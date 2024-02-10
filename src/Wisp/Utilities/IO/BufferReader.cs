@@ -1,6 +1,6 @@
 namespace Wisp;
 
-internal sealed class BufferReader : IBufferReader
+public sealed class BufferReader : IBufferReader
 {
     private readonly ReadOnlyMemory<byte> _buffer;
     private int _position;
