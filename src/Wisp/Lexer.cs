@@ -1,49 +1,99 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
-using Wisp.Extensions;
-
 namespace Wisp;
 
 public sealed class Lexer
 {
-    private readonly IBufferReader _reader;
+    public IBufferReader Reader { get; }
 
     public Lexer(Stream stream)
     {
-        _reader = new BufferReader(stream);
+        Reader = new BufferReader(stream);
     }
 
     public Lexer(IBufferReader reader)
     {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+        Reader = reader ?? throw new ArgumentNullException(nameof(reader));
+    }
+
+    public void EatNewlines()
+    {
+        while (Reader.CanRead)
+        {
+            var current = Reader.PeekChar();
+            switch (current)
+            {
+                case '\r':
+                case '\n':
+                    Reader.Discard();
+                    break;
+                default:
+                    return;
+            }
+        }
+    }
+
+    public ReadOnlySpan<byte> ReadBytes(int length)
+    {
+        return Reader.ReadBytes(length);
     }
 
     public bool Peek([NotNullWhen(true)] out Token? token)
     {
-        var position = _reader.Position;
+        var position = Reader.Position;
 
         try
         {
-            return Read(out token);
+            return TryRead(out token);
         }
         finally
         {
             // Move the cursor back to where we were
-            _reader.Seek(position, SeekOrigin.Begin);
+            Reader.Seek(position, SeekOrigin.Begin);
         }
     }
 
-    public bool Read([NotNullWhen(true)] out Token? token)
+    public bool Check(TokenKind kind)
+    {
+        if (Peek(out var token))
+        {
+            return token.Kind == kind;
+        }
+
+        return false;
+    }
+
+    public Token Expect(TokenKind kind)
+    {
+        var token = Read();
+        if (token.Kind != kind)
+        {
+            throw new InvalidOperationException(
+                $"Expected '{kind}' token in stream but found '{token.Kind}'");
+        }
+
+        return token;
+    }
+
+    public Token Read()
+    {
+        if (!TryRead(out var token))
+        {
+            throw new InvalidOperationException("Could not read next token from stream");
+        }
+
+        return token;
+    }
+
+    public bool TryRead([NotNullWhen(true)] out Token? token)
     {
         EatWhitespace();
 
-        if (!_reader.CanRead)
+        if (!Reader.CanRead)
         {
             token = null;
             return false;
         }
 
-        var current = _reader.PeekChar();
+        var current = Reader.PeekChar();
 
         if (current == '%')
         {
@@ -97,65 +147,65 @@ public sealed class Lexer
 
     public void EatWhitespace()
     {
-        while (_reader.CanRead)
+        while (Reader.CanRead)
         {
-            var current = _reader.PeekChar();
+            var current = Reader.PeekChar();
             if (!current.IsPdfWhitespace())
             {
                 return;
             }
 
-            _reader.ReadByte();
+            Reader.ReadByte();
         }
     }
 
     private Token ReadComment()
     {
-        _reader.Discard('%');
+        Reader.Discard('%');
 
-        var start = _reader.Position;
-        while (_reader.CanRead)
+        var start = Reader.Position;
+        while (Reader.CanRead)
         {
-            var current = _reader.PeekChar();
+            var current = Reader.PeekChar();
             if (current.IsPdfLineBreak())
             {
                 break;
             }
 
-            _reader.ReadByte();
+            Reader.ReadByte();
         }
 
         return new Token(
             TokenKind.Comment,
             Encoding.UTF8.GetString(
-                _reader.ReadBytes(
-                    start, _reader.Position - start)));
+                Reader.ReadBytes(
+                    start, Reader.Position - start)));
     }
 
     private Token ReadName()
     {
-        _reader.Discard('/');
+        Reader.Discard('/');
 
         var accumulator = new StringBuilder();
-        while (_reader.CanRead)
+        while (Reader.CanRead)
         {
-            var current = _reader.PeekChar();
-            if (current.IsPdfWhitespace())
+            var current = Reader.PeekChar();
+            if (!current.IsPdfName() && !current.IsPdfSolidus())
             {
                 break;
             }
 
             if (current == '#')
             {
-                _reader.Discard('#');
+                Reader.Discard('#');
 
-                var hex = _reader.ReadBytes(2);
+                var hex = Reader.ReadBytes(2);
                 accumulator.Append(HexUtility.FromHex(
                     (char)hex[0], (char)hex[1]));
             }
             else
             {
-                accumulator.Append(_reader.ReadChar());
+                accumulator.Append(Reader.ReadChar());
             }
         }
 
@@ -166,15 +216,15 @@ public sealed class Lexer
 
     private Token ReadStringLiteral()
     {
-        _reader.Discard('(');
+        Reader.Discard('(');
 
         var level = 0;
         var escaped = false;
         var accumulator = new List<byte>();
 
-        while (_reader.CanRead)
+        while (Reader.CanRead)
         {
-            var current = _reader.ReadByte();
+            var current = Reader.ReadByte();
 
             // Escaped new line?
             var character = (char)current;
@@ -217,11 +267,11 @@ public sealed class Lexer
 
     private Token ReadBeginDictionaryOrHexStringLiteral()
     {
-        _reader.Discard('<');
+        Reader.Discard('<');
 
-        if (_reader.PeekChar() == '<')
+        if (Reader.PeekChar() == '<')
         {
-            _reader.Discard('<');
+            Reader.Discard('<');
             return new Token(TokenKind.BeginDictionary);
         }
 
@@ -233,18 +283,18 @@ public sealed class Lexer
         var accumulator = new StringBuilder();
         while (true)
         {
-            if (!_reader.CanRead)
+            if (!Reader.CanRead)
             {
                 throw new InvalidOperationException(
                     "Hex string literal is missing trailing '>'.");
             }
 
-            var current = _reader.PeekChar();
+            var current = Reader.PeekChar();
             if (!char.IsLetter(current) && !char.IsDigit(current))
             {
                 if (current == '>')
                 {
-                    _reader.Discard('>');
+                    Reader.Discard('>');
                     break;
                 }
 
@@ -252,7 +302,7 @@ public sealed class Lexer
                     $"Malformed hexadecimal literal. Invalid character '{current}'.");
             }
 
-            accumulator.Append(_reader.ReadChar());
+            accumulator.Append(Reader.ReadChar());
         }
 
         return new Token(
@@ -262,20 +312,20 @@ public sealed class Lexer
 
     private Token ReadBeginArray()
     {
-        _reader.Discard('[');
+        Reader.Discard('[');
         return new Token(TokenKind.BeginArray);
     }
 
     private Token ReadEndArray()
     {
-        _reader.Discard(']');
+        Reader.Discard(']');
         return new Token(TokenKind.EndArray);
     }
 
     private Token ReadEndDictionary()
     {
-        _reader.Discard('>');
-        _reader.Discard('>');
+        Reader.Discard('>');
+        Reader.Discard('>');
         return new Token(TokenKind.EndDictionary);
     }
 
@@ -284,13 +334,13 @@ public sealed class Lexer
         var accumulator = new StringBuilder();
         var encounteredPeriod = false;
 
-        while (_reader.CanRead)
+        while (Reader.CanRead)
         {
-            var current = _reader.PeekChar();
+            var current = Reader.PeekChar();
 
             if (char.IsDigit(current))
             {
-                accumulator.Append(_reader.ReadChar());
+                accumulator.Append(Reader.ReadChar());
             }
             else if (current == '-' || current == '+')
             {
@@ -299,7 +349,7 @@ public sealed class Lexer
                     throw new InvalidOperationException("Encountered malformed integer");
                 }
 
-                _reader.Discard();
+                Reader.Discard();
                 if (current == '-')
                 {
                     accumulator.Append('-');
@@ -313,7 +363,7 @@ public sealed class Lexer
                 }
 
                 encounteredPeriod = true;
-                accumulator.Append(_reader.ReadChar());
+                accumulator.Append(Reader.ReadChar());
             }
             else
             {
@@ -340,15 +390,15 @@ public sealed class Lexer
     private Token ReadKeyword()
     {
         var accumulator = new StringBuilder();
-        while (_reader.CanRead)
+        while (Reader.CanRead)
         {
-            var current = _reader.PeekChar();
+            var current = Reader.PeekChar();
             if (!char.IsLetter(current))
             {
                 break;
             }
 
-            accumulator.Append(_reader.ReadChar());
+            accumulator.Append(Reader.ReadChar());
         }
 
         var keyword = accumulator.ToString();
