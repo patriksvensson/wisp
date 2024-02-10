@@ -9,7 +9,7 @@ public sealed class LexerTests
         var lexer = new Lexer("%Hello World".ToStream());
 
         // When
-        var result = lexer.Read(out var output);
+        var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
@@ -34,7 +34,7 @@ public sealed class LexerTests
         var lexer = new Lexer(input.ToStream());
 
         // When
-        var result = lexer.Read(out var output);
+        var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
@@ -54,7 +54,7 @@ public sealed class LexerTests
         var lexer = new Lexer(input.ToStream());
 
         // When
-        var result = lexer.Read(out var output);
+        var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
@@ -70,7 +70,7 @@ public sealed class LexerTests
         var lexer = new Lexer(input.ToStream());
 
         // When
-        var result = lexer.Read(out var output);
+        var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
@@ -84,7 +84,7 @@ public sealed class LexerTests
         var lexer = new Lexer("<</Foo 1 /Bar 2.1>>".ToStream());
 
         // When
-        var result = lexer.Read(out var output);
+        var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
@@ -98,7 +98,7 @@ public sealed class LexerTests
         var lexer = new Lexer(">>".ToStream());
 
         // When
-        var result = lexer.Read(out var output);
+        var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
@@ -112,7 +112,7 @@ public sealed class LexerTests
         var lexer = new Lexer("[".ToStream());
 
         // When
-        var result = lexer.Read(out var output);
+        var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
@@ -126,7 +126,7 @@ public sealed class LexerTests
         var lexer = new Lexer("]".ToStream());
 
         // When
-        var result = lexer.Read(out var output);
+        var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
@@ -143,7 +143,7 @@ public sealed class LexerTests
         var lexer = new Lexer(input.ToStream());
 
         // When
-        var result = lexer.Read(out var output);
+        var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
@@ -162,7 +162,7 @@ public sealed class LexerTests
         var lexer = new Lexer(input.ToStream());
 
         // When
-        var result = lexer.Read(out var output);
+        var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
@@ -178,7 +178,7 @@ public sealed class LexerTests
         var lexer = new Lexer(input.ToStream());
 
         // When
-        var result = lexer.Read(out var output);
+        var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();
@@ -202,7 +202,7 @@ public sealed class LexerTests
         var lexer = new Lexer(input.ToStream());
 
         // When
-        var result = lexer.Read(out var output);
+        var result = lexer.TryRead(out var output);
 
         // Then
         result.ShouldBeTrue();

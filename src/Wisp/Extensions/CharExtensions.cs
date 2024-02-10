@@ -1,6 +1,4 @@
-using System.Globalization;
-
-namespace Wisp.Extensions;
+namespace Wisp;
 
 public static class CharExtensions
 {
@@ -20,6 +18,12 @@ public static class CharExtensions
         }
     }
 
+    public static bool IsPdfName(this char character)
+    {
+        // Between 0x21 ('!') and 0x7E ('~')?
+        return character >= 0x21 && character <= 0x7E;
+    }
+
     public static bool IsPdfLineBreak(this char character)
     {
         switch (character)
@@ -30,5 +34,11 @@ public static class CharExtensions
             default:
                 return false;
         }
+    }
+
+    public static bool IsPdfSolidus(this char character)
+    {
+        // Solidus is the '/' character.
+        return character == 0x2F;
     }
 }
