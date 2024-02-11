@@ -21,7 +21,7 @@
     <Authors>Patrik Svensson, Phil Scott, Nils Andresen</Authors>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/spectreconsole/spectre.console</RepositoryUrl>
-    <PackageIcon>small-logo.png</PackageIcon>
+    <PackageIcon>wisp.png</PackageIcon>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/spectreconsole/spectre.console</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
