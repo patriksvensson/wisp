@@ -37,6 +37,63 @@ public sealed class PdfTrailerReaderTests
     }
 
     [Fact]
+    public void Should_Read_XRef_Table_With_Prev()
+    {
+        // Given
+        var reader = new BufferReader(
+            """
+            xref
+            0 2
+            0000000000 65535 f
+            0000000017 00000 n
+            trailer
+            <<
+            /Root 1 0 R
+            /Size 2
+            >>
+            startxref
+            0
+            %%EOF
+            xref
+            10 2
+            0000000000 65535 f
+            0000000017 00000 n
+            trailer
+            <<
+            /Root 1 0 R
+            /Size 2
+            /Prev 0
+            >>
+            startxref
+            99
+            %%EOF
+            xref
+            22 3
+            0000000000 65535 f
+            0000000054 00002 n
+            0000000098 00000 n
+            trailer
+            <<
+            /Root 1 0 R
+            /Size 3
+            /Prev 99
+            >>
+            startxref
+            208
+            %%EOF
+            """.ToStream());
+
+        // When
+        var (table, _) = PdfTrailerReader.ReadTrailer(reader);
+
+        // Then
+        table.ShouldNotBeNull();
+        table.GetReference(new PdfObjectId(23, 2))
+            .ShouldBeOfType<PdfIndirectXRef>()
+            .Position.ShouldBe(54);
+    }
+
+    [Fact]
     public void Should_Read_XRef_Table_With_Subsections()
     {
         // Given
