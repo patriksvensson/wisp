@@ -28,4 +28,9 @@
     <ProjectReference Include="..\Wisp\Wisp.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Data\simple.pdf" />
+    <EmbeddedResource Include="Data\simple.pdf" />
+  </ItemGroup>
+
 </Project>
