@@ -7,6 +7,7 @@ public sealed class BufferReader : IBufferReader
 
     public bool CanRead => _position < _buffer.Length;
     public int Position => _position;
+    public int Length => _buffer.Length;
 
     public BufferReader(Stream stream)
     {

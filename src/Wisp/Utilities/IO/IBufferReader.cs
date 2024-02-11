@@ -4,6 +4,7 @@ public interface IBufferReader
 {
     bool CanRead { get; }
     int Position { get; }
+    int Length { get; }
 
     int Seek(long offset, SeekOrigin origin);
 

@@ -30,10 +30,12 @@ public sealed class PdfName : PdfObject, IEqualityComparer<PdfName>
         public static PdfName Root { get; } = new("Root");
         public static PdfName Size { get; } = new("Size");
         public static PdfName Info { get; } = new("Info");
+        public static PdfName Id { get; } = new("ID");
         public static PdfName Type { get; } = new("Type");
         public static PdfName Pages { get; } = new("Pages");
         public static PdfName Length { get; } = new("Length");
         public static PdfName Prev { get; } = new("Prev");
+        public static PdfName Encrypt { get; } = new("Encrypt");
         public static PdfName XRefStm { get; } = new("XRefStm");
         public static PdfName Kids { get; } = new("Kids");
         public static PdfName Contents { get; } = new("Contents");

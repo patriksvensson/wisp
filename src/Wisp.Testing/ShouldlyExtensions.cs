@@ -61,4 +61,18 @@ public static class ShouldlyExtensions
         obj.Value.ShouldBe(value);
         return obj;
     }
+
+    public static PdfObjectId ShouldHaveNumber(this PdfObjectId obj, int value)
+    {
+        obj.ShouldNotBeNull();
+        obj.Number.ShouldBe(value);
+        return obj;
+    }
+
+    public static PdfObjectId ShouldHaveGeneration(this PdfObjectId obj, int value)
+    {
+        obj.ShouldNotBeNull();
+        obj.Generation.ShouldBe(value);
+        return obj;
+    }
 }

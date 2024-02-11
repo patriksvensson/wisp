@@ -10,11 +10,10 @@ public sealed class PdfHeaderReaderTests
         var reader = new BufferReader(input.ToStream());
 
         // When
-        var result = PdfHeaderReader.TryReadVersion(reader, out var version);
+        var result = PdfHeaderReader.ReadHeader(reader);
 
         // Then
-        result.ShouldBeTrue();
-        version.ShouldBe(PdfVersion.Pdf1_6);
+        result.Version.ShouldBe(PdfVersion.Pdf1_6);
     }
 
     [Fact]
@@ -25,11 +24,11 @@ public sealed class PdfHeaderReaderTests
         var reader = new BufferReader(input.ToStream());
 
         // When
-        var result = PdfHeaderReader.TryReadVersion(reader, out var version);
+        var result = Record.Exception(() => PdfHeaderReader.ReadHeader(reader));
 
         // Then
-        result.ShouldBeFalse();
-        version.ShouldBeNull();
+        result.ShouldBeOfType<InvalidOperationException>()
+            .Message.ShouldBe("PDF file is missing header");
     }
 
     [Fact]
@@ -40,10 +39,10 @@ public sealed class PdfHeaderReaderTests
         var reader = new BufferReader(input.ToStream());
 
         // When
-        var result = PdfHeaderReader.TryReadVersion(reader, out var version);
+        var result = Record.Exception(() => PdfHeaderReader.ReadHeader(reader));
 
         // Then
-        result.ShouldBeFalse();
-        version.ShouldBeNull();
+        result.ShouldBeOfType<NotSupportedException>()
+            .Message.ShouldBe("PDF version 1.8 is not supported");
     }
 }

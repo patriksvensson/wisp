@@ -2,9 +2,7 @@ namespace Wisp;
 
 public sealed class PdfHeaderReader
 {
-    public static bool TryReadVersion(
-        IBufferReader reader,
-        [NotNullWhen(true)] out PdfVersion? version)
+    public static PdfHeader ReadHeader(IBufferReader reader)
     {
         var previousPosition = reader.Position;
 
@@ -17,12 +15,11 @@ public sealed class PdfHeaderReader
             var index = text.IndexOf("%PDF-", StringComparison.Ordinal);
             if (index == -1)
             {
-                version = null;
-                return false;
+                throw new InvalidOperationException("PDF file is missing header");
             }
 
             var versionNumber = text.Substring(index + 5, 3);
-            version = versionNumber switch
+            return new PdfHeader(versionNumber switch
             {
                 "1.0" => PdfVersion.Pdf1_0,
                 "1.1" => PdfVersion.Pdf1_1,
@@ -32,10 +29,8 @@ public sealed class PdfHeaderReader
                 "1.5" => PdfVersion.Pdf1_5,
                 "1.6" => PdfVersion.Pdf1_6,
                 "1.7" => PdfVersion.Pdf1_7,
-                _ => null,
-            };
-
-            return version != null;
+                _ => throw new NotSupportedException($"PDF version {versionNumber} is not supported"),
+            });
         }
         finally
         {
