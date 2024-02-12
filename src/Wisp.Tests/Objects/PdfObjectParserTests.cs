@@ -12,7 +12,7 @@ public sealed class PdfObjectParserTests
         var parser = new PdfObjectParser(lexer);
 
         // When
-        var result = parser.ReadObject();
+        var result = parser.ParseObject();
 
         // Then
         result.ShouldBeOfType<PdfBoolean>()
@@ -30,7 +30,7 @@ public sealed class PdfObjectParserTests
         var parser = new PdfObjectParser(lexer);
 
         // When
-        var result = parser.ReadObject();
+        var result = parser.ParseObject();
 
         // Then
         result.ShouldBeOfType<PdfInteger>()
@@ -50,7 +50,7 @@ public sealed class PdfObjectParserTests
         var parser = new PdfObjectParser(lexer);
 
         // When
-        var result = parser.ReadObject();
+        var result = parser.ParseObject();
 
         // Then
         result.ShouldBeOfType<PdfReal>()
@@ -65,7 +65,7 @@ public sealed class PdfObjectParserTests
         var parser = new PdfObjectParser(lexer);
 
         // When
-        var result = parser.ReadObject();
+        var result = parser.ParseObject();
 
         // Then
         result.ShouldBeOfType<PdfNull>();
@@ -85,7 +85,7 @@ public sealed class PdfObjectParserTests
         var parser = new PdfObjectParser(lexer);
 
         // When
-        var result = parser.ReadObject();
+        var result = parser.ParseObject();
 
         // Then
         result.ShouldBeOfType<PdfString>()
@@ -103,7 +103,7 @@ public sealed class PdfObjectParserTests
         var parser = new PdfObjectParser(lexer);
 
         // When
-        var result = parser.ReadObject();
+        var result = parser.ParseObject();
 
         // Then
         result.ShouldBeOfType<PdfString>()
@@ -130,7 +130,7 @@ public sealed class PdfObjectParserTests
         var parser = new PdfObjectParser(lexer);
 
         // When
-        var result = parser.ReadObject();
+        var result = parser.ParseObject();
 
         // Then
         result.ShouldBeOfType<PdfName>()
@@ -146,7 +146,7 @@ public sealed class PdfObjectParserTests
         var parser = new PdfObjectParser(lexer);
 
         // When
-        var result = parser.ReadObject();
+        var result = parser.ParseObject();
 
         // Then
         result.ShouldBeOfType<PdfDictionary>().And(dictionary =>
@@ -170,7 +170,7 @@ public sealed class PdfObjectParserTests
         var parser = new PdfObjectParser(lexer);
 
         // When
-        var result = parser.ReadObject();
+        var result = parser.ParseObject();
 
         // Then
         result.ShouldBeOfType<PdfArray>().And(obj =>
@@ -192,7 +192,7 @@ public sealed class PdfObjectParserTests
         var parser = new PdfObjectParser(lexer);
 
         // When
-        var result = parser.ReadObject();
+        var result = parser.ParseObject();
 
         // Then
         result.ShouldBeOfType<PdfStream>().And(stream =>
@@ -211,7 +211,7 @@ public sealed class PdfObjectParserTests
         var parser = new PdfObjectParser(lexer);
 
         // When
-        var result = parser.ReadObject();
+        var result = parser.ParseObject();
 
         // Then
         result.ShouldBeOfType<PdfObjectId>().And(reference =>
@@ -230,7 +230,7 @@ public sealed class PdfObjectParserTests
         var parser = new PdfObjectParser(lexer);
 
         // When
-        var result = parser.ReadObject();
+        var result = parser.ParseObject();
 
         // Then
         result.ShouldBeOfType<PdfObjectDefinition>().And(reference =>

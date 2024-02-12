@@ -10,4 +10,9 @@ public sealed class PdfObjectDefinition : PdfObject
         Id = id ?? throw new ArgumentNullException(nameof(id));
         Object = obj ?? throw new ArgumentNullException(nameof(obj));
     }
+
+    public override void Accept<TContext>(PdfObjectVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitObjectDefinition(this, context);
+    }
 }

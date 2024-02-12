@@ -91,6 +91,11 @@ public sealed class PdfDictionary : PdfObject, IEnumerable<KeyValuePair<PdfName,
         return GetEnumerator();
     }
 
+    public override void Accept<TContext>(PdfObjectVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitDictionary(this, context);
+    }
+
     public override string ToString()
     {
         return $"[Dictionary] Count = {_dictionary.Count}";

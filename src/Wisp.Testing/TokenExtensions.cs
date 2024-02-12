@@ -4,7 +4,7 @@ using Shouldly;
 
 namespace Wisp.Testing;
 
-public static class TokenExtensions
+internal static class TokenExtensions
 {
     public static void ShouldBeComment(this PdfObjectToken? token)
     {

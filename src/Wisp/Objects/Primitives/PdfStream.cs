@@ -30,6 +30,11 @@ public sealed class PdfStream : PdfObject
         _metadata[PdfName.Known.Length] = new PdfInteger(data?.Length ?? 0);
     }
 
+    public override void Accept<TContext>(PdfObjectVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitStream(this, context);
+    }
+
     public override string ToString()
     {
         return $"[Stream] Length = {Length}";

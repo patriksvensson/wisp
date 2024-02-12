@@ -1,6 +1,6 @@
 namespace Wisp;
 
-public enum PdfObjectTokenKind
+internal enum PdfObjectTokenKind
 {
     Unknown = 0,
     Comment,
@@ -23,5 +23,6 @@ public enum PdfObjectTokenKind
     Reference,
     StartXRef,
     XRef,
-    Keyword,
+    XRefFree,
+    XRefIndirect,
 }

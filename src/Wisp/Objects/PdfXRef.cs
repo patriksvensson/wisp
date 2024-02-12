@@ -40,3 +40,24 @@ public sealed class PdfIndirectXRef : PdfXRef
         return $"[XRef] {Id.Number}:{Id.Generation} Position = {Position}";
     }
 }
+
+[DebuggerDisplay("{ToString(),nq}")]
+public sealed class PdfStreamXRef : PdfXRef
+{
+    public PdfObjectId StreamId { get; }
+    public int Index { get; }
+
+    public PdfStreamXRef(PdfObjectId id, PdfObjectId streamId, int index)
+        : base(id)
+    {
+        StreamId = streamId ?? throw new ArgumentNullException(nameof(streamId));
+        Index = index;
+    }
+
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        var streamId = $"{StreamId.Number}:{StreamId.Generation}";
+        return $"[XRef] {Id.Number}:{Id.Generation} Stream = {streamId}, Index = {Index}";
+    }
+}

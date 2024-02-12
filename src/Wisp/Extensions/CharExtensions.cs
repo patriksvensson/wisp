@@ -1,6 +1,6 @@
 namespace Wisp;
 
-public static class CharExtensions
+internal static class CharExtensions
 {
     public static bool IsPdfWhitespace(this char character)
     {

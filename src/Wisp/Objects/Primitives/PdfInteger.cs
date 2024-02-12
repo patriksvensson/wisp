@@ -10,6 +10,11 @@ public sealed class PdfInteger : PdfObject
         Value = value;
     }
 
+    public override void Accept<TContext>(PdfObjectVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitInteger(this, context);
+    }
+
     public override string ToString()
     {
         return $"[Integer] {Value}";

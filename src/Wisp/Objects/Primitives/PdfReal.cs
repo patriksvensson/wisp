@@ -10,6 +10,11 @@ public sealed class PdfReal : PdfObject
         Value = value;
     }
 
+    public override void Accept<TContext>(PdfObjectVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitReal(this, context);
+    }
+
     public override string ToString()
     {
         return $"[Real] {Value}";

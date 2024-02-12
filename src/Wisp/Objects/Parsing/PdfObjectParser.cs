@@ -1,13 +1,16 @@
 namespace Wisp;
 
-public sealed class PdfObjectParser
+internal sealed class PdfObjectParser
 {
     public PdfObjectLexer Lexer { get; }
-    public IBufferReader Reader => Lexer.Reader;
+    public bool IsStreamObject { get; }
 
-    public PdfObjectParser(IBufferReader reader)
+    public IByteReader Reader => Lexer.Reader;
+
+    public PdfObjectParser(IByteReader reader, bool isStreamObject = false)
     {
         Lexer = new PdfObjectLexer(reader);
+        IsStreamObject = isStreamObject;
     }
 
     public PdfObjectParser(PdfObjectLexer lexer)
@@ -15,7 +18,7 @@ public sealed class PdfObjectParser
         Lexer = lexer ?? throw new ArgumentNullException(nameof(lexer));
     }
 
-    public PdfObject ReadObject()
+    public PdfObject ParseObject()
     {
         while (Lexer.Check(PdfObjectTokenKind.Comment))
         {
@@ -29,21 +32,21 @@ public sealed class PdfObjectParser
 
         return token.Kind switch
         {
-            PdfObjectTokenKind.Null => ReadNull(),
-            PdfObjectTokenKind.Boolean => ReadBoolean(),
-            PdfObjectTokenKind.Integer => ReadInteger(),
-            PdfObjectTokenKind.Real => ReadReal(),
-            PdfObjectTokenKind.StringLiteral => ReadStringLiteral(),
-            PdfObjectTokenKind.HexStringLiteral => ReadHexStringLiteral(),
-            PdfObjectTokenKind.Name => ReadName(),
-            PdfObjectTokenKind.BeginDictionary => ReadDictionary(),
-            PdfObjectTokenKind.BeginArray => ReadArray(),
-            PdfObjectTokenKind.XRef => ReadXRefTable(),
+            PdfObjectTokenKind.Null => ParseNull(),
+            PdfObjectTokenKind.Boolean => ParseBoolean(),
+            PdfObjectTokenKind.Integer => ParseInteger(),
+            PdfObjectTokenKind.Real => ParseReal(),
+            PdfObjectTokenKind.StringLiteral => ParseStringLiteral(),
+            PdfObjectTokenKind.HexStringLiteral => ParseHexStringLiteral(),
+            PdfObjectTokenKind.Name => ParseName(),
+            PdfObjectTokenKind.BeginDictionary => ParseDictionary(),
+            PdfObjectTokenKind.BeginArray => ParseArray(),
+            PdfObjectTokenKind.XRef => ParseXRefTable(),
             _ => throw new InvalidOperationException($"Unknown token {token.Kind} encountered in stream"),
         };
     }
 
-    private PdfObject ReadBoolean()
+    private PdfObject ParseBoolean()
     {
         var token = Lexer.Expect(PdfObjectTokenKind.Boolean);
         return (token.Text == "true")
@@ -51,7 +54,7 @@ public sealed class PdfObjectParser
             : new PdfBoolean(false);
     }
 
-    private PdfObject ReadInteger()
+    private PdfObject ParseInteger()
     {
         var value = Lexer.Expect(PdfObjectTokenKind.Integer).ParseInteger();
         var position = Lexer.Reader.Position;
@@ -75,7 +78,7 @@ public sealed class PdfObjectParser
                     Lexer.Expect(PdfObjectTokenKind.BeginObject);
                     return new PdfObjectDefinition(
                         new PdfObjectId(value, generation),
-                        ReadObject());
+                        ParseObject());
                 }
             }
 
@@ -86,19 +89,19 @@ public sealed class PdfObjectParser
         return new PdfInteger(value);
     }
 
-    private PdfObject ReadReal()
+    private PdfObject ParseReal()
     {
         var value = Lexer.Expect(PdfObjectTokenKind.Real).ParseReal();
         return new PdfReal(value);
     }
 
-    private PdfObject ReadNull()
+    private PdfObject ParseNull()
     {
         Lexer.Expect(PdfObjectTokenKind.Null);
         return new PdfNull();
     }
 
-    private PdfObject ReadStringLiteral()
+    private PdfObject ParseStringLiteral()
     {
         static bool DecodeString(
             byte[] bytes,
@@ -141,19 +144,19 @@ public sealed class PdfObjectParser
         return new PdfString(decoded, encoding.Value);
     }
 
-    private PdfObject ReadHexStringLiteral()
+    private PdfObject ParseHexStringLiteral()
     {
         var token = Lexer.Expect(PdfObjectTokenKind.HexStringLiteral);
         return new PdfString(token.Text!, PdfStringEncoding.HexLiteral);
     }
 
-    private PdfObject ReadName()
+    private PdfObject ParseName()
     {
         var token = Lexer.Expect(PdfObjectTokenKind.Name);
         return new PdfName(token.Text!);
     }
 
-    private PdfObject ReadDictionary()
+    private PdfObject ParseDictionary()
     {
         Lexer.Expect(PdfObjectTokenKind.BeginDictionary);
 
@@ -165,17 +168,27 @@ public sealed class PdfObjectParser
                 break;
             }
 
-            var temp = ReadObject();
+            var temp = ParseObject();
             if (temp is not PdfName key)
             {
                 throw new InvalidOperationException("Encountered dictionary key that was not a PDF name");
             }
 
-            var value = ReadObject();
+            var value = ParseObject();
             result.Set(key, value);
         }
 
-        Lexer.Expect(PdfObjectTokenKind.EndDictionary);
+        if (IsStreamObject)
+        {
+            if (Lexer.Reader.CanRead)
+            {
+                Lexer.Expect(PdfObjectTokenKind.EndDictionary);
+            }
+        }
+        else
+        {
+            Lexer.Expect(PdfObjectTokenKind.EndDictionary);
+        }
 
         // Is there a stream as well?
         var stream = ParseStream(result);
@@ -187,7 +200,7 @@ public sealed class PdfObjectParser
         return result;
     }
 
-    private PdfArray ReadArray()
+    private PdfArray ParseArray()
     {
         Lexer.Expect(PdfObjectTokenKind.BeginArray);
 
@@ -199,7 +212,7 @@ public sealed class PdfObjectParser
                 break;
             }
 
-            result.Add(ReadObject());
+            result.Add(ParseObject());
         }
 
         Lexer.Expect(PdfObjectTokenKind.EndArray);
@@ -232,7 +245,7 @@ public sealed class PdfObjectParser
         return stream;
     }
 
-    private PdfObject ReadXRefTable()
+    private PdfObject ParseXRefTable()
     {
         Lexer.Expect(PdfObjectTokenKind.XRef);
 
@@ -253,16 +266,18 @@ public sealed class PdfObjectParser
                 var position = Lexer.Expect(PdfObjectTokenKind.Integer).ParseInteger();
                 var generation = Lexer.Expect(PdfObjectTokenKind.Integer).ParseInteger();
 
-                var free = Lexer.Expect(PdfObjectTokenKind.Keyword).Text == "f";
-                if (free)
+                switch (Lexer.Read().Kind)
                 {
-                    table.Add(new PdfFreeXRef(new PdfObjectId(id, generation)));
-                }
-                else
-                {
-                    table.Add(new PdfIndirectXRef(
-                        new PdfObjectId(id, generation),
-                        position));
+                    case PdfObjectTokenKind.XRefFree:
+                        table.Add(new PdfFreeXRef(new PdfObjectId(id, generation)));
+                        break;
+                    case PdfObjectTokenKind.XRefIndirect:
+                        table.Add(new PdfIndirectXRef(
+                            new PdfObjectId(id, generation),
+                            position));
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unknown xref kind encountered");
                 }
             }
         }

@@ -40,6 +40,11 @@ public sealed class PdfObjectId : PdfObject, IEquatable<PdfObjectId>
         return PdfObjectIdComparer.Shared.Equals(this, other);
     }
 
+    public override void Accept<TContext>(PdfObjectVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitObjectId(this, context);
+    }
+
     public override int GetHashCode()
     {
         return PdfObjectIdComparer.Shared.GetHashCode(this);

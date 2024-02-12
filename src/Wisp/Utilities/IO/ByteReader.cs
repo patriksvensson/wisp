@@ -1,6 +1,6 @@
 namespace Wisp;
 
-public sealed class BufferReader : IBufferReader
+internal sealed class ByteReader : IByteReader
 {
     private readonly ReadOnlyMemory<byte> _buffer;
     private int _position;
@@ -9,12 +9,16 @@ public sealed class BufferReader : IBufferReader
     public int Position => _position;
     public int Length => _buffer.Length;
 
-    public BufferReader(Stream stream)
+    public ByteReader(Stream stream)
     {
         ArgumentNullException.ThrowIfNull(stream);
 
         _buffer = new ReadOnlyMemory<byte>(ReadAllBytes(stream));
         _position = 0;
+    }
+
+    public void Dispose()
+    {
     }
 
     public int PeekByte()

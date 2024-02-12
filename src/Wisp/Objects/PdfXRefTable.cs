@@ -21,6 +21,23 @@ public sealed class PdfXRefTable : PdfObject, IEnumerable<PdfXRef>
         return null;
     }
 
+    public PdfXRef GetRequiredXRef(PdfObjectId id)
+    {
+        if (id is null)
+        {
+            throw new ArgumentNullException(nameof(id));
+        }
+
+        var xref = GetReference(id);
+        if (xref == null)
+        {
+            throw new InvalidOperationException(
+                $"Could not find xref {id.Number}:{id.Generation} in xref table.");
+        }
+
+        return xref;
+    }
+
     public bool Contains(PdfObjectId id)
     {
         if (id is null)
@@ -68,5 +85,10 @@ public sealed class PdfXRefTable : PdfObject, IEnumerable<PdfXRef>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    public override void Accept<TContext>(PdfObjectVisitor<TContext> visitor, TContext context)
+    {
+        throw new NotSupportedException();
     }
 }
