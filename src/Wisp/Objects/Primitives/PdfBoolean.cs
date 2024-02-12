@@ -10,6 +10,11 @@ public sealed class PdfBoolean : PdfObject
         Value = value;
     }
 
+    public override void Accept<TContext>(PdfObjectVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitBoolean(this, context);
+    }
+
     public override string ToString()
     {
         return $"[Boolean] {Value}";

@@ -32,6 +32,11 @@ public sealed class PdfArray : PdfObject, IEnumerable<PdfObject>
         return GetEnumerator();
     }
 
+    public override void Accept<TContext>(PdfObjectVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitArray(this, context);
+    }
+
     public override string ToString()
     {
         return $"[Array] Count = {_items.Count}";

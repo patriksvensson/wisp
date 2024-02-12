@@ -1,8 +1,8 @@
 namespace Wisp;
 
-internal static class BufferReaderExtensions
+internal static class ByteReaderExtensions
 {
-    public static char PeekChar(this IBufferReader reader)
+    public static char PeekChar(this IByteReader reader)
     {
         if (reader is null)
         {
@@ -12,7 +12,7 @@ internal static class BufferReaderExtensions
         return (char)reader.PeekByte();
     }
 
-    public static char ReadChar(this IBufferReader reader)
+    public static char ReadChar(this IByteReader reader)
     {
         if (reader is null)
         {
@@ -22,12 +22,12 @@ internal static class BufferReaderExtensions
         return (char)reader.ReadByte();
     }
 
-    public static void Discard(this IBufferReader reader)
+    public static void Discard(this IByteReader reader)
     {
         reader.ReadByte();
     }
 
-    public static void Discard(this IBufferReader reader, char expected)
+    public static void Discard(this IByteReader reader, char expected)
     {
         var read = ReadChar(reader);
         if (read != expected)

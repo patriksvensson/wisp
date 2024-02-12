@@ -33,4 +33,13 @@
     <EmbeddedResource Include="Data\simple.pdf" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="PdfDocumentTests.Header.cs">
+      <DependentUpon>PdfDocumentTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="PdfDocumentTests.Trailer.cs">
+      <DependentUpon>PdfDocumentTests.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>

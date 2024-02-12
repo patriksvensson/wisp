@@ -1,6 +1,6 @@
 namespace Wisp;
 
-public interface IBufferReader
+public interface IByteReader : IDisposable
 {
     bool CanRead { get; }
     int Position { get; }

@@ -1,10 +1,10 @@
 namespace Wisp;
 
-public static class PdfTrailerReader
+internal static class PdfTrailerReader
 {
     private static readonly byte[] _marker = new byte[] { 0x73, 0x74, 0x61, 0x72, 0x74, 0x78, 0x72, 0x65, 0x66, };
 
-    public static (PdfXRefTable? Table, PdfTrailer? Trailer) ReadTrailer(IBufferReader reader)
+    public static (PdfXRefTable? Table, PdfTrailer? Trailer) ReadTrailer(IByteReader reader)
     {
         var parser = new PdfObjectParser(reader);
         var previousPosition = reader.Position;
@@ -59,7 +59,7 @@ public static class PdfTrailerReader
     {
         // Read the xref table
         parser.Reader.Seek(xrefStart.Value, SeekOrigin.Begin);
-        var table = parser.ReadObject() as PdfXRefTable;
+        var table = parser.ParseObject() as PdfXRefTable;
 
         // Now find the trailer
         var trailer = default(PdfTrailer);
@@ -68,7 +68,7 @@ public static class PdfTrailerReader
             var current = parser.Lexer.Read();
             if (current.Kind == PdfObjectTokenKind.Trailer)
             {
-                var trailerDictionary = parser.ReadObject() as PdfDictionary;
+                var trailerDictionary = parser.ParseObject() as PdfDictionary;
                 if (trailerDictionary != null)
                 {
                     trailer = new PdfTrailer(trailerDictionary);
@@ -86,7 +86,7 @@ public static class PdfTrailerReader
         parser.Reader.Seek(-Math.Min(1024, parser.Reader.Length), SeekOrigin.End);
 
         var index = 0;
-        var found = new List<int>();
+        var found = new List<int?>();
         while (parser.Reader.CanRead)
         {
             var current = parser.Reader.ReadByte();
@@ -101,7 +101,7 @@ public static class PdfTrailerReader
 
             if (index == _marker.Length)
             {
-                var obj = parser.ReadObject();
+                var obj = parser.ParseObject();
                 if (obj is not PdfInteger integer)
                 {
                     throw new InvalidOperationException("Expected startxref to be an integer");

@@ -20,6 +20,11 @@ public sealed class PdfName : PdfObject, IEqualityComparer<PdfName>
         return PdfNameComparer.Shared.GetHashCode(obj);
     }
 
+    public override void Accept<TContext>(PdfObjectVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitName(this, context);
+    }
+
     public override string ToString()
     {
         return $"[Name] {Value}";

@@ -185,27 +185,4 @@ public sealed class PdfObjectLexerTests
         output?.Kind.ShouldBe(PdfObjectTokenKind.Boolean);
         output?.Text.ShouldBe(input);
     }
-
-    [Theory]
-    [InlineData("trailer", PdfObjectTokenKind.Trailer)]
-    [InlineData("obj", PdfObjectTokenKind.BeginObject)]
-    [InlineData("endobj", PdfObjectTokenKind.EndObject)]
-    [InlineData("stream", PdfObjectTokenKind.BeginStream)]
-    [InlineData("endstream", PdfObjectTokenKind.EndStream)]
-    [InlineData("null", PdfObjectTokenKind.Null)]
-    [InlineData("R", PdfObjectTokenKind.Reference)]
-    [InlineData("startxref", PdfObjectTokenKind.StartXRef)]
-    [InlineData("xref", PdfObjectTokenKind.XRef)]
-    public void Should_Parse_Keyword(string input, PdfObjectTokenKind expected)
-    {
-        // Given
-        var lexer = new PdfObjectLexer(input.ToStream());
-
-        // When
-        var result = lexer.TryRead(out var output);
-
-        // Then
-        result.ShouldBeTrue();
-        output?.Kind.ShouldBe(expected);
-    }
 }

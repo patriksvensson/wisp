@@ -12,6 +12,11 @@ public sealed class PdfString : PdfObject
         Encoding = encoding;
     }
 
+    public override void Accept<TContext>(PdfObjectVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitString(this, context);
+    }
+
     public override string ToString()
     {
         return $"[String] {Value} ({Encoding})";

@@ -1,6 +1,6 @@
 namespace Wisp;
 
-public sealed class PdfObjectToken
+internal sealed class PdfObjectToken
 {
     public PdfObjectTokenKind Kind { get; }
     public string? Text { get; }

@@ -1,15 +1,15 @@
 namespace Wisp;
 
-public sealed class PdfObjectLexer
+internal sealed class PdfObjectLexer
 {
-    public IBufferReader Reader { get; }
+    public IByteReader Reader { get; }
 
     public PdfObjectLexer(Stream stream)
     {
-        Reader = new BufferReader(stream);
+        Reader = new ByteReader(stream);
     }
 
-    public PdfObjectLexer(IBufferReader reader)
+    public PdfObjectLexer(IByteReader reader)
     {
         Reader = reader ?? throw new ArgumentNullException(nameof(reader));
     }
@@ -422,8 +422,12 @@ public sealed class PdfObjectLexer
                 return new PdfObjectToken(PdfObjectTokenKind.StartXRef);
             case "xref":
                 return new PdfObjectToken(PdfObjectTokenKind.XRef);
+            case "f":
+                return new PdfObjectToken(PdfObjectTokenKind.XRefFree);
+            case "n":
+                return new PdfObjectToken(PdfObjectTokenKind.XRefIndirect);
             default:
-                return new PdfObjectToken(PdfObjectTokenKind.Keyword, keyword);
+                throw new InvalidOperationException($"Unknown token '{keyword}'");
         }
     }
 }
