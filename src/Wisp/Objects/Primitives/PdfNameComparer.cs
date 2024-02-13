@@ -1,4 +1,4 @@
-namespace Wisp;
+namespace Wisp.Objects;
 
 public sealed class PdfNameComparer : IEqualityComparer<PdfName>
 {

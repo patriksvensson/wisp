@@ -1,4 +1,4 @@
-namespace Wisp;
+namespace Wisp.Internal;
 
 internal sealed class PdfObjectLexer : IDisposable
 {

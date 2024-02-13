@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Wisp.Testing;
 
 public static class EmbeddedResourceReader

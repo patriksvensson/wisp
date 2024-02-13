@@ -1,4 +1,4 @@
-namespace Wisp;
+namespace Wisp.Internal;
 
 internal static class PdfDocumentReader
 {

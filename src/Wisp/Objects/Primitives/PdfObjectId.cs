@@ -1,4 +1,4 @@
-namespace Wisp;
+namespace Wisp.Objects;
 
 [DebuggerDisplay("{ToString(),nq}")]
 public sealed class PdfObjectId : PdfObject, IEquatable<PdfObjectId>

@@ -1,4 +1,4 @@
-namespace Wisp;
+namespace Wisp.Objects;
 
 [DebuggerDisplay("{ToString(),nq}")]
 public sealed class PdfDictionary : PdfObject, IEnumerable<KeyValuePair<PdfName, PdfObject>>

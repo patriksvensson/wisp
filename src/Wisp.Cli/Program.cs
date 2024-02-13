@@ -1,7 +1,4 @@
-﻿using Spectre.Console;
-using Spectre.Console.Cli;
-
-namespace Wisp.Cli;
+﻿namespace Wisp.Cli;
 
 public static class Program
 {

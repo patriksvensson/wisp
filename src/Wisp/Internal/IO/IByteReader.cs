@@ -1,6 +1,6 @@
-namespace Wisp;
+namespace Wisp.Internal;
 
-public interface IByteReader : IDisposable
+internal interface IByteReader : IDisposable
 {
     bool CanRead { get; }
     int Position { get; }

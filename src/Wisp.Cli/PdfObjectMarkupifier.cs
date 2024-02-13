@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace Wisp.Cli;
 
 public static class PdfObjectMarkupifier

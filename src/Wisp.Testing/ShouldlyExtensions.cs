@@ -1,5 +1,3 @@
-using Shouldly;
-
 namespace Wisp.Testing;
 
 public static class ShouldlyExtensions

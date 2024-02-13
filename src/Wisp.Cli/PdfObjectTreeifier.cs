@@ -1,5 +1,3 @@
-using Spectre.Console;
-
 namespace Wisp.Cli;
 
 public static class PdfObjectTreeifier
