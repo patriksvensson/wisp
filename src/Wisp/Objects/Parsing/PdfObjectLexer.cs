@@ -1,6 +1,6 @@
 namespace Wisp;
 
-internal sealed class PdfObjectLexer
+internal sealed class PdfObjectLexer : IDisposable
 {
     public IByteReader Reader { get; }
 
@@ -12,6 +12,11 @@ internal sealed class PdfObjectLexer
     public PdfObjectLexer(IByteReader reader)
     {
         Reader = reader ?? throw new ArgumentNullException(nameof(reader));
+    }
+
+    public void Dispose()
+    {
+        Reader.Dispose();
     }
 
     public void EatNewlines()

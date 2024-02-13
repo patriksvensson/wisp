@@ -7,10 +7,10 @@ internal static class PdfDocumentReader
         var reader = new PdfReader(stream);
 
         // Read the header
-        var header = PdfHeaderReader.ReadHeader(reader.Reader);
+        var header = PdfHeaderReader.ReadHeader(reader);
 
         // Read the trailer and xref table
-        var (table, trailer) = PdfTrailerReader.ReadTrailer(reader.Reader);
+        var (table, trailer) = PdfTrailerReader.ReadTrailer(reader);
 
         // Put together the PDF document
         return new PdfDocument(

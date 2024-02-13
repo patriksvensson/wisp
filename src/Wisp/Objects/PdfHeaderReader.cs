@@ -2,7 +2,7 @@ namespace Wisp;
 
 internal sealed class PdfHeaderReader
 {
-    public static PdfHeader ReadHeader(IByteReader reader)
+    public static PdfHeader ReadHeader(PdfReader reader)
     {
         var previousPosition = reader.Position;
 

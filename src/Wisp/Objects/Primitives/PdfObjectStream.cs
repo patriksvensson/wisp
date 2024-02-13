@@ -24,15 +24,16 @@ public sealed class PdfObjectStream : PdfObject
         }
 
         var stream = new MemoryStream(bytes);
-        var parser = new PdfObjectParser(new ByteReader(stream), true);
+        using (var parser = new PdfObjectParser(stream, true))
+        {
+            var offsets = GetOffsets(parser);
 
-        var offsets = GetOffsets(parser);
+            // Go to the object position.
+            var offset = offsets[index];
+            parser.Lexer.Reader.Seek(offset, SeekOrigin.Begin);
 
-        // Go to the object position.
-        var offset = offsets[index];
-        parser.Lexer.Reader.Seek(offset, SeekOrigin.Begin);
-
-        return parser.ParseObject();
+            return parser.ParseObject();
+        }
     }
 
     private List<int> GetOffsets(PdfObjectParser parser)

@@ -1,21 +1,24 @@
 namespace Wisp;
 
-internal sealed class PdfObjectParser
+internal sealed class PdfObjectParser : IDisposable
 {
     public PdfObjectLexer Lexer { get; }
     public bool IsStreamObject { get; }
 
-    public IByteReader Reader => Lexer.Reader;
-
-    public PdfObjectParser(IByteReader reader, bool isStreamObject = false)
+    public PdfObjectParser(Stream stream, bool isStreamObject = false)
     {
-        Lexer = new PdfObjectLexer(reader);
+        Lexer = new PdfObjectLexer(stream);
         IsStreamObject = isStreamObject;
     }
 
     public PdfObjectParser(PdfObjectLexer lexer)
     {
         Lexer = lexer ?? throw new ArgumentNullException(nameof(lexer));
+    }
+
+    public void Dispose()
+    {
+        Lexer.Dispose();
     }
 
     public PdfObject ParseObject()
@@ -251,7 +254,7 @@ internal sealed class PdfObjectParser
 
         var table = new PdfXRefTable();
 
-        while (Reader.CanRead)
+        while (Lexer.Reader.CanRead)
         {
             if (!Lexer.Check(PdfObjectTokenKind.Integer))
             {

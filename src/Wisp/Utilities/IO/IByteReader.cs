@@ -6,7 +6,7 @@ public interface IByteReader : IDisposable
     int Position { get; }
     int Length { get; }
 
-    int Seek(long offset, SeekOrigin origin);
+    int Seek(int offset, SeekOrigin origin);
 
     int PeekByte();
     int ReadByte();

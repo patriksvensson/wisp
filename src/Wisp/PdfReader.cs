@@ -4,17 +4,33 @@ internal sealed class PdfReader : IDisposable
 {
     private readonly PdfObjectParser _parser;
 
-    public IByteReader Reader { get; }
+    public int Position => _parser.Lexer.Reader.Position;
+    public int Length => _parser.Lexer.Reader.Length;
+    public bool CanRead => _parser.Lexer.Reader.CanRead;
 
     public PdfReader(Stream stream)
     {
-        Reader = new ByteReader(stream);
-        _parser = new PdfObjectParser(Reader);
+        _parser = new PdfObjectParser(stream);
     }
 
     public void Dispose()
     {
-        Reader.Dispose();
+        _parser.Dispose();
+    }
+
+    public int Seek(int offset, SeekOrigin origin)
+    {
+        return _parser.Lexer.Reader.Seek(offset, origin);
+    }
+
+    public int ReadByte()
+    {
+        return _parser.Lexer.Reader.ReadByte();
+    }
+
+    public ReadOnlySpan<byte> ReadBytes(int count)
+    {
+        return _parser.Lexer.Reader.ReadBytes(count);
     }
 
     public PdfObjectToken? PeekToken()
@@ -26,6 +42,11 @@ internal sealed class PdfReader : IDisposable
     public PdfObjectToken ReadToken()
     {
         return _parser.Lexer.Read();
+    }
+
+    public PdfObject ReadObject()
+    {
+        return _parser.ParseObject();
     }
 
     public bool TryReadObject(IPdfReaderContext context, PdfObjectId id, [NotNullWhen(true)] out PdfObject? result)
@@ -66,7 +87,7 @@ internal sealed class PdfReader : IDisposable
             throw new ArgumentNullException(nameof(xref));
         }
 
-        var position = Reader.Position;
+        var position = _parser.Lexer.Reader.Position;
 
         try
         {
@@ -75,7 +96,7 @@ internal sealed class PdfReader : IDisposable
         }
         catch
         {
-            Reader.Seek(position, SeekOrigin.Begin);
+            _parser.Lexer.Reader.Seek(position, SeekOrigin.Begin);
 
             obj = null;
             return false;
@@ -98,7 +119,7 @@ internal sealed class PdfReader : IDisposable
 
     private PdfObject ReadIndirectObject(IPdfReaderContext context, PdfIndirectXRef xref)
     {
-        Reader.Seek(xref.Position, SeekOrigin.Begin);
+        _parser.Lexer.Reader.Seek(xref.Position, SeekOrigin.Begin);
         var obj = _parser.ParseObject();
 
         if (obj is PdfObjectDefinition objDefinition)

@@ -67,7 +67,7 @@ internal sealed class ByteReader : IByteReader
         return result;
     }
 
-    public int Seek(long offset, SeekOrigin origin)
+    public int Seek(int offset, SeekOrigin origin)
     {
         switch (origin)
         {

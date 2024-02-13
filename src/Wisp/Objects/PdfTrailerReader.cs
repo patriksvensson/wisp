@@ -4,15 +4,14 @@ internal static class PdfTrailerReader
 {
     private static readonly byte[] _marker = new byte[] { 0x73, 0x74, 0x61, 0x72, 0x74, 0x78, 0x72, 0x65, 0x66, };
 
-    public static (PdfXRefTable? Table, PdfTrailer? Trailer) ReadTrailer(IByteReader reader)
+    public static (PdfXRefTable? Table, PdfTrailer? Trailer) ReadTrailer(PdfReader reader)
     {
-        var parser = new PdfObjectParser(reader);
         var previousPosition = reader.Position;
 
         try
         {
             // Find where the xref table start
-            var xrefStart = FindXrefStart(parser);
+            var xrefStart = FindXrefStart(reader);
             if (xrefStart == null)
             {
                 throw new InvalidOperationException("Could not find xref start");
@@ -22,7 +21,7 @@ internal static class PdfTrailerReader
             var trailer = default(PdfTrailer);
             while (true)
             {
-                var (readTable, readTrailer) = ReadXRefTableAndTrailer(parser, xrefStart);
+                var (readTable, readTrailer) = ReadXRefTableAndTrailer(reader, xrefStart);
 
                 if (readTable != null)
                 {
@@ -54,21 +53,21 @@ internal static class PdfTrailerReader
 
     private static (PdfXRefTable? Table, PdfTrailer? Trailer)
         ReadXRefTableAndTrailer(
-            PdfObjectParser parser,
+            PdfReader reader,
             [DisallowNull] int? xrefStart)
     {
         // Read the xref table
-        parser.Reader.Seek(xrefStart.Value, SeekOrigin.Begin);
-        var table = parser.ParseObject() as PdfXRefTable;
+        reader.Seek(xrefStart.Value, SeekOrigin.Begin);
+        var table = reader.ReadObject() as PdfXRefTable;
 
         // Now find the trailer
         var trailer = default(PdfTrailer);
-        while (parser.Reader.CanRead)
+        while (reader.CanRead)
         {
-            var current = parser.Lexer.Read();
+            var current = reader.ReadToken();
             if (current.Kind == PdfObjectTokenKind.Trailer)
             {
-                var trailerDictionary = parser.ParseObject() as PdfDictionary;
+                var trailerDictionary = reader.ReadObject() as PdfDictionary;
                 if (trailerDictionary != null)
                 {
                     trailer = new PdfTrailer(trailerDictionary);
@@ -80,16 +79,16 @@ internal static class PdfTrailerReader
         return (table, trailer);
     }
 
-    private static int? FindXrefStart(PdfObjectParser parser)
+    private static int? FindXrefStart(PdfReader reader)
     {
         // Back up 1024 bytes (or as much as the file allow)
-        parser.Reader.Seek(-Math.Min(1024, parser.Reader.Length), SeekOrigin.End);
+        reader.Seek(-Math.Min(1024, reader.Length), SeekOrigin.End);
 
         var index = 0;
         var found = new List<int?>();
-        while (parser.Reader.CanRead)
+        while (reader.CanRead)
         {
-            var current = parser.Reader.ReadByte();
+            var current = reader.ReadByte();
             if (current == _marker[index])
             {
                 index++;
@@ -101,7 +100,7 @@ internal static class PdfTrailerReader
 
             if (index == _marker.Length)
             {
-                var obj = parser.ParseObject();
+                var obj = reader.ReadObject();
                 if (obj is not PdfInteger integer)
                 {
                     throw new InvalidOperationException("Expected startxref to be an integer");
