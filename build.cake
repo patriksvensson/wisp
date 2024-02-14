@@ -19,20 +19,9 @@ Task("Build")
         Verbosity = DotNetVerbosity.Minimal,
         NoLogo = true,
         NoIncremental = context.HasArgument("rebuild"),
-        MSBuildSettings = new DotNetMSBuildSettings()
-            .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
-    });
-});
-
-Task("Build-Analyzer")
-    .IsDependentOn("Build")
-    .Does(context => 
-{
-    DotNetBuild("./src/Spectre.Console.Analyzer.sln", new DotNetBuildSettings {
-        Configuration = configuration,
-        Verbosity = DotNetVerbosity.Minimal,
-        NoLogo = true,
-        NoIncremental = context.HasArgument("rebuild"),
+        EnvironmentVariables = new Dictionary<string, string> {
+            { "MSBUILDTERMINALLOGGER", "true" }
+        },
         MSBuildSettings = new DotNetMSBuildSettings()
             .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
     });
@@ -48,6 +37,9 @@ Task("Test")
         NoLogo = true,
         NoRestore = true,
         NoBuild = true,
+        EnvironmentVariables = new Dictionary<string, string> {
+            { "MSBUILDTERMINALLOGGER", "true" }
+        },
     });
 });
 
@@ -62,6 +54,9 @@ Task("Package")
         NoRestore = true,
         NoBuild = true,
         OutputDirectory = "./.artifacts",
+        EnvironmentVariables = new Dictionary<string, string> {
+            { "MSBUILDTERMINALLOGGER", "true" }
+        },
         MSBuildSettings = new DotNetMSBuildSettings()
             .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
     });
