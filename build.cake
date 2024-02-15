@@ -20,7 +20,7 @@ Task("Build")
         NoLogo = true,
         NoIncremental = context.HasArgument("rebuild"),
         EnvironmentVariables = new Dictionary<string, string> {
-            { "MSBUILDTERMINALLOGGER", context.BuildSystem().IsRunningOnGitHubActions ? "false" : "true" }
+            { "MSBUILDTERMINALLOGGER", "auto" }
         },
         MSBuildSettings = new DotNetMSBuildSettings()
             .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
@@ -38,7 +38,7 @@ Task("Test")
         NoRestore = true,
         NoBuild = true,
         EnvironmentVariables = new Dictionary<string, string> {
-            { "MSBUILDTERMINALLOGGER", context.BuildSystem().IsRunningOnGitHubActions ? "false" : "true" }
+            { "MSBUILDTERMINALLOGGER", "auto" }
         },
     });
 });
@@ -55,7 +55,7 @@ Task("Package")
         NoBuild = true,
         OutputDirectory = "./.artifacts",
         EnvironmentVariables = new Dictionary<string, string> {
-            { "MSBUILDTERMINALLOGGER", context.BuildSystem().IsRunningOnGitHubActions ? "false" : "true" }
+            { "MSBUILDTERMINALLOGGER", "auto" }
         },
         MSBuildSettings = new DotNetMSBuildSettings()
             .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
