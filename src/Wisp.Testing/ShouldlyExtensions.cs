@@ -73,4 +73,35 @@ public static class ShouldlyExtensions
         obj.Generation.ShouldBe(value);
         return obj;
     }
+
+    public static PdfDictionary ShouldHaveKeyValue(this PdfDictionary obj, string key, int value)
+    {
+        var pdfKey = new PdfName(key);
+        obj.ContainsKey(pdfKey).ShouldBeTrue();
+        obj[pdfKey].ShouldBeOfType<PdfInteger>().ShouldHaveValue(value);
+        return obj;
+    }
+
+    public static PdfDictionary ShouldHaveKeyValue(this PdfDictionary obj, string key, double value)
+    {
+        var pdfKey = new PdfName(key);
+        obj.ContainsKey(pdfKey).ShouldBeTrue();
+        obj[pdfKey].ShouldBeOfType<PdfReal>().ShouldHaveValue(value);
+        return obj;
+    }
+
+    public static PdfDictionary ShouldHaveArrayItem(this PdfDictionary obj, string key, double value)
+    {
+        var pdfKey = new PdfName(key);
+        obj.ContainsKey(pdfKey).ShouldBeTrue();
+        obj[pdfKey].ShouldBeOfType<PdfReal>().ShouldHaveValue(value);
+        return obj;
+    }
+
+    public static PdfObjectDefinition ShouldHaveId(this PdfObjectDefinition obj, int number, int generation)
+    {
+        obj.Id.Number.ShouldBe(number);
+        obj.Id.Generation.ShouldBe(generation);
+        return obj;
+    }
 }

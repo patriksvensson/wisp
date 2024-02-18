@@ -1,0 +1,142 @@
+%PDF-1.6
+%?????????
+1 0 obj
+true
+endobj
+2 0 obj
+false
+endobj
+3 0 obj
+12
+endobj
+4 0 obj
+-12
+endobj
+5 0 obj
++12
+endobj
+6 0 obj
+.13
+endobj
+7 0 obj
+-.13
+endobj
+8 0 obj
+12.34
+endobj
+9 0 obj
+-12.34
+endobj
+10 0 obj
++12.34
+endobj
+11 0 obj
+null
+endobj
+12 0 obj
+(Hello World)
+endobj
+13 0 obj
+(Hello
+World)
+endobj
+14 0 obj
+(These \
+two strings \
+are the same.)
+endobj
+15 0 obj
+<504446>
+endobj
+16 0 obj
+<50442>
+endobj
+17 0 obj
+/Name1
+endobj
+18 0 obj
+/ASomewhatLongerName
+endobj
+19 0 obj
+/A;Name_With-Various***Characters?
+endobj
+20 0 obj
+/1.2
+endobj
+21 0 obj
+/$$
+endobj
+22 0 obj
+/@pattern
+endobj
+23 0 obj
+/.notdef
+endobj
+24 0 obj
+/lime#20Green
+endobj
+25 0 obj
+/paired#28#29parentheses
+endobj
+26 0 obj
+/The_Key_of_F#23_Minor
+endobj
+27 0 obj
+/A#42
+endobj
+28 0 obj
+<</Foo 1 /Bar 2.1>>
+endobj
+29 0 obj
+[ 1 2.1 ]
+endobj
+30 0 obj
+<</Length 1 >>
+stream
+1
+endstream
+endobj
+31 0 obj
+8 3 R
+endobj
+xref
+0 32
+0000000000 65535 f 
+0000000020 00000 n 
+0000000040 00000 n 
+0000000061 00000 n 
+0000000079 00000 n 
+0000000098 00000 n 
+0000000117 00000 n 
+0000000136 00000 n 
+0000000156 00000 n 
+0000000177 00000 n 
+0000000199 00000 n 
+0000000222 00000 n 
+0000000243 00000 n 
+0000000273 00000 n 
+0000000303 00000 n 
+0000000357 00000 n 
+0000000382 00000 n 
+0000000406 00000 n 
+0000000429 00000 n 
+0000000466 00000 n 
+0000000517 00000 n 
+0000000538 00000 n 
+0000000558 00000 n 
+0000000584 00000 n 
+0000000609 00000 n 
+0000000639 00000 n 
+0000000680 00000 n 
+0000000719 00000 n 
+0000000741 00000 n 
+0000000777 00000 n 
+0000000803 00000 n 
+0000000853 00000 n 
+trailer
+<<
+/Size 32
+>>
+startxref
+875
+%%EOF
