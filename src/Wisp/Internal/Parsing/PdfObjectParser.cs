@@ -144,6 +144,15 @@ internal sealed class PdfObjectParser : IDisposable
             throw new InvalidOperationException("Could not decode PDF string");
         }
 
+        // Is the string really a date?
+        if (decoded.StartsWith("D:"))
+        {
+            if (PdfDate.TryParse(decoded.Substring(2), out var date))
+            {
+                return new PdfDate(date.Value);
+            }
+        }
+
         return new PdfString(decoded, encoding.Value);
     }
 

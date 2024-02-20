@@ -220,5 +220,28 @@ public sealed partial class PdfDocumentTests
                 .ShouldHaveNumber(8)
                 .ShouldHaveGeneration(3);
         }
+
+        [Theory]
+        [InlineData("32:0", "20060926213913+02:30")]
+        [InlineData("33:0", "20060926213913+02:00")]
+        [InlineData("34:0", "20060926213913+00:00")]
+        [InlineData("35:0", "20060926213900+00:00")]
+        [InlineData("36:0", "20060926210000+00:00")]
+        [InlineData("37:0", "20060926000000+00:00")]
+        [InlineData("38:0", "20060901000000+00:00")]
+        [InlineData("39:0", "20060101000000+00:00")]
+        [InlineData("40:0", "00010101000000+00:00")]
+        public void Should_Parse_Date(string id, string expected)
+        {
+            // Given, When
+            var result = _fixture.Document.TryReadObject(
+                PdfObjectId.Parse(id), out var obj);
+
+            // Then
+            result.ShouldBeTrue();
+            obj.ShouldBeOfType<PdfObjectDefinition>()
+                .Object.ShouldBeOfType<PdfDate>()
+                .ShouldHaveDate(expected);
+        }
     }
 }

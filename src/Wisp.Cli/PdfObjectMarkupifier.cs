@@ -23,6 +23,11 @@ public static class PdfObjectMarkupifier
             context.Append("[silver][[Boolean]][/]" + (obj.Value ? "[yellow]true[/]" : "[yellow]false[/]"));
         }
 
+        public override void VisitDate(PdfDate obj, StringBuilder context)
+        {
+            context.Append("[silver][[Date]][/] [yellow]" + obj.Value.ToString("yyyyMMddHHmmsszzz") + "[/]");
+        }
+
         public override void VisitDictionary(PdfDictionary obj, StringBuilder context)
         {
             context.Append($"[silver][[Dictionary]][/] [green]{obj.Count}[/] [silver]item(s)[/]");

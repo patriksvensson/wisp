@@ -89,4 +89,18 @@ public static class ShouldlyExtensions
         obj[pdfKey].ShouldBeOfType<PdfReal>().ShouldHaveValue(value);
         return obj;
     }
+
+    public static PdfDate ShouldHaveDate(this PdfDate obj, string value)
+    {
+        obj.ShouldNotBeNull();
+        obj.Value.ShouldBe(DateTimeOffset.ParseExact(value, "yyyyMMddHHmmsszzz", null, DateTimeStyles.None));
+        return obj;
+    }
+
+    public static PdfDate ShouldHaveDate(this PdfDate obj, DateTimeOffset value)
+    {
+        obj.ShouldNotBeNull();
+        obj.Value.ShouldBe(value);
+        return obj;
+    }
 }
