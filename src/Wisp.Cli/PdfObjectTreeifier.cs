@@ -26,6 +26,11 @@ public static class PdfObjectTreeifier
             context.AddNode(PdfObjectMarkupifier.ToMarkup(obj));
         }
 
+        public override void VisitDate(PdfDate obj, IHasTreeNodes context)
+        {
+            context.AddNode(PdfObjectMarkupifier.ToMarkup(obj));
+        }
+
         public override void VisitDictionary(PdfDictionary obj, IHasTreeNodes context)
         {
             var root = context.AddNode(PdfObjectMarkupifier.ToMarkup(obj));
