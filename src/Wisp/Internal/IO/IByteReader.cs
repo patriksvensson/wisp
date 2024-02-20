@@ -3,10 +3,10 @@ namespace Wisp.Internal;
 internal interface IByteReader : IDisposable
 {
     bool CanRead { get; }
-    int Position { get; }
-    int Length { get; }
+    long Position { get; }
+    long Length { get; }
 
-    int Seek(int offset, SeekOrigin origin);
+    long Seek(long offset, SeekOrigin origin);
 
     int PeekByte();
     int ReadByte();

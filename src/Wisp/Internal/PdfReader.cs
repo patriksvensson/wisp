@@ -4,8 +4,8 @@ internal sealed class PdfReader : IDisposable
 {
     private readonly PdfObjectParser _parser;
 
-    public int Position => _parser.Lexer.Reader.Position;
-    public int Length => _parser.Lexer.Reader.Length;
+    public long Position => _parser.Lexer.Reader.Position;
+    public long Length => _parser.Lexer.Reader.Length;
     public bool CanRead => _parser.Lexer.Reader.CanRead;
 
     public PdfReader(Stream stream)
@@ -18,7 +18,7 @@ internal sealed class PdfReader : IDisposable
         _parser.Dispose();
     }
 
-    public int Seek(int offset, SeekOrigin origin)
+    public long Seek(long offset, SeekOrigin origin)
     {
         return _parser.Lexer.Reader.Seek(offset, origin);
     }

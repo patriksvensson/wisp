@@ -6,8 +6,8 @@ internal sealed class ByteReader : IByteReader
     private int _position;
 
     public bool CanRead => _position < _buffer.Length;
-    public int Position => _position;
-    public int Length => _buffer.Length;
+    public long Position => _position;
+    public long Length => _buffer.Length;
 
     public ByteReader(Stream stream)
     {
@@ -67,7 +67,7 @@ internal sealed class ByteReader : IByteReader
         return result;
     }
 
-    public int Seek(int offset, SeekOrigin origin)
+    public long Seek(long offset, SeekOrigin origin)
     {
         switch (origin)
         {
