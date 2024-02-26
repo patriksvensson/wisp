@@ -18,86 +18,86 @@ public static class ShouldlyExtensions
         action(item);
     }
 
-    public static PdfBoolean ShouldHaveValue(this PdfBoolean obj, bool value)
+    public static CosBoolean ShouldHaveValue(this CosBoolean obj, bool value)
     {
         obj.ShouldNotBeNull();
         obj.Value.ShouldBe(value);
         return obj;
     }
 
-    public static PdfInteger ShouldHaveValue(this PdfInteger obj, int value)
+    public static CosInteger ShouldHaveValue(this CosInteger obj, int value)
     {
         obj.ShouldNotBeNull();
         obj.Value.ShouldBe(value);
         return obj;
     }
 
-    public static PdfReal ShouldHaveValue(this PdfReal obj, double value)
+    public static CosReal ShouldHaveValue(this CosReal obj, double value)
     {
         obj.ShouldNotBeNull();
         obj.Value.ShouldBe(value);
         return obj;
     }
 
-    public static PdfString ShouldHaveValue(this PdfString obj, string value)
+    public static CosString ShouldHaveValue(this CosString obj, string value)
     {
         obj.ShouldNotBeNull();
         obj.Value.ShouldBe(value);
         return obj;
     }
 
-    public static PdfString ShouldHaveEncoding(this PdfString obj, PdfStringEncoding value)
+    public static CosString ShouldHaveEncoding(this CosString obj, CosStringEncoding value)
     {
         obj.ShouldNotBeNull();
         obj.Encoding.ShouldBe(value);
         return obj;
     }
 
-    public static PdfName ShouldHaveValue(this PdfName obj, string value)
+    public static CosName ShouldHaveValue(this CosName obj, string value)
     {
         obj.ShouldNotBeNull();
         obj.Value.ShouldBe(value);
         return obj;
     }
 
-    public static PdfObjectId ShouldHaveNumber(this PdfObjectId obj, int value)
+    public static CosObjectId ShouldHaveNumber(this CosObjectId obj, int value)
     {
         obj.ShouldNotBeNull();
         obj.Number.ShouldBe(value);
         return obj;
     }
 
-    public static PdfObjectId ShouldHaveGeneration(this PdfObjectId obj, int value)
+    public static CosObjectId ShouldHaveGeneration(this CosObjectId obj, int value)
     {
         obj.ShouldNotBeNull();
         obj.Generation.ShouldBe(value);
         return obj;
     }
 
-    public static PdfDictionary ShouldHaveKeyValue(this PdfDictionary obj, string key, int value)
+    public static CosDictionary ShouldHaveKeyValue(this CosDictionary obj, string key, int value)
     {
-        var pdfKey = new PdfName(key);
+        var pdfKey = new CosName(key);
         obj.ContainsKey(pdfKey).ShouldBeTrue();
-        obj[pdfKey].ShouldBeOfType<PdfInteger>().ShouldHaveValue(value);
+        obj[pdfKey].ShouldBeOfType<CosInteger>().ShouldHaveValue(value);
         return obj;
     }
 
-    public static PdfDictionary ShouldHaveKeyValue(this PdfDictionary obj, string key, double value)
+    public static CosDictionary ShouldHaveKeyValue(this CosDictionary obj, string key, double value)
     {
-        var pdfKey = new PdfName(key);
+        var pdfKey = new CosName(key);
         obj.ContainsKey(pdfKey).ShouldBeTrue();
-        obj[pdfKey].ShouldBeOfType<PdfReal>().ShouldHaveValue(value);
+        obj[pdfKey].ShouldBeOfType<CosReal>().ShouldHaveValue(value);
         return obj;
     }
 
-    public static PdfDate ShouldHaveDate(this PdfDate obj, string value)
+    public static CosDate ShouldHaveDate(this CosDate obj, string value)
     {
         obj.ShouldNotBeNull();
         obj.Value.ShouldBe(DateTimeOffset.ParseExact(value, "yyyyMMddHHmmsszzz", null, DateTimeStyles.None));
         return obj;
     }
 
-    public static PdfDate ShouldHaveDate(this PdfDate obj, DateTimeOffset value)
+    public static CosDate ShouldHaveDate(this CosDate obj, DateTimeOffset value)
     {
         obj.ShouldNotBeNull();
         obj.Value.ShouldBe(value);
