@@ -1,5 +1,6 @@
 namespace Wisp.Cos;
 
+[PublicAPI]
 public static class CosTrailerReader
 {
     private static readonly byte[] _marker = [0x73, 0x74, 0x61, 0x72, 0x74, 0x78, 0x72, 0x65, 0x66];

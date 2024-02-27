@@ -1,5 +1,6 @@
 namespace Wisp.Cos;
 
+[PublicAPI]
 public sealed class CosToken
 {
     public CosTokenKind Kind { get; }
@@ -14,6 +15,7 @@ public sealed class CosToken
     }
 }
 
+[PublicAPI]
 public static class CosTokenExtensions
 {
     public static int ParseInteger(this CosToken token)

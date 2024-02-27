@@ -1,5 +1,6 @@
 namespace Wisp.Cos;
 
+[PublicAPI]
 public enum CosTokenKind
 {
     Unknown = 0,

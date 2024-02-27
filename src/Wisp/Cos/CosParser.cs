@@ -1,5 +1,6 @@
 namespace Wisp.Cos;
 
+[PublicAPI]
 public sealed class CosParser : IDisposable
 {
     private readonly bool _isStreamObject;

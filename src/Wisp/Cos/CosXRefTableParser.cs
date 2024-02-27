@@ -1,5 +1,6 @@
 ﻿namespace Wisp.Cos;
 
+[PublicAPI]
 public static class CosXRefTableParser
 {
     public static CosXRefTable Parse(CosParser parser)

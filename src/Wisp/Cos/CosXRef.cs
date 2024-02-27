@@ -1,5 +1,6 @@
 namespace Wisp.Cos;
 
+[PublicAPI]
 public abstract class CosXRef
 {
     public CosObjectId Id { get; }
@@ -10,6 +11,7 @@ public abstract class CosXRef
     }
 }
 
+[PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
 public sealed class CosFreeXRef : CosXRef
 {
@@ -24,6 +26,7 @@ public sealed class CosFreeXRef : CosXRef
     }
 }
 
+[PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
 public sealed class CosIndirectXRef : CosXRef
 {
@@ -41,6 +44,7 @@ public sealed class CosIndirectXRef : CosXRef
     }
 }
 
+[PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
 public sealed class CosStreamXRef : CosXRef
 {

@@ -1,5 +1,6 @@
 namespace Wisp.Cos;
 
+[PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
 public sealed class CosObjectId : CosPrimitive, IEquatable<CosObjectId>
 {

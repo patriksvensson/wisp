@@ -1,5 +1,6 @@
 namespace Wisp.Cos;
 
+[PublicAPI]
 public sealed class CosObject : CosPrimitive
 {
     public CosObjectId Id { get; }

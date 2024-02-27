@@ -1,5 +1,6 @@
 namespace Wisp.Cos;
 
+[PublicAPI]
 public sealed class CosLexer : IDisposable
 {
     internal IByteStreamReader Reader { get; }

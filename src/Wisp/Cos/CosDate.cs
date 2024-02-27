@@ -1,9 +1,10 @@
 namespace Wisp.Cos;
 
+[PublicAPI]
 public sealed class CosDate : CosPrimitive
 {
-    private static readonly string[] _formats = new[]
-    {
+    private static readonly string[] _formats =
+    [
         "yyyyMMddHHmmsszzz",
         "yyyyMMddHHmmsszz",
         "yyyyMMddHHmmss",
@@ -11,8 +12,8 @@ public sealed class CosDate : CosPrimitive
         "yyyyMMddHH",
         "yyyyMMdd",
         "yyyyMM",
-        "yyyy",
-    };
+        "yyyy"
+    ];
 
     public DateTimeOffset Value { get; }
 
