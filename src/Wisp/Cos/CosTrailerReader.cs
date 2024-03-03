@@ -18,29 +18,26 @@ public static class CosTrailerReader
                 throw new InvalidOperationException("Could not find xref start");
             }
 
-            var table = new CosXRefTable();
-            var trailer = default(CosDictionary);
-            while (true)
+            var table = default(CosXRefTable?);
+            var trailer = default(CosDictionary?);
+
+            while (xrefStart > 0)
             {
-                var (readTable, readTrailer) = ReadXRefTableAndTrailer(parser, xrefStart);
-                if (readTable != null)
+                parser.Seek(xrefStart.Value, SeekOrigin.Begin);
+                var (readTable, readTrailer) = parser.PeekToken()?.Kind == CosTokenKind.XRef
+                    ? CosXRefTableParser.Parse(parser)
+                    : CosXRefTableParser.ParseXRefStream(parser);
+
+                table = table?.Merge(readTable) ?? readTable;
+                trailer = readTrailer;
+
+                var prev = trailer.GetOptional<CosInteger>(CosName.Known.Prev);
+                if (prev == null)
                 {
-                    table = table.Merge(readTable);
+                    break;
                 }
 
-                if (readTrailer != null)
-                {
-                    trailer = readTrailer;
-
-                    var prev = trailer.GetOptionalValue<CosInteger>(CosName.Known.Prev);
-                    if (prev != null)
-                    {
-                        xrefStart = prev.Value;
-                        continue;
-                    }
-                }
-
-                break;
+                xrefStart = prev.Value;
             }
 
             return (table, trailer);
@@ -51,38 +48,13 @@ public static class CosTrailerReader
         }
     }
 
-    private static (CosXRefTable? Table, CosDictionary? Trailer) ReadXRefTableAndTrailer(
-        CosParser parser, [DisallowNull] int? xrefStart)
-    {
-        // Read the xref table
-        parser.Seek(xrefStart.Value, SeekOrigin.Begin);
-        var table = CosXRefTableParser.Parse(parser);
-
-        // Now find the trailer
-        var trailer = default(CosDictionary);
-        while (parser.CanRead)
-        {
-            var current = parser.ReadToken();
-            if (current.Kind == CosTokenKind.Trailer)
-            {
-                if (parser.ParseObject() is CosDictionary trailerDictionary)
-                {
-                    trailer = trailerDictionary;
-                    break;
-                }
-            }
-        }
-
-        return (table, trailer);
-    }
-
-    private static int? FindXrefStart(CosParser parser)
+    private static long? FindXrefStart(CosParser parser)
     {
         // Back up 1024 bytes (or as much as the file allow)
         parser.Seek(-Math.Min(1024, parser.Length), SeekOrigin.End);
 
         var index = 0;
-        var found = new List<int?>();
+        var found = new List<long?>();
         while (parser.CanRead)
         {
             var current = parser.ReadByte();

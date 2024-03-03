@@ -5,11 +5,12 @@ namespace Wisp.Cos;
 public sealed class CosStream : CosPrimitive
 {
     private byte[] _data;
+    private bool _decoded;
 
     public CosDictionary Metadata { get; }
 
-    public int Length => Metadata.ReadRequiredInteger(CosName.Known.Length);
-    public CosDictionary? DecodeParams => Metadata.GetOptionalValue<CosDictionary>(CosName.Known.DecodeParms);
+    public long Length => Metadata.GetRequiredInteger(CosName.Known.Length);
+    public CosDictionary? DecodeParams => Metadata.GetOptional<CosDictionary>(CosName.Known.DecodeParms);
 
     public CosStream(CosDictionary metadata, byte[] data)
     {
@@ -19,7 +20,12 @@ public sealed class CosStream : CosPrimitive
 
     public byte[] GetData()
     {
-        // TODO: Decode the data
+        if (!_decoded)
+        {
+            _data = FilterPipeline.Decode(this, _data);
+            _decoded = true;
+        }
+
         return _data;
     }
 

@@ -4,9 +4,9 @@ namespace Wisp.Cos;
 [DebuggerDisplay("{ToString(),nq}")]
 public sealed class CosInteger : CosPrimitive
 {
-    public int Value { get; }
+    public long Value { get; }
 
-    public CosInteger(int value)
+    public CosInteger(long value)
     {
         Value = value;
     }

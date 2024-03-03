@@ -34,9 +34,9 @@ public sealed class CosXRefTable : IEnumerable<CosXRef>
             result.Add(entry);
         }
 
-        if (other.Any(entry => !result.Add(entry)))
+        foreach (var entry in other)
         {
-            throw new InvalidOperationException("Could not add xref entry to xref table");
+            result.Add(entry);
         }
 
         return result;

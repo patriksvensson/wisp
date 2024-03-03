@@ -29,6 +29,8 @@ public sealed class CosName : CosPrimitive, IEqualityComparer<CosName>
     internal static class Known
     {
         public static CosName Root { get; } = new("Root");
+        public static CosName Catalog { get; } = new("Catalog");
+        public static CosName Version { get; } = new CosName("Version");
         public static CosName Size { get; } = new("Size");
         public static CosName Info { get; } = new("Info");
         public static CosName Id { get; } = new("ID");

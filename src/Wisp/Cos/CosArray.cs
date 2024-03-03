@@ -38,3 +38,33 @@ public sealed class CosArray : CosPrimitive, IEnumerable<CosPrimitive>
         return $"[Array] Count = {_items.Count}";
     }
 }
+
+public static class CosArrayExtensions
+{
+    public static int? GetIntegerValue(this CosArray array, int index)
+    {
+        if (index >= array.Count)
+        {
+            return null;
+        }
+
+        var value = array[index] as CosInteger;
+        if (value == null)
+        {
+            return null;
+        }
+
+        return (int)value.Value;
+    }
+
+    public static int GetIntegerValue(this CosArray array, int index, int defaultValue)
+    {
+        var result = GetIntegerValue(array, index);
+        if (result == null)
+        {
+            return defaultValue;
+        }
+
+        return result.Value;
+    }
+}

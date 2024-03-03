@@ -2,7 +2,12 @@ namespace Wisp.Testing;
 
 public static class ShouldlyExtensions
 {
-    public static void And<T>(this T item, Action<T> action)
+    public static T And<T>(this T item)
+    {
+        return item;
+    }
+
+    public static T And<T>(this T item, Action<T> action)
         where T : class
     {
         if (item is null)
@@ -16,6 +21,7 @@ public static class ShouldlyExtensions
         }
 
         action(item);
+        return item;
     }
 
     public static CosBoolean ShouldHaveValue(this CosBoolean obj, bool value)

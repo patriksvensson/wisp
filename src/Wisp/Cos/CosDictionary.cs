@@ -124,7 +124,7 @@ public static class PdfDictionaryExtensions
         }
     }
 
-    public static T? GetOptionalValue<T>(this CosDictionary dictionary, CosName key)
+    public static T? GetOptional<T>(this CosDictionary dictionary, CosName key)
         where T : CosPrimitive
     {
         if (!dictionary.TryGetValue(key, out var obj))
@@ -142,7 +142,7 @@ public static class PdfDictionaryExtensions
         return item;
     }
 
-    public static T GetOptionalValue<T>(this CosDictionary dictionary, CosName key, Func<T> func)
+    public static T GetOptional<T>(this CosDictionary dictionary, CosName key, Func<T> func)
         where T : CosPrimitive
     {
         if (!dictionary.TryGetValue(key, out var obj))
@@ -160,10 +160,10 @@ public static class PdfDictionaryExtensions
         return item;
     }
 
-    public static T GetRequiredValue<T>(this CosDictionary dictionary, CosName key)
+    public static T GetRequired<T>(this CosDictionary dictionary, CosName key)
         where T : CosPrimitive
     {
-        var result = GetOptionalValue<T>(dictionary, key);
+        var result = GetOptional<T>(dictionary, key);
         if (result == null)
         {
             throw new InvalidOperationException($"Could not get value for required key '{key.Value}'.");
@@ -172,13 +172,29 @@ public static class PdfDictionaryExtensions
         return result;
     }
 
-    public static int ReadRequiredInteger(this CosDictionary dictionary, CosName key)
+    public static long GetRequiredInteger(this CosDictionary dictionary, CosName key)
     {
-        return GetRequiredValue<CosInteger>(dictionary, key).Value;
+        return GetRequired<CosInteger>(dictionary, key).Value;
     }
 
-    public static int? ReadOptionalInteger(this CosDictionary dictionary, CosName key)
+    public static long? GetOptionalInteger(this CosDictionary dictionary, CosName key)
     {
-        return GetOptionalValue<CosInteger>(dictionary, key)?.Value;
+        return GetOptional<CosInteger>(dictionary, key)?.Value;
+    }
+
+    public static CosArray? GetArray(this CosDictionary dictionary, CosName key)
+    {
+        return dictionary.Get(key) as CosArray;
+    }
+
+    public static int? GetInt32(this CosDictionary dictionary, CosName key)
+    {
+        var value = dictionary.Get(key) as CosInteger;
+        if (value == null)
+        {
+            return null;
+        }
+
+        return (int)value.Value;
     }
 }

@@ -29,12 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Data\simple.pdf" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Data\Primitives.pdf" />
-    <EmbeddedResource Include="Data\Primitives.pdf" />
+    <None Remove="Data\XRefStream.pdf" />
+    <EmbeddedResource Include="Data\XRefStream.pdf" />
+    <None Remove="Data\XRefStreamIncremental.pdf" />
+    <EmbeddedResource Include="Data\XRefStreamIncremental.pdf" />
   </ItemGroup>
 
 </Project>

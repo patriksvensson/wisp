@@ -57,6 +57,7 @@ public sealed class CosObjectId : CosPrimitive, IEquatable<CosObjectId>
     }
 }
 
+[PublicAPI]
 public sealed class CosObjectIdComparer : IEqualityComparer<CosObjectId>
 {
     public static CosObjectIdComparer Shared { get; } = new();

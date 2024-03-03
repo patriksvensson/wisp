@@ -264,7 +264,7 @@ public sealed class CosParser : IDisposable
             return null;
         }
 
-        var length = metadata.ReadOptionalInteger(CosName.Known.Length);
+        var length = metadata.GetOptionalInteger(CosName.Known.Length);
         if (length == null)
         {
             throw new InvalidOperationException("Stream did not have a specified length");
@@ -273,7 +273,7 @@ public sealed class CosParser : IDisposable
         // Read the stream data
         Lexer.Expect(CosTokenKind.BeginStream);
         Lexer.EatNewlines();
-        var data = Lexer.ReadBytes(length.Value);
+        var data = Lexer.ReadBytes((int)length.Value);
         Lexer.Expect(CosTokenKind.EndStream);
 
         return new CosStream(metadata, data.ToArray());

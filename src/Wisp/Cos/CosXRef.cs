@@ -30,9 +30,9 @@ public sealed class CosFreeXRef : CosXRef
 [DebuggerDisplay("{ToString(),nq}")]
 public sealed class CosIndirectXRef : CosXRef
 {
-    public int Position { get; }
+    public long Position { get; }
 
-    public CosIndirectXRef(CosObjectId id, int position)
+    public CosIndirectXRef(CosObjectId id, long position)
         : base(id)
     {
         Position = position;
