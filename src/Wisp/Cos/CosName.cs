@@ -26,7 +26,7 @@ public sealed class CosName : CosPrimitive, IEqualityComparer<CosName>
         return $"[Name] {Value}";
     }
 
-    internal static class Known
+    public static class Known
     {
         public static CosName Root { get; } = new("Root");
         public static CosName Catalog { get; } = new("Catalog");
@@ -61,6 +61,7 @@ public sealed class CosName : CosPrimitive, IEqualityComparer<CosName>
         public static CosName Index { get; } = new("Index");
         public static CosName N { get; } = new("N");
         public static CosName First { get; } = new("First");
+        public static CosName Last { get; } = new("Last");
         public static CosName W { get; } = new("W");
     }
 }

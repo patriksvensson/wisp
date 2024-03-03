@@ -197,4 +197,26 @@ public static class PdfDictionaryExtensions
 
         return (int)value.Value;
     }
+
+    public static string? GetString(this CosDictionary dictionary, CosName key)
+    {
+        var value = dictionary.Get(key) as CosString;
+        if (value == null)
+        {
+            return null;
+        }
+
+        return value.Value;
+    }
+
+    public static string? GetNameString(this CosDictionary dictionary, CosName key)
+    {
+        var value = dictionary.Get(key) as CosName;
+        if (value == null)
+        {
+            return null;
+        }
+
+        return value.Value;
+    }
 }

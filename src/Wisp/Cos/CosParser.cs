@@ -230,6 +230,13 @@ public sealed class CosParser : IDisposable
         var stream = ParseStream(result);
         if (stream != null)
         {
+            var type = result.GetNameString(CosName.Known.Type);
+            if (type != null && type.Equals("ObjStm", StringComparison.Ordinal))
+            {
+                // This seems to be an object stream
+                return new CosObjectStream(stream);
+            }
+
             return stream;
         }
 
@@ -264,7 +271,7 @@ public sealed class CosParser : IDisposable
             return null;
         }
 
-        var length = metadata.GetOptionalInteger(CosName.Known.Length);
+        var length = metadata.GetInt32(CosName.Known.Length);
         if (length == null)
         {
             throw new InvalidOperationException("Stream did not have a specified length");
@@ -273,7 +280,7 @@ public sealed class CosParser : IDisposable
         // Read the stream data
         Lexer.Expect(CosTokenKind.BeginStream);
         Lexer.EatNewlines();
-        var data = Lexer.ReadBytes((int)length.Value);
+        var data = Lexer.ReadBytes(length.Value);
         Lexer.Expect(CosTokenKind.EndStream);
 
         return new CosStream(metadata, data.ToArray());
