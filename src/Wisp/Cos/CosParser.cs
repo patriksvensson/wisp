@@ -85,13 +85,13 @@ public sealed class CosParser : IDisposable
 
     private CosPrimitive ParseInteger()
     {
-        var value = Lexer.Expect(CosTokenKind.Integer).ParseInteger();
+        var value = Lexer.Expect(CosTokenKind.Integer).ParseInt32();
         var position = Lexer.Reader.Position;
 
         // Got an integer next?
         if (Lexer.Peek(out var token) && token.Kind == CosTokenKind.Integer)
         {
-            var generation = Lexer.Expect(CosTokenKind.Integer).ParseInteger();
+            var generation = Lexer.Expect(CosTokenKind.Integer).ParseInt32();
 
             if (Lexer.Peek(out token))
             {
@@ -119,14 +119,14 @@ public sealed class CosParser : IDisposable
 
     private CosReal ParseReal()
     {
-        var value = Lexer.Expect(CosTokenKind.Real).ParseReal();
+        var value = Lexer.Expect(CosTokenKind.Real).ParseDouble();
         return new CosReal(value);
     }
 
     private CosNull ParseNull()
     {
         Lexer.Expect(CosTokenKind.Null);
-        return new CosNull();
+        return CosNull.Shared;
     }
 
     private CosPrimitive ParseStringLiteral()
@@ -230,10 +230,9 @@ public sealed class CosParser : IDisposable
         var stream = ParseStream(result);
         if (stream != null)
         {
-            var type = result.GetNameString(CosName.Known.Type);
-            if (type != null && type.Equals("ObjStm", StringComparison.Ordinal))
+            if (result.TryGetValue<CosName>(CosName.Known.Type, out var type)
+                && type.Equals(CosName.Known.ObjStm))
             {
-                // This seems to be an object stream
                 return new CosObjectStream(stream);
             }
 
@@ -271,7 +270,7 @@ public sealed class CosParser : IDisposable
             return null;
         }
 
-        var length = metadata.GetInt32(CosName.Known.Length);
+        var length = metadata.GetOptional<CosInteger>(CosName.Known.Length)?.IntValue;
         if (length == null)
         {
             throw new InvalidOperationException("Stream did not have a specified length");

@@ -65,21 +65,3 @@ public sealed class CosXRefTable : IEnumerable<CosXRef>
         return GetEnumerator();
     }
 }
-
-public static class CosXRefTableExtensions
-{
-    public static CosXRef GetRequiredXRef(this CosXRefTable table, CosObjectId id)
-    {
-        ArgumentNullException.ThrowIfNull(table);
-        ArgumentNullException.ThrowIfNull(id);
-
-        var xref = table.GetXRef(id);
-        if (xref == null)
-        {
-            throw new InvalidOperationException(
-                $"Could not find xref {id.Number}:{id.Generation} in xref table.");
-        }
-
-        return xref;
-    }
-}

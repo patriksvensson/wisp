@@ -23,6 +23,18 @@ public sealed class CosArray : CosPrimitive, IEnumerable<CosPrimitive>
         _items.Add(item);
     }
 
+    public bool TryGetValue(int index, [NotNullWhen(true)] out CosPrimitive? item)
+    {
+        if (index >= _items.Count)
+        {
+            item = null;
+            return false;
+        }
+
+        item = _items[index];
+        return true;
+    }
+
     public IEnumerator<CosPrimitive> GetEnumerator()
     {
         return _items.GetEnumerator();
@@ -39,32 +51,45 @@ public sealed class CosArray : CosPrimitive, IEnumerable<CosPrimitive>
     }
 }
 
+[PublicAPI]
 public static class CosArrayExtensions
 {
-    public static int? GetIntegerValue(this CosArray array, int index)
+    public static bool TryGetValue<T>(this CosArray array, int index, [NotNullWhen(true)] out T? item)
+        where T : CosPrimitive
     {
-        if (index >= array.Count)
+        if (!array.TryGetValue(index, out var primitive) || primitive is not T result)
         {
-            return null;
+            item = null;
+            return false;
         }
 
-        var value = array[index] as CosInteger;
-        if (value == null)
-        {
-            return null;
-        }
-
-        return (int)value.Value;
+        item = result;
+        return true;
     }
 
-    public static int GetIntegerValue(this CosArray array, int index, int defaultValue)
+    public static T? GetOptional<T>(this CosArray array, int index)
+        where T : CosPrimitive
     {
-        var result = GetIntegerValue(array, index);
-        if (result == null)
+        TryGetValue<T>(array, index, out var result);
+        return result;
+    }
+
+    public static T GetRequired<T>(this CosArray array, int index)
+        where T : CosPrimitive
+    {
+        if (!array.TryGetValue(index, out var primitive))
         {
-            return defaultValue;
+            throw new IndexOutOfRangeException();
         }
 
-        return result.Value;
+        if (primitive is not T result)
+        {
+            throw new InvalidOperationException(
+                $"Expected item at position {index} to be " +
+                $"of type '{typeof(T).Name}', but was " +
+                $"'{primitive.GetType().Name}'");
+        }
+
+        return result;
     }
 }

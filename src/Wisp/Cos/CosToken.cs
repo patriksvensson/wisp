@@ -18,7 +18,7 @@ public sealed class CosToken
 [PublicAPI]
 public static class CosTokenExtensions
 {
-    public static int ParseInteger(this CosToken token)
+    public static int ParseInt32(this CosToken token)
     {
         ArgumentNullException.ThrowIfNull(token);
 
@@ -32,7 +32,7 @@ public static class CosTokenExtensions
             : int.Parse(token.Text, CultureInfo.InvariantCulture);
     }
 
-    public static double ParseReal(this CosToken token)
+    public static double ParseDouble(this CosToken token)
     {
         ArgumentNullException.ThrowIfNull(token);
 

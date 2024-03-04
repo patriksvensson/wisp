@@ -98,30 +98,21 @@ public sealed class CosDictionary : CosPrimitive, IEnumerable<KeyValuePair<CosNa
     }
 }
 
+[PublicAPI]
 public static class PdfDictionaryExtensions
 {
-    public static CosPrimitive? Get(this CosDictionary dictionary, CosName key)
+    public static bool TryGetValue<T>(this CosDictionary dictionary, CosName key, [NotNullWhen(true)] out T? value)
+        where T : CosPrimitive
     {
-        if (dictionary is null)
+        var resolved = dictionary.GetOptional<T>(key);
+        if (resolved != null)
         {
-            throw new System.ArgumentNullException(nameof(dictionary));
+            value = resolved;
+            return true;
         }
 
-        if (key is null)
-        {
-            throw new ArgumentNullException(nameof(key));
-        }
-
-        dictionary.TryGetValue(key, out var value);
-        return value;
-    }
-
-    public static void SetIfNotNull(this CosDictionary dictionary, CosName key, CosPrimitive? value)
-    {
-        if (value != null)
-        {
-            dictionary.Set(key, value);
-        }
+        value = null;
+        return false;
     }
 
     public static T? GetOptional<T>(this CosDictionary dictionary, CosName key)
@@ -130,24 +121,6 @@ public static class PdfDictionaryExtensions
         if (!dictionary.TryGetValue(key, out var obj))
         {
             return default;
-        }
-
-        if (obj is not T item)
-        {
-            throw new InvalidOperationException(
-                $"Expected key '{key.Value}' to be of type '{typeof(T).Name}', " +
-                $"but it was of type '{obj.GetType().Name}'");
-        }
-
-        return item;
-    }
-
-    public static T GetOptional<T>(this CosDictionary dictionary, CosName key, Func<T> func)
-        where T : CosPrimitive
-    {
-        if (!dictionary.TryGetValue(key, out var obj))
-        {
-            return func();
         }
 
         if (obj is not T item)
@@ -172,51 +145,11 @@ public static class PdfDictionaryExtensions
         return result;
     }
 
-    public static long GetRequiredInteger(this CosDictionary dictionary, CosName key)
+    public static void SetIfNotNull(this CosDictionary dictionary, CosName key, CosPrimitive? value)
     {
-        return GetRequired<CosInteger>(dictionary, key).Value;
-    }
-
-    public static long? GetOptionalInteger(this CosDictionary dictionary, CosName key)
-    {
-        return GetOptional<CosInteger>(dictionary, key)?.Value;
-    }
-
-    public static CosArray? GetArray(this CosDictionary dictionary, CosName key)
-    {
-        return dictionary.Get(key) as CosArray;
-    }
-
-    public static int? GetInt32(this CosDictionary dictionary, CosName key)
-    {
-        var value = dictionary.Get(key) as CosInteger;
-        if (value == null)
+        if (value != null)
         {
-            return null;
+            dictionary.Set(key, value);
         }
-
-        return (int)value.Value;
-    }
-
-    public static string? GetString(this CosDictionary dictionary, CosName key)
-    {
-        var value = dictionary.Get(key) as CosString;
-        if (value == null)
-        {
-            return null;
-        }
-
-        return value.Value;
-    }
-
-    public static string? GetNameString(this CosDictionary dictionary, CosName key)
-    {
-        var value = dictionary.Get(key) as CosName;
-        if (value == null)
-        {
-            return null;
-        }
-
-        return value.Value;
     }
 }

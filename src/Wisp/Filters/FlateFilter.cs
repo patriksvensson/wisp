@@ -7,12 +7,12 @@ public sealed class FlateFilter : Filter
 {
     public override string Name { get; } = "FlateDecode";
 
-    public override byte[] Decode(byte[] data, CosDictionary parameters)
+    public override byte[] Decode(byte[] data, CosDictionary? parameters)
     {
         // Run the deflate algorithm
         var bytes = Deflate(data);
 
-        var predictor = parameters.GetInt32(CosName.Known.Predictor) ?? 1;
+        var predictor = parameters?.GetOptional<CosInteger>(CosName.Known.Predictor)?.Value ?? 1;
         if (predictor != 1)
         {
             // TODO: Support PNG encoding

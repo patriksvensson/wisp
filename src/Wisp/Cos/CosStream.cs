@@ -9,8 +9,8 @@ public sealed class CosStream : CosPrimitive
 
     public CosDictionary Metadata { get; }
 
-    public long Length => Metadata.GetRequiredInteger(CosName.Known.Length);
-    public CosDictionary? DecodeParams => Metadata.GetOptional<CosDictionary>(CosName.Known.DecodeParms);
+    public long Length => Metadata.GetRequired<CosInteger>(CosName.Known.Length).Value;
+    public CosDictionary? DecodeParms => Metadata.GetOptional<CosDictionary>(CosName.Known.DecodeParms);
 
     public CosStream(CosDictionary metadata, byte[] data)
     {
@@ -22,9 +22,7 @@ public sealed class CosStream : CosPrimitive
     {
         if (!_decoded)
         {
-            var pipeline = FilterPipeline.Create(Metadata);
-
-            _data = pipeline.Decode(_data, Metadata);
+            _data = Filter.Decode(this, _data);
             _decoded = true;
         }
 

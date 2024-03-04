@@ -1,6 +1,7 @@
 namespace Wisp.Cos;
 
-internal sealed class CosHeaderReader
+[PublicAPI]
+public sealed class CosHeaderReader
 {
     public static PdfVersion Read(CosParser parser)
     {

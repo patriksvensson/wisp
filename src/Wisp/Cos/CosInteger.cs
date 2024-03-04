@@ -5,6 +5,7 @@ namespace Wisp.Cos;
 public sealed class CosInteger : CosPrimitive
 {
     public long Value { get; }
+    public int IntValue => (int)Value;
 
     public CosInteger(long value)
     {

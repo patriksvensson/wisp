@@ -34,7 +34,7 @@ public sealed class CosObjectStreamTests : IClassFixture<CosFixture.XRefStream>
             .Object.ShouldBeOfType<CosDictionary>();
 
         // Ensure that the contents of the object is correct
-        result.GetInt32(CosName.Known.Count).ShouldBe(2);
+        result.GetRequired<CosInteger>(CosName.Known.Count).ShouldHaveValue(2);
         result.GetRequired<CosObjectId>(CosName.Known.First).ShouldBe(8, 0);
         result.GetRequired<CosObjectId>(CosName.Known.Last).ShouldBe(8, 0);
     }

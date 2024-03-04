@@ -16,13 +16,13 @@ public static class CosXRefTableParser
                 break;
             }
 
-            var startId = parser.Lexer.Expect(CosTokenKind.Integer).ParseInteger();
-            var count = parser.Lexer.Expect(CosTokenKind.Integer).ParseInteger();
+            var startId = parser.Lexer.Expect(CosTokenKind.Integer).ParseInt32();
+            var count = parser.Lexer.Expect(CosTokenKind.Integer).ParseInt32();
 
             foreach (var id in Enumerable.Range(startId, count))
             {
-                var position = parser.Lexer.Expect(CosTokenKind.Integer).ParseInteger();
-                var generation = parser.Lexer.Expect(CosTokenKind.Integer).ParseInteger();
+                var position = parser.Lexer.Expect(CosTokenKind.Integer).ParseInt32();
+                var generation = parser.Lexer.Expect(CosTokenKind.Integer).ParseInt32();
 
                 switch (parser.Lexer.Read().Kind)
                 {
@@ -125,7 +125,7 @@ public static class CosXRefTableParser
 
     private static int[] GetFieldSizes(CosStream stream)
     {
-        var wArray = stream.Metadata.GetArray(CosName.Known.W);
+        var wArray = stream.Metadata.GetOptional<CosArray>(CosName.Known.W);
         if (wArray == null)
         {
             throw new InvalidOperationException("XRef Stream is missing /W array");
@@ -137,9 +137,9 @@ public static class CosXRefTableParser
         }
 
         var w = new int[3];
-        w[0] = wArray.GetIntegerValue(0, 1);
-        w[1] = wArray.GetIntegerValue(1, 0);
-        w[2] = wArray.GetIntegerValue(2, 0);
+        w[0] = wArray.GetOptional<CosInteger>(0)?.IntValue ?? 1;
+        w[1] = wArray.GetOptional<CosInteger>(1)?.IntValue ?? 0;
+        w[2] = wArray.GetOptional<CosInteger>(2)?.IntValue ?? 0;
 
         if (w[0] < 0 || w[1] < 0 || w[2] < 0)
         {
@@ -151,14 +151,14 @@ public static class CosXRefTableParser
 
     private static Queue<int> GetObjectIds(CosStream stream)
     {
-        var size = stream.Metadata.GetInt32(CosName.Known.Size);
+        var size = stream.Metadata.GetOptional<CosInteger>(CosName.Known.Size)?.Value;
         if (size == null)
         {
             throw new InvalidOperationException(
                 "Stream xref table did not have size");
         }
 
-        var indexArray = stream.Metadata.GetArray(CosName.Known.Index);
+        var indexArray = stream.Metadata.GetOptional<CosArray>(CosName.Known.Index);
         if (indexArray == null)
         {
             indexArray = new CosArray
@@ -226,6 +226,7 @@ public static class CosXRefTableParser
             return [];
         }
 
+        // TODO: Optimize this
         using (var reader = new BinaryReader(new MemoryStream(data), Encoding.ASCII))
         {
             var result = new List<(int First, int Second, int Third)>();

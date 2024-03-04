@@ -1,5 +1,6 @@
 namespace Wisp.Cos;
 
+[PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
 public sealed class CosObjectStream : CosPrimitive
 {
@@ -11,12 +12,7 @@ public sealed class CosObjectStream : CosPrimitive
     /// <summary>
     /// Gets the number of indirect objects stored in the stream.
     /// </summary>
-    public int N => _stream.Metadata.GetInt32(CosName.Known.N) ?? 0;
-
-    /// <summary>
-    /// Gets the length in bytes of the stream.
-    /// </summary>
-    public long Length => _stream.Metadata.GetInt32(CosName.Known.Length) ?? _stream.Length;
+    public int N => _stream.Metadata.GetOptional<CosInteger>(CosName.Known.N)?.IntValue ?? 0;
 
     public CosObjectStream(CosStream stream)
     {
@@ -89,7 +85,7 @@ public sealed class CosObjectStream : CosPrimitive
             return;
         }
 
-        var objectOffset = _stream.Metadata.GetInt32(CosName.Known.First);
+        var objectOffset = _stream.Metadata.GetOptional<CosInteger>(CosName.Known.First)?.Value;
         if (objectOffset == null)
         {
             throw new InvalidOperationException("Object stream is missing /First parameter");
