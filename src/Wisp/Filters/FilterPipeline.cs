@@ -3,82 +3,109 @@ namespace Wisp.Filters;
 [PublicAPI]
 public sealed class FilterPipeline
 {
-    private readonly List<Filter> _filters;
+    private readonly List<Filter> _pipeline;
+
+    private static readonly Dictionary<string, Filter> _filters = new(StringComparer.Ordinal)
+    {
+        { "ASCIIHexDecode", new AsciiHexFilter() },
+        { "ASCII85Decode", new Ascii85Filter() },
+        { "LZWDecode", new LzwFilter() },
+        { "FlateDecode", new FlateFilter() },
+        { "RunLengthDecode", new RunLengthFilter() },
+        { "CCITTFaxDecode", new CcittFaxFilter() },
+        { "JBIG2Decode", new Jbig2Filter() },
+        { "DCTDecode", new DctFilter() },
+        { "JPXDecode", new JpxFilter() },
+        { "Crypt", new CryptFilter() },
+    };
 
     private FilterPipeline()
     {
-        _filters = new List<Filter>();
+        _pipeline = new List<Filter>();
     }
 
     public FilterPipeline(Filter filter)
     {
         ArgumentNullException.ThrowIfNull(filter);
 
-        _filters = new List<Filter>(new[] { filter });
+        _pipeline = new List<Filter>(new[] { filter });
     }
 
     public FilterPipeline(IEnumerable<Filter>? filters)
     {
-        _filters = new List<Filter>(filters ?? Enumerable.Empty<Filter>());
+        _pipeline = new List<Filter>(filters ?? Enumerable.Empty<Filter>());
     }
 
-    public byte[] Decode(byte[] data)
+    public static FilterPipeline Create(CosDictionary dictionary)
     {
-        foreach (var filter in _filters)
-        {
-            data = filter.Decode(data);
-        }
+        ArgumentNullException.ThrowIfNull(dictionary);
 
-        return data;
-    }
-
-    public static byte[] Decode(CosStream stream, byte[] data)
-    {
-        return CreatePipeline(stream).Decode(data);
-    }
-
-    private static FilterPipeline CreatePipeline(CosStream stream)
-    {
         // Get the parameters
-        var parameters = stream.Metadata.GetOptional(
+        var decodeParams = dictionary.GetOptional(
             CosName.Known.DecodeParms,
             () => new CosDictionary());
 
         // Is there a filter?
-        if (stream.Metadata.TryGetValue(CosName.Known.Filter, out var filterObj))
+        if (dictionary.TryGetValue(CosName.Known.Filter, out var filterObj))
         {
             return filterObj switch
             {
-                CosArray filterArray => CreateFilterPipeline(filterArray, parameters),
-                CosName filterName => new FilterPipeline(CreateFilter(filterName, parameters)),
-                _ => throw new InvalidOperationException("Could not parse filters"),
+                CosArray filterArray => CreateFilterPipeline(filterArray, decodeParams),
+                CosName filterName => new FilterPipeline(CreateFilter(filterName, decodeParams)),
+                _ => throw new InvalidOperationException("Invalid filter primitive"),
             };
         }
 
         return new FilterPipeline();
     }
 
-    private static FilterPipeline CreateFilterPipeline(CosArray filterArray, CosDictionary parameters)
+    public byte[] Decode(byte[] data, CosDictionary parameters)
     {
-        var filters = new List<Filter>();
-        foreach (var filter in filterArray)
+        // Any unsupported filters?
+        if (_pipeline.Any(x => !x.Supported))
+        {
+            var unsupported = _pipeline.Where(x => !x.Supported).ToArray();
+            if (unsupported.Length == 1)
+            {
+                throw new InvalidOperationException(
+                    $"Cannot decode data. The filter {unsupported[0]} is not supported");
+            }
+
+            var unsupportedNames = string.Join(",", unsupported.Select(x => x.Name));
+            throw new InvalidOperationException(
+                $"Cannot decode data. The following filters are unsupported: {unsupportedNames}");
+        }
+
+        foreach (var filter in _pipeline)
+        {
+            data = filter.Decode(data, parameters);
+        }
+
+        return data;
+    }
+
+    private static FilterPipeline CreateFilterPipeline(CosArray filters, CosDictionary parameters)
+    {
+        var result = new List<Filter>();
+
+        foreach (var filter in filters)
         {
             if (filter is not CosName filterName)
             {
                 throw new InvalidOperationException("Expected filter name to be a COS name");
             }
 
-            filters.Add(CreateFilter(filterName, parameters));
+            result.Add(CreateFilter(filterName, parameters));
         }
 
-        return new FilterPipeline(filters);
+        return new FilterPipeline(result);
     }
 
     private static Filter CreateFilter(CosName filterName, CosDictionary parameters)
     {
-        if (filterName.Value.Equals("FlateDecode", StringComparison.Ordinal))
+        if (_filters.TryGetValue(filterName.Value, out var filter))
         {
-            return new DeflateFilter(parameters);
+            return filter;
         }
 
         throw new NotSupportedException($"Unsupported filter '{filterName.Value}'");

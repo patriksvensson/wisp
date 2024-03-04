@@ -2,21 +2,17 @@ using System.IO.Compression;
 
 namespace Wisp.Filters;
 
-public sealed class DeflateFilter : Filter
+[PublicAPI]
+public sealed class FlateFilter : Filter
 {
-    private readonly CosDictionary _parameters;
+    public override string Name { get; } = "FlateDecode";
 
-    public DeflateFilter(CosDictionary parameters)
-    {
-        _parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
-    }
-
-    public override byte[] Decode(byte[] data)
+    public override byte[] Decode(byte[] data, CosDictionary parameters)
     {
         // Run the deflate algorithm
         var bytes = Deflate(data);
 
-        var predictor = _parameters.GetInt32(CosName.Known.Predictor) ?? 1;
+        var predictor = parameters.GetInt32(CosName.Known.Predictor) ?? 1;
         if (predictor != 1)
         {
             // TODO: Support PNG encoding

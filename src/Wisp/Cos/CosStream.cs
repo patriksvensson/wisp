@@ -22,7 +22,9 @@ public sealed class CosStream : CosPrimitive
     {
         if (!_decoded)
         {
-            _data = FilterPipeline.Decode(this, _data);
+            var pipeline = FilterPipeline.Create(Metadata);
+
+            _data = pipeline.Decode(_data, Metadata);
             _decoded = true;
         }
 
@@ -31,7 +33,7 @@ public sealed class CosStream : CosPrimitive
 
     public void SetData(byte[]? data, CosDictionary? decodeParameters)
     {
-        _data = data ?? Array.Empty<byte>();
+        _data = data ?? [];
         Metadata[CosName.Known.DecodeParms] = decodeParameters;
         Metadata[CosName.Known.Length] = new CosInteger(data?.Length ?? 0);
     }
