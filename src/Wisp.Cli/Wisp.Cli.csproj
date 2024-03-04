@@ -3,11 +3,10 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <IsPackable>true</IsPackable>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../../resources/wisp.png" Pack="true" PackagePath="\" Link="Properties/wisp.png" />
     <AdditionalFiles Include="../stylecop.json" Link="Properties/stylecop.json" />
   </ItemGroup>
 

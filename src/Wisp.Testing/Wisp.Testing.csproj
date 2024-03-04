@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Wisp\Wisp.csproj" />
-    <ProjectReference Include="..\Wisp\Wisp.csproj" />
   </ItemGroup>
 
   <ItemGroup>
