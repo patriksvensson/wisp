@@ -5,4 +5,5 @@ global using System.Globalization;
 global using System.Text;
 global using JetBrains.Annotations;
 global using Wisp.Cos;
+global using Wisp.Filters;
 global using Wisp.Internal;

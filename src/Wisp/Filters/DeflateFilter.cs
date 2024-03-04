@@ -1,8 +1,8 @@
 using System.IO.Compression;
 
-namespace Wisp.Internal;
+namespace Wisp.Filters;
 
-internal sealed class DeflateFilter : Filter
+public sealed class DeflateFilter : Filter
 {
     private readonly CosDictionary _parameters;
 
@@ -19,6 +19,7 @@ internal sealed class DeflateFilter : Filter
         var predictor = _parameters.GetInt32(CosName.Known.Predictor) ?? 1;
         if (predictor != 1)
         {
+            // TODO: Support PNG encoding
             throw new NotSupportedException(
                 "Additional decoding is required, but not yet supported");
         }
@@ -28,11 +29,23 @@ internal sealed class DeflateFilter : Filter
 
     private static byte[] Deflate(byte[] data)
     {
-        var output = new MemoryStream();
-        using (var input = new MemoryStream(data.Skip(2).ToArray())) // TODO: Not OK!
-        using (var decoder = new DeflateStream(input, CompressionMode.Decompress))
+        if (data.Length < 2)
         {
-            decoder.CopyTo(output);
+            throw new InvalidOperationException("Invalid flate stream");
+        }
+
+        var output = new MemoryStream();
+        using (var input = new MemoryStream(data))
+        {
+            // The deflate stream does not support the
+            // header, so just consume the first two bytes.
+            input.ReadByte();
+            input.ReadByte();
+
+            using (var decoder = new DeflateStream(input, CompressionMode.Decompress))
+            {
+                decoder.CopyTo(output);
+            }
         }
 
         return output.ToArray();

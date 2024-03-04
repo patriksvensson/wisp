@@ -1,10 +1,14 @@
-namespace Wisp.Internal;
+namespace Wisp.Filters;
 
-internal sealed class FilterPipeline
+[PublicAPI]
+public sealed class FilterPipeline
 {
     private readonly List<Filter> _filters;
 
-    public static FilterPipeline Default { get; } = new(new NopFilter());
+    private FilterPipeline()
+    {
+        _filters = new List<Filter>();
+    }
 
     public FilterPipeline(Filter filter)
     {
@@ -45,16 +49,16 @@ internal sealed class FilterPipeline
         {
             return filterObj switch
             {
-                CosArray filterArray => CreateFilters(filterArray, parameters),
+                CosArray filterArray => CreateFilterPipeline(filterArray, parameters),
                 CosName filterName => new FilterPipeline(CreateFilter(filterName, parameters)),
                 _ => throw new InvalidOperationException("Could not parse filters"),
             };
         }
 
-        return Default;
+        return new FilterPipeline();
     }
 
-    private static FilterPipeline CreateFilters(CosArray filterArray, CosDictionary parameters)
+    private static FilterPipeline CreateFilterPipeline(CosArray filterArray, CosDictionary parameters)
     {
         var filters = new List<Filter>();
         foreach (var filter in filterArray)
@@ -76,9 +80,7 @@ internal sealed class FilterPipeline
         {
             return new DeflateFilter(parameters);
         }
-        else
-        {
-            throw new NotSupportedException($"Unsupported filter '{filterName.Value}'");
-        }
+
+        throw new NotSupportedException($"Unsupported filter '{filterName.Value}'");
     }
 }
