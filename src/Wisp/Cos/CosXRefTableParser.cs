@@ -164,7 +164,7 @@ public static class CosXRefTableParser
             indexArray = new CosArray
             {
                 new CosInteger(0),
-                new CosInteger(size.Value),
+                new CosInteger(size),
             };
         }
 
@@ -198,21 +198,8 @@ public static class CosXRefTableParser
         return new Queue<int>(result);
     }
 
-    private static List<(int First, int Second, int Third)> ReadEntries(CosStream stream, int[] sizes)
+    private static IEnumerable<(int First, int Second, int Third)> ReadEntries(CosStream stream, int[] sizes)
     {
-        static int Unpack(BinaryReader reader, int length)
-        {
-            var accumulated = 0;
-            for (var index = 0; index < length; index++)
-            {
-                var offset = 8 * (length - index - 1);
-                var value = reader.ReadByte();
-                accumulated |= offset == 0 ? value : value << offset;
-            }
-
-            return accumulated;
-        }
-
         ArgumentNullException.ThrowIfNull(stream);
 
         if (sizes.Length != 3)
@@ -223,24 +210,33 @@ public static class CosXRefTableParser
         var data = stream.GetData();
         if (data is null)
         {
-            return [];
+            yield break;
         }
 
-        // TODO: Optimize this
-        using (var reader = new BinaryReader(new MemoryStream(data), Encoding.ASCII))
+        using var reader = new MemoryStream(data);
+        while (reader.Position < reader.Length)
         {
-            var result = new List<(int First, int Second, int Third)>();
+            var first = Unpack(reader, sizes[0]);
+            var second = Unpack(reader, sizes[1]);
+            var third = Unpack(reader, sizes[2]);
 
-            while (reader.PeekChar() != -1)
+            yield return (first, second, third);
+        }
+
+        yield break;
+
+        // Unpacks an integer using n bytes in the stream
+        static int Unpack(Stream stream, int length)
+        {
+            var accumulated = 0;
+            for (var index = 0; index < length; index++)
             {
-                var first = Unpack(reader, sizes[0]);
-                var second = Unpack(reader, sizes[1]);
-                var third = Unpack(reader, sizes[2]);
-
-                result.Add((first, second, third));
+                var offset = 8 * (length - index - 1);
+                var value = stream.ReadByte();
+                accumulated |= offset == 0 ? value : value << offset;
             }
 
-            return result;
+            return accumulated;
         }
     }
 }

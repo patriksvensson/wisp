@@ -12,6 +12,11 @@ public sealed class CosInteger : CosPrimitive
         Value = value;
     }
 
+    public CosInteger(long? value)
+    {
+        Value = value ?? 0;
+    }
+
     public override string ToString()
     {
         return $"[Integer] {Value}";
