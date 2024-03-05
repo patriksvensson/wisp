@@ -12,7 +12,7 @@ public sealed class FlateFilter : Filter
         // Run the deflate algorithm
         var bytes = Deflate(data);
 
-        var predictor = parameters?.GetOptional<CosInteger>(CosName.Known.Predictor)?.Value ?? 1;
+        var predictor = parameters?.GetInt32(CosNames.Predictor) ?? 1;
         if (predictor != 1)
         {
             // TODO: Support PNG encoding

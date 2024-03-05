@@ -9,8 +9,10 @@ public sealed class CosStream : CosPrimitive
 
     public CosDictionary Metadata { get; }
 
-    public long Length => Metadata.GetRequired<CosInteger>(CosName.Known.Length).Value;
-    public CosDictionary? DecodeParms => Metadata.GetOptional<CosDictionary>(CosName.Known.DecodeParms);
+    public long Length => Metadata.GetInt64(CosNames.Length)
+                          ?? throw new InvalidOperationException("/Length missing from stream");
+
+    public CosDictionary? DecodeParms => Metadata.GetDictionary(CosNames.DecodeParms);
 
     public CosStream(CosDictionary metadata, byte[] data)
     {
@@ -32,8 +34,8 @@ public sealed class CosStream : CosPrimitive
     public void SetData(byte[]? data, CosDictionary? decodeParameters)
     {
         _data = data ?? [];
-        Metadata[CosName.Known.DecodeParms] = decodeParameters;
-        Metadata[CosName.Known.Length] = new CosInteger(data?.Length ?? 0);
+        Metadata[CosNames.DecodeParms] = decodeParameters;
+        Metadata[CosNames.Length] = new CosInteger(data?.Length ?? 0);
     }
 
     public override string ToString()

@@ -31,7 +31,7 @@ public static class CosTrailerReader
                 table = table?.Merge(readTable) ?? readTable;
                 trailer = readTrailer;
 
-                var prev = trailer.GetOptional<CosInteger>(CosName.Known.Prev);
+                var prev = trailer.GetInt64(CosNames.Prev);
                 if (prev == null)
                 {
                     break;

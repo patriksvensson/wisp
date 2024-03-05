@@ -230,8 +230,8 @@ public sealed class CosParser : IDisposable
         var stream = ParseStream(result);
         if (stream != null)
         {
-            if (result.TryGetValue<CosName>(CosName.Known.Type, out var type)
-                && type.Equals(CosName.Known.ObjStm))
+            var type = result.GetName(CosNames.Type);
+            if (type?.Equals(CosNames.ObjStm) == true)
             {
                 return new CosObjectStream(stream);
             }
@@ -270,7 +270,7 @@ public sealed class CosParser : IDisposable
             return null;
         }
 
-        var length = metadata.GetOptional<CosInteger>(CosName.Known.Length)?.IntValue;
+        var length = metadata.GetInt32(CosNames.Length);
         if (length == null)
         {
             throw new InvalidOperationException("Stream did not have a specified length");

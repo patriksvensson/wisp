@@ -55,7 +55,7 @@ public sealed class FilterPipeline
         public static FilterPipeline Create(CosStream stream)
         {
             // Is there a filter?
-            if (stream.Metadata.TryGetValue(CosName.Known.Filter, out var filterObj))
+            if (stream.Metadata.TryGetValue(CosNames.Filter, out var filterObj))
             {
                 return filterObj switch
                 {

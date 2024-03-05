@@ -12,7 +12,7 @@ public sealed class CosObjectStream : CosPrimitive
     /// <summary>
     /// Gets the number of indirect objects stored in the stream.
     /// </summary>
-    public int N => _stream.Metadata.GetOptional<CosInteger>(CosName.Known.N)?.IntValue ?? 0;
+    public int N => _stream.Metadata.GetInt32(CosNames.N) ?? 0;
 
     public CosObjectStream(CosStream stream)
     {
@@ -85,7 +85,7 @@ public sealed class CosObjectStream : CosPrimitive
             return;
         }
 
-        var objectOffset = _stream.Metadata.GetOptional<CosInteger>(CosName.Known.First)?.Value;
+        var objectOffset = _stream.Metadata.GetInt64(CosNames.First);
         if (objectOffset == null)
         {
             throw new InvalidOperationException("Object stream is missing /First parameter");

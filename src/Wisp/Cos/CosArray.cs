@@ -23,16 +23,14 @@ public sealed class CosArray : CosPrimitive, IEnumerable<CosPrimitive>
         _items.Add(item);
     }
 
-    public bool TryGetValue(int index, [NotNullWhen(true)] out CosPrimitive? item)
+    public CosPrimitive? GetAt(int index)
     {
         if (index >= _items.Count)
         {
-            item = null;
-            return false;
+            return null;
         }
 
-        item = _items[index];
-        return true;
+        return _items[index];
     }
 
     public IEnumerator<CosPrimitive> GetEnumerator()
@@ -54,42 +52,61 @@ public sealed class CosArray : CosPrimitive, IEnumerable<CosPrimitive>
 [PublicAPI]
 public static class CosArrayExtensions
 {
-    public static bool TryGetValue<T>(this CosArray array, int index, [NotNullWhen(true)] out T? item)
-        where T : CosPrimitive
+    public static CosInteger? GetIntegerAt(this CosArray array, int index)
     {
-        if (!array.TryGetValue(index, out var primitive) || primitive is not T result)
-        {
-            item = null;
-            return false;
-        }
-
-        item = result;
-        return true;
+        return array.GetAt<CosInteger>(index);
     }
 
-    public static T? GetOptional<T>(this CosArray array, int index)
-        where T : CosPrimitive
+    public static CosName? GetNameAt(this CosArray array, int index)
     {
-        TryGetValue<T>(array, index, out var result);
-        return result;
+        return array.GetAt<CosName>(index);
     }
 
-    public static T GetRequired<T>(this CosArray array, int index)
+    public static CosObjectId? GetObjectIdAt(this CosArray array, int index)
+    {
+        return array.GetAt<CosObjectId>(index);
+    }
+
+    public static CosDictionary? GetDictionaryAt(this CosArray array, int index)
+    {
+        return array.GetAt<CosDictionary>(index);
+    }
+
+    public static CosArray? GetArrayAt(this CosArray array, int index)
+    {
+        return array.GetAt<CosArray>(index);
+    }
+
+    public static int? GetInt32At(this CosArray array, int index)
+    {
+        return array.GetAt<CosInteger>(index)?.IntValue;
+    }
+
+    public static long? GetInt64At(this CosArray array, int index)
+    {
+        return array.GetAt<CosInteger>(index)?.Value;
+    }
+
+    public static T? GetAt<T>(this CosArray array, int index)
         where T : CosPrimitive
     {
-        if (!array.TryGetValue(index, out var primitive))
+        var obj = array.GetAt(index);
+        if (obj == null)
         {
-            throw new IndexOutOfRangeException();
+            return null;
         }
 
-        if (primitive is not T result)
+        if (obj is not T item)
         {
+#if DEBUG
             throw new InvalidOperationException(
-                $"Expected item at position {index} to be " +
-                $"of type '{typeof(T).Name}', but was " +
-                $"'{primitive.GetType().Name}'");
+                $"Expected object at #{index} to be of type '{typeof(T).Name}', " +
+                $"but it was of type '{obj.GetType().Name}'");
+#else
+            return null;
+#endif
         }
 
-        return result;
+        return item;
     }
 }

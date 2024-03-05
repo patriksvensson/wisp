@@ -125,21 +125,21 @@ public static class CosXRefTableParser
 
     private static int[] GetFieldSizes(CosStream stream)
     {
-        var wArray = stream.Metadata.GetOptional<CosArray>(CosName.Known.W);
-        if (wArray == null)
+        var sizes = stream.Metadata.GetArray(CosNames.W);
+        if (sizes == null)
         {
             throw new InvalidOperationException("XRef Stream is missing /W array");
         }
 
-        if (wArray.Count != 3)
+        if (sizes.Count != 3)
         {
-            throw new InvalidOperationException($"Expected 3 items in /W array in XRef stream. Found {wArray.Count}");
+            throw new InvalidOperationException($"Expected 3 items in /W array in XRef stream. Found {sizes.Count}");
         }
 
         var w = new int[3];
-        w[0] = wArray.GetOptional<CosInteger>(0)?.IntValue ?? 1;
-        w[1] = wArray.GetOptional<CosInteger>(1)?.IntValue ?? 0;
-        w[2] = wArray.GetOptional<CosInteger>(2)?.IntValue ?? 0;
+        w[0] = sizes.GetInt32At(0) ?? 1;
+        w[1] = sizes.GetInt32At(1) ?? 0;
+        w[2] = sizes.GetInt32At(2) ?? 0;
 
         if (w[0] < 0 || w[1] < 0 || w[2] < 0)
         {
@@ -151,14 +151,14 @@ public static class CosXRefTableParser
 
     private static Queue<int> GetObjectIds(CosStream stream)
     {
-        var size = stream.Metadata.GetOptional<CosInteger>(CosName.Known.Size)?.Value;
+        var size = stream.Metadata.GetInt64(CosNames.Size);
         if (size == null)
         {
             throw new InvalidOperationException(
                 "Stream xref table did not have size");
         }
 
-        var indexArray = stream.Metadata.GetOptional<CosArray>(CosName.Known.Index);
+        var indexArray = stream.Metadata.GetArray(CosNames.Index);
         if (indexArray == null)
         {
             indexArray = new CosArray

@@ -16,7 +16,11 @@ public sealed class CosDictionary : CosPrimitive, IEnumerable<KeyValuePair<CosNa
 
     public CosPrimitive? this[CosName key]
     {
-        get => _dictionary[key];
+        get
+        {
+            _dictionary.TryGetValue(key, out var value);
+            return value;
+        }
         set
         {
             // Setting the value to null
@@ -101,21 +105,42 @@ public sealed class CosDictionary : CosPrimitive, IEnumerable<KeyValuePair<CosNa
 [PublicAPI]
 public static class PdfDictionaryExtensions
 {
-    public static bool TryGetValue<T>(this CosDictionary dictionary, CosName key, [NotNullWhen(true)] out T? value)
-        where T : CosPrimitive
+    public static CosInteger? GetInteger(this CosDictionary dictionary, CosName key)
     {
-        var resolved = dictionary.GetOptional<T>(key);
-        if (resolved != null)
-        {
-            value = resolved;
-            return true;
-        }
-
-        value = null;
-        return false;
+        return dictionary.Get<CosInteger>(key);
     }
 
-    public static T? GetOptional<T>(this CosDictionary dictionary, CosName key)
+    public static CosName? GetName(this CosDictionary dictionary, CosName key)
+    {
+        return dictionary.Get<CosName>(key);
+    }
+
+    public static CosObjectId? GetObjectId(this CosDictionary dictionary, CosName key)
+    {
+        return dictionary.Get<CosObjectId>(key);
+    }
+
+    public static CosDictionary? GetDictionary(this CosDictionary dictionary, CosName key)
+    {
+        return dictionary.Get<CosDictionary>(key);
+    }
+
+    public static CosArray? GetArray(this CosDictionary dictionary, CosName key)
+    {
+        return dictionary.Get<CosArray>(key);
+    }
+
+    public static int? GetInt32(this CosDictionary dictionary, CosName key)
+    {
+        return dictionary.Get<CosInteger>(key)?.IntValue;
+    }
+
+    public static long? GetInt64(this CosDictionary dictionary, CosName key)
+    {
+        return dictionary.Get<CosInteger>(key)?.Value;
+    }
+
+    public static T? Get<T>(this CosDictionary dictionary, CosName key)
         where T : CosPrimitive
     {
         if (!dictionary.TryGetValue(key, out var obj))
@@ -125,31 +150,15 @@ public static class PdfDictionaryExtensions
 
         if (obj is not T item)
         {
+#if DEBUG
             throw new InvalidOperationException(
                 $"Expected key '{key.Value}' to be of type '{typeof(T).Name}', " +
                 $"but it was of type '{obj.GetType().Name}'");
+#else
+            return null;
+#endif
         }
 
         return item;
-    }
-
-    public static T GetRequired<T>(this CosDictionary dictionary, CosName key)
-        where T : CosPrimitive
-    {
-        var result = GetOptional<T>(dictionary, key);
-        if (result == null)
-        {
-            throw new InvalidOperationException($"Could not get value for required key '{key.Value}'.");
-        }
-
-        return result;
-    }
-
-    public static void SetIfNotNull(this CosDictionary dictionary, CosName key, CosPrimitive? value)
-    {
-        if (value != null)
-        {
-            dictionary.Set(key, value);
-        }
     }
 }
