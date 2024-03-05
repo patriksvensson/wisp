@@ -192,6 +192,13 @@ public sealed class CosLexer : IDisposable
                 break;
             }
 
+            // Not part of spec but...
+            if (current == '<' || current == '>' || current == '/' ||
+                current == '[' || current == ']')
+            {
+                break;
+            }
+
             if (current == '#')
             {
                 Reader.Discard('#');
