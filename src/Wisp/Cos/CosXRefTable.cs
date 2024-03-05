@@ -24,7 +24,7 @@ public sealed class CosXRefTable : IEnumerable<CosXRef>
         return _lookup.ContainsKey(id);
     }
 
-    public CosXRefTable Merge(CosXRefTable other)
+    internal CosXRefTable Merge(CosXRefTable other)
     {
         ArgumentNullException.ThrowIfNull(other);
 
@@ -42,7 +42,7 @@ public sealed class CosXRefTable : IEnumerable<CosXRef>
         return result;
     }
 
-    public bool Add(CosXRef reference)
+    internal bool Add(CosXRef reference)
     {
         ArgumentNullException.ThrowIfNull(reference);
 

@@ -31,7 +31,7 @@ public static class EmbeddedResourceReader
         }
     }
 
-    public static Stream? GetStream(string resourceName)
+    public static Stream GetStream(string resourceName)
     {
         if (resourceName is null)
         {
@@ -46,6 +46,12 @@ public static class EmbeddedResourceReader
         }
 
         resourceName = resourceName.Replace("/", ".", StringComparison.Ordinal);
-        return assembly.GetManifestResourceStream(resourceName);
+        var stream = assembly.GetManifestResourceStream(resourceName);
+        if (stream == null)
+        {
+            throw new InvalidOperationException($"Could not resolve manifest stream '{resourceName}'");
+        }
+
+        return stream;
     }
 }

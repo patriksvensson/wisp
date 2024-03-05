@@ -5,7 +5,7 @@ public static class CosTrailerReader
 {
     private static readonly byte[] _marker = [0x73, 0x74, 0x61, 0x72, 0x74, 0x78, 0x72, 0x65, 0x66];
 
-    public static (CosXRefTable? Table, CosDictionary? Trailer) Read(CosParser parser)
+    public static (CosXRefTable Table, CosDictionary Trailer) Read(CosParser parser)
     {
         var previousPosition = parser.Position;
 
@@ -40,7 +40,9 @@ public static class CosTrailerReader
                 xrefStart = prev.Value;
             }
 
-            return (table, trailer);
+            return (
+                table ?? new CosXRefTable(),
+                trailer ?? new CosDictionary());
         }
         finally
         {

@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <None Remove="Data\XRefStream.pdf" />
+    <EmbeddedResource Include="Data\Simple.pdf" />
     <EmbeddedResource Include="Data\XRefStream.pdf" />
     <None Remove="Data\XRefStreamIncremental.pdf" />
     <EmbeddedResource Include="Data\XRefStreamIncremental.pdf" />
