@@ -2,7 +2,7 @@ namespace Wisp.Cos;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
-public sealed class CosObjectStream : CosPrimitive
+public sealed class CosObjectStream : ICosPrimitive
 {
     private readonly CosStream _stream;
     private readonly List<(int Id, long Offset)> _offsetsByIndex = new();

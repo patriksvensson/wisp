@@ -2,7 +2,7 @@ namespace Wisp.Cos;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
-public sealed class CosInteger : CosPrimitive
+public sealed class CosInteger : ICosPrimitive
 {
     public long Value { get; }
     public int IntValue => (int)Value;

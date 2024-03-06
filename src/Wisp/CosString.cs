@@ -2,7 +2,7 @@ namespace Wisp.Cos;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
-public sealed class CosString : CosPrimitive
+public sealed class CosString : ICosPrimitive
 {
     public string Value { get; }
     public CosStringEncoding Encoding { get; }

@@ -2,9 +2,11 @@ namespace Wisp.Cos;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
-public sealed class CosName : CosPrimitive, IEquatable<CosName>
+public sealed class CosName : ICosPrimitive, IEquatable<CosName>
 {
     public string Value { get; }
+
+    public static CosNameComparer Comparer => CosNameComparer.Shared;
 
     public CosName(string value)
     {

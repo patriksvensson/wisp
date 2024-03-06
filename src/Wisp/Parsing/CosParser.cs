@@ -11,8 +11,12 @@ public sealed class CosParser : IDisposable
     public long Length => Lexer.Reader.Length;
     public bool CanRead => Lexer.Reader.CanRead;
 
-    public CosParser(Stream stream, bool isStreamObject = false)
+    public CosParser(
+        Stream stream,
+        bool isStreamObject = false)
     {
+        ArgumentNullException.ThrowIfNull(stream);
+
         Lexer = new CosLexer(stream);
         _isStreamObject = isStreamObject;
     }
@@ -48,7 +52,7 @@ public sealed class CosParser : IDisposable
         return Lexer.Read();
     }
 
-    public CosPrimitive ParseObject()
+    public ICosPrimitive ParseObject()
     {
         while (Lexer.Check(CosTokenKind.Comment))
         {
@@ -75,7 +79,7 @@ public sealed class CosParser : IDisposable
         };
     }
 
-    private CosPrimitive ParseBoolean()
+    private ICosPrimitive ParseBoolean()
     {
         var token = Lexer.Expect(CosTokenKind.Boolean);
         return (token.Text == "true")
@@ -83,7 +87,7 @@ public sealed class CosParser : IDisposable
             : new CosBoolean(false);
     }
 
-    private CosPrimitive ParseInteger()
+    private ICosPrimitive ParseInteger()
     {
         var value = Lexer.Expect(CosTokenKind.Integer).ParseInt32();
         var position = Lexer.Reader.Position;
@@ -129,7 +133,7 @@ public sealed class CosParser : IDisposable
         return CosNull.Shared;
     }
 
-    private CosPrimitive ParseStringLiteral()
+    private ICosPrimitive ParseStringLiteral()
     {
         static bool DecodeString(
             byte[] bytes,
@@ -180,10 +184,10 @@ public sealed class CosParser : IDisposable
         return new CosString(decoded, encoding.Value);
     }
 
-    private CosString ParseHexStringLiteral()
+    private CosHexString ParseHexStringLiteral()
     {
         var token = Lexer.Expect(CosTokenKind.HexStringLiteral);
-        return new CosString(token.Text!, CosStringEncoding.HexLiteral);
+        return new CosHexString(token.Lexeme!);
     }
 
     private CosName ParseName()
@@ -192,7 +196,7 @@ public sealed class CosParser : IDisposable
         return new CosName(token.Text!);
     }
 
-    private CosPrimitive ParseDictionary()
+    private ICosPrimitive ParseDictionary()
     {
         Lexer.Expect(CosTokenKind.BeginDictionary);
 

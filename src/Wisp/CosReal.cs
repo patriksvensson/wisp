@@ -2,7 +2,7 @@ namespace Wisp.Cos;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
-public sealed class CosReal : CosPrimitive
+public sealed class CosReal : ICosPrimitive
 {
     public double Value { get; }
 

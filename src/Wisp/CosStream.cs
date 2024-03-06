@@ -2,7 +2,7 @@ namespace Wisp.Cos;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
-public sealed class CosStream : CosPrimitive
+public sealed class CosStream : ICosPrimitive
 {
     private byte[] _data;
     private bool _decoded;

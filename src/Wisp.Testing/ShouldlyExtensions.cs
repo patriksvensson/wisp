@@ -52,6 +52,13 @@ public static class ShouldlyExtensions
         return obj;
     }
 
+    public static CosHexString ShouldHaveHexValue(this CosHexString? obj, string value)
+    {
+        obj.ShouldNotBeNull();
+        Convert.ToHexString(obj.Value).ShouldBe(value);
+        return obj;
+    }
+
     public static CosName ShouldHaveValue(this CosName? obj, string value)
     {
         obj.ShouldNotBeNull();

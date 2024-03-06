@@ -2,28 +2,28 @@ namespace Wisp.Cos;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
-public sealed class CosArray : CosPrimitive, IEnumerable<CosPrimitive>
+public sealed class CosArray : ICosPrimitive, IEnumerable<ICosPrimitive>
 {
-    private readonly List<CosPrimitive> _items;
+    private readonly List<ICosPrimitive> _items;
 
     public int Count => _items.Count;
 
-    public CosPrimitive this[int index]
+    public ICosPrimitive this[int index]
     {
         get => _items[index];
     }
 
     public CosArray()
     {
-        _items = new List<CosPrimitive>();
+        _items = new List<ICosPrimitive>();
     }
 
-    public void Add(CosPrimitive item)
+    public void Add(ICosPrimitive item)
     {
         _items.Add(item);
     }
 
-    public CosPrimitive? GetAt(int index)
+    public ICosPrimitive? GetAt(int index)
     {
         if (index >= _items.Count)
         {
@@ -33,7 +33,7 @@ public sealed class CosArray : CosPrimitive, IEnumerable<CosPrimitive>
         return _items[index];
     }
 
-    public IEnumerator<CosPrimitive> GetEnumerator()
+    public IEnumerator<ICosPrimitive> GetEnumerator()
     {
         return _items.GetEnumerator();
     }
@@ -88,12 +88,12 @@ public static class CosArrayExtensions
     }
 
     public static T? GetAt<T>(this CosArray array, int index)
-        where T : CosPrimitive
+        where T : ICosPrimitive
     {
         var obj = array.GetAt(index);
         if (obj == null)
         {
-            return null;
+            return default;
         }
 
         if (obj is not T item)
@@ -103,7 +103,7 @@ public static class CosArrayExtensions
                 $"Expected object at #{index} to be of type '{typeof(T).Name}', " +
                 $"but it was of type '{obj.GetType().Name}'");
 #else
-            return null;
+            return default;
 #endif
         }
 

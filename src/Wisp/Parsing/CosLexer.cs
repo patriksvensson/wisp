@@ -282,6 +282,46 @@ public sealed class CosLexer : IDisposable
         return ReadHexStringLiteral();
     }
 
+    private CosToken ReadHexStringLiteral1()
+    {
+        var queue = new Queue<char>();
+        var result = new List<byte>();
+        while (true)
+        {
+            if (!Reader.CanRead)
+            {
+                throw new InvalidOperationException(
+                    "Hex string literal is missing trailing '>'.");
+            }
+
+            var current = Reader.PeekChar();
+            if (!char.IsLetter(current) && !char.IsDigit(current))
+            {
+                if (current == '>')
+                {
+                    Reader.Discard('>');
+                    break;
+                }
+
+                throw new InvalidOperationException(
+                    $"Malformed hexadecimal literal. Invalid character '{current}'.");
+            }
+
+            queue.Enqueue(Reader.ReadChar());
+
+            if (queue.Count == 2)
+            {
+                var first = queue.Dequeue();
+                var second = queue.Dequeue();
+                result.Add((byte)HexUtility.FromHex(first, second));
+            }
+        }
+
+        return new CosToken(
+            CosTokenKind.HexStringLiteral,
+            lexeme: result.ToArray());
+    }
+
     private CosToken ReadHexStringLiteral()
     {
         var accumulator = new StringBuilder();
@@ -309,9 +349,14 @@ public sealed class CosLexer : IDisposable
             accumulator.Append(Reader.ReadChar());
         }
 
+        if (accumulator.Length % 2 != 0)
+        {
+            accumulator.Append('0');
+        }
+
         return new CosToken(
             CosTokenKind.HexStringLiteral,
-            HexUtility.FromHex(accumulator.ToString()));
+            lexeme: Convert.FromHexString(accumulator.ToString()));
     }
 
     private CosToken ReadBeginArray()

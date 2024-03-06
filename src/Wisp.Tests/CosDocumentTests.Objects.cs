@@ -1,5 +1,3 @@
-using Wisp.Testing.Fixtures;
-
 namespace Wisp.Tests;
 
 public sealed partial class CosDocumentTests

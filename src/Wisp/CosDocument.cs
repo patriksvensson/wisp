@@ -6,15 +6,17 @@ public sealed class CosDocument
     public PdfVersion Version { get; }
     public CosObjectCollection Objects { get; }
     public CosXRefTable XRefTable { get; }
-    public CosDictionary Trailer { get; }
+    public CosTrailer Trailer { get; }
 
-    public CosDocument(
-        PdfVersion version, CosXRefTable xRefTable,
-        CosDictionary trailer, CosObjectResolver? resolver)
+    internal CosDocument(
+        PdfVersion version,
+        CosXRefTable xRefTable,
+        CosTrailer trailer,
+        CosObjectResolver? objectResolver)
     {
         ArgumentNullException.ThrowIfNull(xRefTable);
 
-        Objects = new CosObjectCollection(xRefTable, resolver);
+        Objects = new CosObjectCollection(xRefTable, objectResolver);
         Version = version;
         XRefTable = xRefTable;
         Trailer = trailer ?? throw new ArgumentNullException(nameof(trailer));

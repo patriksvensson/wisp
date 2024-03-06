@@ -2,10 +2,12 @@ namespace Wisp.Cos;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
-public sealed class CosObjectId : CosPrimitive, IEquatable<CosObjectId>
+public sealed class CosObjectId : ICosPrimitive, IEquatable<CosObjectId>
 {
     public int Number { get; set; }
     public int Generation { get; set; }
+
+    public static CosObjectIdComparer Comparer => CosObjectIdComparer.Shared;
 
     public CosObjectId(int number, int generation)
     {

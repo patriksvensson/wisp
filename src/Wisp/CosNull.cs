@@ -2,7 +2,7 @@ namespace Wisp.Cos;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
-public sealed class CosNull : CosPrimitive
+public sealed class CosNull : ICosPrimitive
 {
     public static CosNull Shared { get; } = new();
 

@@ -15,7 +15,7 @@ public static class CosNames
     public static CosName Encrypt { get; } = new("Encrypt");
     public static CosName Filter { get; } = new("Filter");
     public static CosName First { get; } = new("First");
-    public static CosName ID { get; } = new("ID");
+    public static CosName Id { get; } = new("ID");
     public static CosName Index { get; } = new("Index");
     public static CosName Info { get; } = new("Info");
     public static CosName Keywords { get; } = new("Keywords");

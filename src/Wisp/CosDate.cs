@@ -1,7 +1,7 @@
 namespace Wisp.Cos;
 
 [PublicAPI]
-public sealed class CosDate : CosPrimitive
+public sealed class CosDate : ICosPrimitive
 {
     private static readonly string[] _formats =
     [
