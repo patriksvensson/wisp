@@ -21,7 +21,30 @@ public static class CosDocumentReader
         // Create the object resolver
         var resolver = new CosObjectResolver(parser, xRefTable);
 
-        // Create the document
-        return new CosDocument(version, xRefTable, trailer, resolver);
+        // Get the document information
+        var info = default(CosInfo);
+        if (trailer.Info != null)
+        {
+            var infoObj = resolver.GetObject(trailer.Info);
+            if (infoObj == null)
+            {
+                // TODO: We should remove the info object from the trailer
+                throw new InvalidOperationException(
+                    "Info object was specified but did not exist");
+            }
+
+            var infoDictionary = infoObj.Object as CosDictionary;
+            if (infoDictionary == null)
+            {
+                throw new InvalidOperationException(
+                    "Info object was expected to be a dictionary, but was not");
+            }
+
+            info = new CosInfo(trailer.Info, infoDictionary);
+        }
+
+        return new CosDocument(
+            version, xRefTable, trailer,
+            info, resolver);
     }
 }

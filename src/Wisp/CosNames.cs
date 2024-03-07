@@ -10,6 +10,7 @@ public static class CosNames
     public static CosName Columns { get; } = new("Columns");
     public static CosName Contents { get; } = new("Contents");
     public static CosName Count { get; } = new("Count");
+    public static CosName CreationDate { get; } = new("CreationDate");
     public static CosName Creator { get; } = new("Creator");
     public static CosName DecodeParms { get; } = new("DecodeParms");
     public static CosName Encrypt { get; } = new("Encrypt");
@@ -23,6 +24,7 @@ public static class CosNames
     public static CosName Last { get; } = new("Last");
     public static CosName Length { get; } = new("Length");
     public static CosName MediaBox { get; } = new("MediaBox");
+    public static CosName ModDate { get; } = new("ModDate");
     public static CosName N { get; } = new("N");
     public static CosName ObjStm { get; } = new("ObjStm");
     public static CosName Pages { get; } = new("Pages");

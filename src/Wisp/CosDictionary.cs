@@ -2,7 +2,7 @@ namespace Wisp.Cos;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
-public sealed class CosDictionary : ICosPrimitive, IEnumerable<KeyValuePair<CosName, ICosPrimitive>>
+public class CosDictionary : ICosPrimitive, IEnumerable<KeyValuePair<CosName, ICosPrimitive>>
 {
     private readonly Dictionary<CosName, ICosPrimitive> _dictionary;
 
@@ -23,6 +23,17 @@ public sealed class CosDictionary : ICosPrimitive, IEnumerable<KeyValuePair<CosN
     public CosDictionary()
     {
         _dictionary = new Dictionary<CosName, ICosPrimitive>(CosNameComparer.Shared);
+    }
+
+    public CosDictionary(CosDictionary dictionary)
+        : this()
+    {
+        ArgumentNullException.ThrowIfNull(dictionary);
+
+        foreach (var (key, value) in dictionary)
+        {
+            Set(key, value);
+        }
     }
 
     public bool ContainsKey(CosName key)
@@ -104,6 +115,26 @@ public static class PdfDictionaryExtensions
     public static CosInteger GetRequiredInteger(this CosDictionary dictionary, CosName key)
     {
         return dictionary.GetRequired<CosInteger>(key);
+    }
+
+    public static CosString? GetString(this CosDictionary dictionary, CosName key)
+    {
+        return dictionary.Get<CosString>(key);
+    }
+
+    public static CosString GetRequiredString(this CosDictionary dictionary, CosName key)
+    {
+        return dictionary.GetRequired<CosString>(key);
+    }
+
+    public static CosDate? GetDate(this CosDictionary dictionary, CosName key)
+    {
+        return dictionary.Get<CosDate>(key);
+    }
+
+    public static CosDate GetRequiredDate(this CosDictionary dictionary, CosName key)
+    {
+        return dictionary.GetRequired<CosDate>(key);
     }
 
     public static CosName? GetName(this CosDictionary dictionary, CosName key)
@@ -194,5 +225,18 @@ public static class PdfDictionaryExtensions
         }
 
         return item;
+    }
+
+    public static void SetRequired(this CosDictionary dictionary, CosName key, ICosPrimitive value)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+
+        if (value == null)
+        {
+            throw new InvalidOperationException(
+                "Cannot set required key '{key}' to null");
+        }
+
+        dictionary[key] = value;
     }
 }
