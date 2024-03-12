@@ -46,6 +46,18 @@ public class CosDictionary : ICosPrimitive, IEnumerable<KeyValuePair<CosName, IC
         return _dictionary.ContainsKey(key);
     }
 
+    public void Add(CosName key, ICosPrimitive value)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+        ArgumentNullException.ThrowIfNull(value);
+
+        if (!_dictionary.TryAdd(key, value))
+        {
+            throw new InvalidOperationException(
+                "Another item with the same key already exist in the dictionary");
+        }
+    }
+
     public ICosPrimitive? Get(CosName key)
     {
         _dictionary.TryGetValue(key, out var value);
@@ -98,6 +110,12 @@ public class CosDictionary : ICosPrimitive, IEnumerable<KeyValuePair<CosName, IC
         return GetEnumerator();
     }
 
+    public void Accept<TContext>(ICosVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitDictionary(this, context);
+    }
+
+    [DebuggerStepThrough]
     public override string ToString()
     {
         return $"[Dictionary] Count = {_dictionary.Count}";
@@ -147,14 +165,14 @@ public static class PdfDictionaryExtensions
         return dictionary.GetRequired<CosName>(key);
     }
 
-    public static CosObjectId? GetObjectId(this CosDictionary dictionary, CosName key)
+    public static CosObjectReference? GetObjectReference(this CosDictionary dictionary, CosName key)
     {
-        return dictionary.Get<CosObjectId>(key);
+        return dictionary.Get<CosObjectReference>(key);
     }
 
-    public static CosObjectId GetRequiredObjectId(this CosDictionary dictionary, CosName key)
+    public static CosObjectReference GetRequiredObjectReference(this CosDictionary dictionary, CosName key)
     {
-        return dictionary.GetRequired<CosObjectId>(key);
+        return dictionary.GetRequired<CosObjectReference>(key);
     }
 
     public static CosDictionary? GetDictionary(this CosDictionary dictionary, CosName key)

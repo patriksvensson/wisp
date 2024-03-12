@@ -11,8 +11,14 @@ public sealed class CosReal : ICosPrimitive
         Value = value;
     }
 
+    [DebuggerStepThrough]
+    public void Accept<TContext>(ICosVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitReal(this, context);
+    }
+
     public override string ToString()
     {
-        return $"[Real] {Value}";
+        return $"[Real] {Value.ToString(CultureInfo.InvariantCulture)}";
     }
 }

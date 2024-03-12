@@ -74,6 +74,13 @@ public static class ShouldlyExtensions
         return obj;
     }
 
+    public static CosObjectReference ShouldBe(this CosObjectReference? obj, int number, int generation)
+    {
+        obj.ShouldNotBeNull();
+        obj.Id.ShouldBe(number, generation);
+        return obj;
+    }
+
     public static CosObjectId ShouldHaveNumber(this CosObjectId? obj, int value)
     {
         obj.ShouldNotBeNull();

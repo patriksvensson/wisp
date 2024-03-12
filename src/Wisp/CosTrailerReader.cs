@@ -25,8 +25,8 @@ public static class CosTrailerReader
             {
                 parser.Seek(xrefStart.Value, SeekOrigin.Begin);
                 var (readTable, readTrailer) = parser.PeekToken()?.Kind == CosTokenKind.XRef
-                    ? CosXRefTableParser.Parse(parser)
-                    : CosXRefTableParser.ParseXRefStream(parser);
+                    ? CosXRefTableReader.Read(parser)
+                    : CosXRefTableReader.ParseXRefStream(parser);
 
                 table = table?.Merge(readTable) ?? readTable;
                 trailer = readTrailer;
@@ -71,7 +71,7 @@ public static class CosTrailerReader
 
             if (index == _marker.Length)
             {
-                var obj = parser.ParseObject();
+                var obj = parser.Parse();
                 if (obj is not CosInteger integer)
                 {
                     throw new InvalidOperationException("Expected 'startxref' to be an integer");

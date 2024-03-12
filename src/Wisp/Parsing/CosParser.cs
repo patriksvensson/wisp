@@ -52,7 +52,7 @@ public sealed class CosParser : IDisposable
         return Lexer.Read();
     }
 
-    public ICosPrimitive ParseObject()
+    public ICosPrimitive Parse()
     {
         while (Lexer.Check(CosTokenKind.Comment))
         {
@@ -104,13 +104,13 @@ public sealed class CosParser : IDisposable
                     case CosTokenKind.Reference:
                         // Reference means object ID
                         Lexer.Expect(CosTokenKind.Reference);
-                        return new CosObjectId(value, generation);
+                        return new CosObjectReference(new CosObjectId(value, generation));
                     case CosTokenKind.BeginObject:
                         // Object definition
                         Lexer.Expect(CosTokenKind.BeginObject);
                         return new CosObject(
                             new CosObjectId(value, generation),
-                            ParseObject());
+                            Parse());
                 }
             }
 
@@ -208,13 +208,13 @@ public sealed class CosParser : IDisposable
                 break;
             }
 
-            var temp = ParseObject();
+            var temp = Parse();
             if (temp is not CosName key)
             {
                 throw new InvalidOperationException("Encountered dictionary key that was not a PDF name");
             }
 
-            var value = ParseObject();
+            var value = Parse();
             result.Set(key, value);
         }
 
@@ -258,7 +258,7 @@ public sealed class CosParser : IDisposable
                 break;
             }
 
-            result.Add(ParseObject());
+            result.Add(Parse());
         }
 
         Lexer.Expect(CosTokenKind.EndArray);

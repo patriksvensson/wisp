@@ -1,9 +1,9 @@
 ﻿namespace Wisp.Cos;
 
 [PublicAPI]
-public static class CosXRefTableParser
+public static class CosXRefTableReader
 {
-    public static (CosXRefTable XRefTable, CosDictionary Trailer) Parse(CosParser parser)
+    public static (CosXRefTable XRefTable, CosDictionary Trailer) Read(CosParser parser)
     {
         parser.Lexer.Expect(CosTokenKind.XRef);
 
@@ -23,11 +23,19 @@ public static class CosXRefTableParser
             {
                 var position = parser.Lexer.Expect(CosTokenKind.Integer).ParseInt32();
                 var generation = parser.Lexer.Expect(CosTokenKind.Integer).ParseInt32();
+                var kind = parser.Lexer.Read().Kind;
 
-                switch (parser.Lexer.Read().Kind)
+                if (position == 0)
+                {
+                    // Word adds empty rows in the xref table sometimes
+                    // For now, just ignore since it doesn't point to an actual object
+                    continue;
+                }
+
+                switch (kind)
                 {
                     case CosTokenKind.XRefFree:
-                        table.Add(new CosFreeXRef(new CosObjectId(id, generation)));
+                        // We don't care of free objects
                         break;
                     case CosTokenKind.XRefIndirect:
                         table.Add(new CosIndirectXRef(
@@ -47,7 +55,7 @@ public static class CosXRefTableParser
             var current = parser.ReadToken();
             if (current.Kind == CosTokenKind.Trailer)
             {
-                if (parser.ParseObject() is CosDictionary trailerDictionary)
+                if (parser.Parse() is CosDictionary trailerDictionary)
                 {
                     trailer = trailerDictionary;
                     break;
@@ -61,16 +69,13 @@ public static class CosXRefTableParser
     public static (CosXRefTable XRefTable, CosDictionary Trailer) ParseXRefStream(CosParser parser)
     {
         var start = parser.Position;
-        var primitive = parser.ParseObject();
+        var primitive = parser.Parse();
         if (primitive is not CosObject obj || obj.Object is not CosStream stream)
         {
             throw new InvalidOperationException("Expected COS stream");
         }
 
         var table = new CosXRefTable();
-
-        // Add ourselves (the xref stream object) to the table
-        table.Add(new CosIndirectXRef(obj.Id, start));
 
         var sizes = GetFieldSizes(stream);
         var ids = GetObjectIds(stream);
@@ -87,10 +92,7 @@ public static class CosXRefTableParser
 
             if (entry.First == 0)
             {
-                // Free object
-                var generation = entry.Third;
-                table.Add(new CosFreeXRef(
-                    new CosObjectId(entry.Second, generation)));
+                // We don't care of free objects
             }
             else if (entry.First == 1)
             {
@@ -120,12 +122,12 @@ public static class CosXRefTableParser
             }
         }
 
-        return (table, stream.Metadata);
+        return (table, stream.Dictionary);
     }
 
     private static int[] GetFieldSizes(CosStream stream)
     {
-        var sizes = stream.Metadata.GetArray(CosNames.W);
+        var sizes = stream.Dictionary.GetArray(CosNames.W);
         if (sizes == null)
         {
             throw new InvalidOperationException("XRef Stream is missing /W array");
@@ -151,14 +153,14 @@ public static class CosXRefTableParser
 
     private static Queue<int> GetObjectIds(CosStream stream)
     {
-        var size = stream.Metadata.GetInt64(CosNames.Size);
+        var size = stream.Dictionary.GetInt64(CosNames.Size);
         if (size == null)
         {
             throw new InvalidOperationException(
                 "Stream xref table did not have size");
         }
 
-        var indexArray = stream.Metadata.GetArray(CosNames.Index);
+        var indexArray = stream.Dictionary.GetArray(CosNames.Index);
         if (indexArray == null)
         {
             indexArray = new CosArray
@@ -207,7 +209,7 @@ public static class CosXRefTableParser
             throw new InvalidOperationException("Invalid sizes");
         }
 
-        var data = stream.GetData();
+        var data = stream.GetUnfilteredData();
         if (data is null)
         {
             yield break;

@@ -5,37 +5,75 @@ namespace Wisp.Cos;
 public sealed class CosStream : ICosPrimitive
 {
     private byte[] _data;
-    private bool _decoded;
 
-    public CosDictionary Metadata { get; }
+    public CosDictionary Dictionary { get; }
+    public long Length => Dictionary.GetInt64(CosNames.Length) ?? throw new InvalidOperationException("/Length missing from stream");
+    public CosDictionary? DecodeParms => Dictionary.GetDictionary(CosNames.DecodeParms);
 
-    public long Length => Metadata.GetInt64(CosNames.Length)
-                          ?? throw new InvalidOperationException("/Length missing from stream");
+    public bool IsCompressed => Dictionary.ContainsKey(CosNames.Filter);
 
-    public CosDictionary? DecodeParms => Metadata.GetDictionary(CosNames.DecodeParms);
-
-    public CosStream(CosDictionary metadata, byte[] data)
+    public CosStream(CosDictionary dictionary, byte[] data)
     {
-        Metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
         _data = data ?? throw new ArgumentNullException(nameof(data));
+
+        Dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
+        if (!Dictionary.ContainsKey(CosNames.Length))
+        {
+            Dictionary.Add(CosNames.Length, new CosInteger(_data.Length));
+        }
     }
 
     public byte[] GetData()
     {
-        if (!_decoded)
+        return _data;
+    }
+
+    public byte[] GetUnfilteredData()
+    {
+        if (Dictionary.ContainsKey(CosNames.Filter))
         {
-            _data = Filter.Decode(this, _data);
-            _decoded = true;
+            return Filter.Decode(this, _data);
         }
 
         return _data;
     }
 
+    public void Compress(CosCompression compression)
+    {
+        if (!Dictionary.ContainsKey(CosNames.Filter))
+        {
+            _data = FlateFilter.Encode(_data, compression);
+
+            Dictionary.Set(CosNames.Filter, new CosName("FlateDecode"));
+            Dictionary.Set(CosNames.DecodeParms, null);
+            Dictionary.Set(CosNames.Length, new CosInteger(_data.Length));
+        }
+    }
+
+    public void Decompress()
+    {
+        if (Dictionary.ContainsKey(CosNames.Filter))
+        {
+            _data = Filter.Decode(this, _data);
+
+            Dictionary.Set(CosNames.Filter, null);
+            Dictionary.Set(CosNames.DecodeParms, null);
+            Dictionary.Set(CosNames.Length, new CosInteger(_data.Length));
+        }
+    }
+
     public void SetData(byte[]? data, CosDictionary? decodeParameters)
     {
         _data = data ?? [];
-        Metadata[CosNames.DecodeParms] = decodeParameters;
-        Metadata[CosNames.Length] = new CosInteger(data?.Length ?? 0);
+        Dictionary.Set(CosNames.Filter, null);
+        Dictionary.Set(CosNames.DecodeParms, decodeParameters);
+        Dictionary.Set(CosNames.Length, new CosInteger(data?.Length ?? 0));
+    }
+
+    [DebuggerStepThrough]
+    public void Accept<TContext>(ICosVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitStream(this, context);
     }
 
     public override string ToString()

@@ -17,6 +17,12 @@ public sealed class CosInteger : ICosPrimitive
         Value = value ?? 0;
     }
 
+    [DebuggerStepThrough]
+    public void Accept<TContext>(ICosVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitInteger(this, context);
+    }
+
     public override string ToString()
     {
         return $"[Integer] {Value}";

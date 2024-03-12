@@ -15,4 +15,10 @@ public sealed class CosBoolean : ICosPrimitive
     {
         return $"[Boolean] {Value}";
     }
+
+    [DebuggerStepThrough]
+    public void Accept<TContext>(ICosVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitBoolean(this, context);
+    }
 }

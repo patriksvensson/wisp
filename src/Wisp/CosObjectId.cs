@@ -2,8 +2,10 @@ namespace Wisp.Cos;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
-public sealed class CosObjectId : ICosPrimitive, IEquatable<CosObjectId>
+public sealed class CosObjectId : ICosPrimitive, IEquatable<CosObjectId>, IComparable<CosObjectId>
 {
+    private static readonly char[] _separator = [':'];
+
     public int Number { get; set; }
     public int Generation { get; set; }
 
@@ -17,7 +19,7 @@ public sealed class CosObjectId : ICosPrimitive, IEquatable<CosObjectId>
 
     public static CosObjectId Parse(string text)
     {
-        var parts = text.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+        var parts = text.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
         if (parts.Length == 2)
         {
             return new CosObjectId(
@@ -26,6 +28,16 @@ public sealed class CosObjectId : ICosPrimitive, IEquatable<CosObjectId>
         }
 
         throw new InvalidOperationException("Could not parse object ID.");
+    }
+
+    public int CompareTo(CosObjectId? other)
+    {
+        if (other == null)
+        {
+            return 1;
+        }
+
+        return Number.CompareTo(other.Number);
     }
 
     public override bool Equals(object? obj)
@@ -51,6 +63,12 @@ public sealed class CosObjectId : ICosPrimitive, IEquatable<CosObjectId>
     public override int GetHashCode()
     {
         return CosObjectIdComparer.Shared.GetHashCode(this);
+    }
+
+    [DebuggerStepThrough]
+    public void Accept<TContext>(ICosVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitObjectId(this, context);
     }
 
     public override string ToString()

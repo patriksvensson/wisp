@@ -12,16 +12,18 @@ public sealed class CosObjectStream : ICosPrimitive
     /// <summary>
     /// Gets the number of indirect objects stored in the stream.
     /// </summary>
-    public int N => _stream.Metadata.GetInt32(CosNames.N) ?? 0;
+    public int N => _stream.Dictionary.GetInt32(CosNames.N) ?? 0;
+
+    public CosDictionary Metadata => _stream.Dictionary;
 
     public CosObjectStream(CosStream stream)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
     }
 
-    public CosObject GetObject(CosObjectId id)
+    public CosObject GetObject(ICosObjectCache cache, CosObjectId id)
     {
-        var bytes = _stream.GetData();
+        var bytes = _stream.GetUnfilteredData();
         if (bytes == null)
         {
             throw new InvalidOperationException("Stream contained no data");
@@ -29,10 +31,18 @@ public sealed class CosObjectStream : ICosPrimitive
 
         if (_unpacked)
         {
-            if (!_offsetsById.ContainsKey(id.Number))
+            if (_offsetsById.ContainsKey(id.Number))
             {
-                throw new InvalidOperationException("Object does not exist within object stream");
+                // Ok, we know the ID, does this object exist in the cache?
+                // Try to get it without resolving (since we don't want a stack overflow).
+                var obj = cache.Get(id, resolve: false);
+                if (obj != null)
+                {
+                    return obj;
+                }
             }
+
+            throw new InvalidOperationException("Object does not exist within object stream");
         }
 
         using (var stream = new MemoryStream(bytes))
@@ -48,15 +58,16 @@ public sealed class CosObjectStream : ICosPrimitive
 
             // Read the object at the correct offset
             parser.Lexer.Reader.Seek(offset, SeekOrigin.Begin);
-            var obj = parser.ParseObject();
+            var primitive = parser.Parse();
+            var obj = new CosObject(id, primitive);
 
-            return new CosObject(id, obj);
+            return obj;
         }
     }
 
-    public CosObject GetObjectByIndex(int index)
+    public CosObject GetObjectByIndex(ICosObjectCache cache, int index)
     {
-        var bytes = _stream.GetData();
+        var bytes = _stream.GetUnfilteredData();
         if (bytes == null)
         {
             throw new InvalidOperationException("Stream contained no data");
@@ -68,14 +79,46 @@ public sealed class CosObjectStream : ICosPrimitive
             EnsureOffsetsHaveBeenPopulated(parser);
 
             // Read the object at the correct offset
-            var (id, offset) = _offsetsByIndex[index];
-            parser.Lexer.Reader.Seek(offset, SeekOrigin.Begin);
-            var obj = parser.ParseObject();
+            var (number, offset) = _offsetsByIndex[index];
+            var id = new CosObjectId(number, 0);
 
-            return new CosObject(
-                new CosObjectId(id, 0),
-                obj);
+            // Ok, we know the ID, does this object exist in the cache?
+            // Try to get it without resolving (since we don't want a stack overflow).
+            var obj = cache.Get(id, resolve: false);
+            if (obj != null)
+            {
+                return obj;
+            }
+
+            // Find the object and parse it
+            parser.Lexer.Reader.Seek(offset, SeekOrigin.Begin);
+            var primitive = parser.Parse();
+            obj = new CosObject(id, primitive);
+
+            return obj;
         }
+    }
+
+    internal List<int> GetObjectIds()
+    {
+        var bytes = _stream.GetUnfilteredData();
+        if (bytes == null)
+        {
+            throw new InvalidOperationException("Stream contained no data");
+        }
+
+        if (!_unpacked)
+        {
+            using (var stream = new MemoryStream(bytes))
+            {
+                var parser = new CosParser(stream, true);
+                EnsureOffsetsHaveBeenPopulated(parser);
+
+                return _offsetsById.Keys.ToList();
+            }
+        }
+
+        return _offsetsById.Keys.ToList();
     }
 
     private void EnsureOffsetsHaveBeenPopulated(CosParser parser)
@@ -85,7 +128,7 @@ public sealed class CosObjectStream : ICosPrimitive
             return;
         }
 
-        var objectOffset = _stream.Metadata.GetInt64(CosNames.First);
+        var objectOffset = _stream.Dictionary.GetInt64(CosNames.First);
         if (objectOffset == null)
         {
             throw new InvalidOperationException("Object stream is missing /First parameter");
@@ -98,14 +141,20 @@ public sealed class CosObjectStream : ICosPrimitive
                 throw new InvalidOperationException("Encountered premature end of object stream");
             }
 
-            var id = (int)((CosInteger)parser.ParseObject()).Value;
-            var offset = objectOffset.Value + ((CosInteger)parser.ParseObject()).Value;
+            var id = (int)((CosInteger)parser.Parse()).Value;
+            var offset = objectOffset.Value + ((CosInteger)parser.Parse()).Value;
 
             _offsetsById.Add(id, offset);
             _offsetsByIndex.Add((id, offset));
         }
 
         _unpacked = true;
+    }
+
+    [DebuggerStepThrough]
+    public void Accept<TContext>(ICosVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitObjectStream(this, context);
     }
 
     public override string ToString()

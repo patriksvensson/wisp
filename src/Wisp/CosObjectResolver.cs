@@ -12,9 +12,22 @@ public sealed class CosObjectResolver
         _xRefTable = xRefTable ?? throw new ArgumentNullException(nameof(xRefTable));
     }
 
-    public CosObject? GetObject(CosObjectId id)
+    public CosObject? GetObject(ICosObjectCache owner, CosObjectReference reference)
     {
+        ArgumentNullException.ThrowIfNull(reference);
+        return GetObject(owner, reference.Id);
+    }
+
+    public CosObject? GetObject(ICosObjectCache owner, CosObjectId id)
+    {
+        ArgumentNullException.ThrowIfNull(id);
+
         var xref = _xRefTable.GetXRef(id);
+        return GetObjectByXRef(owner, xref);
+    }
+
+    private CosObject? GetObjectByXRef(ICosObjectCache owner, CosXRef? xref)
+    {
         switch (xref)
         {
             case null:
@@ -25,19 +38,29 @@ public sealed class CosObjectResolver
                 var streamObjectXRef = _xRefTable.GetXRef(streamXref.StreamId) as CosIndirectXRef;
                 Debug.Assert(streamObjectXRef != null, "Could not get xref to stream object");
 
+                if (streamObjectXRef.Position == null)
+                {
+                    throw new InvalidOperationException("Object in object stream should exist in cache");
+                }
+
                 // Parse the object stream
-                _parser.Seek(streamObjectXRef.Position, SeekOrigin.Begin);
-                var streamObject = _parser.ParseObject() as CosObject;
+                _parser.Seek(streamObjectXRef.Position.Value, SeekOrigin.Begin);
+                var streamObject = _parser.Parse() as CosObject;
                 Debug.Assert(streamObject != null, "Could not find an object at the stream position");
                 var objectStream = streamObject.Object as CosObjectStream;
                 Debug.Assert(objectStream != null, "Object was not an object stream");
 
                 // Get the object within the stream
-                return objectStream.GetObjectByIndex(streamXref.Index);
+                return objectStream.GetObjectByIndex(owner, streamXref.Index);
 
             case CosIndirectXRef indirectXRef:
-                _parser.Seek(indirectXRef.Position, SeekOrigin.Begin);
-                return _parser.ParseObject() as CosObject;
+                if (indirectXRef.Position == null)
+                {
+                    throw new InvalidOperationException("Object should exist in cache");
+                }
+
+                _parser.Seek(indirectXRef.Position.Value, SeekOrigin.Begin);
+                return _parser.Parse() as CosObject;
 
             default:
                 return null;

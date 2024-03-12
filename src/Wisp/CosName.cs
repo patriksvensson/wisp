@@ -10,7 +10,7 @@ public sealed class CosName : ICosPrimitive, IEquatable<CosName>
 
     public CosName(string value)
     {
-        Value = value ?? throw new ArgumentNullException(nameof(value));
+        Value = value.TrimStart('/') ?? throw new ArgumentNullException(nameof(value));
     }
 
     public bool Equals(CosName? other)
@@ -21,6 +21,12 @@ public sealed class CosName : ICosPrimitive, IEquatable<CosName>
     public override int GetHashCode()
     {
         return CosNameComparer.Shared.GetHashCode(this);
+    }
+
+    [DebuggerStepThrough]
+    public void Accept<TContext>(ICosVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitName(this, context);
     }
 
     public override string ToString()

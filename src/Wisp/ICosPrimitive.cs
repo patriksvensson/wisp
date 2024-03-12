@@ -1,4 +1,4 @@
 namespace Wisp.Cos;
 
 [PublicAPI]
-public interface ICosPrimitive;
+public interface ICosPrimitive : ICosVisitable;
