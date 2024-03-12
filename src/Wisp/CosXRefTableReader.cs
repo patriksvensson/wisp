@@ -27,7 +27,7 @@ public static class CosXRefTableReader
 
                 if (position == 0)
                 {
-                    // Word adds empty rows in the xref table sometimes
+                    // Microsoft Word adds empty rows in the xref table sometimes
                     // For now, just ignore since it doesn't point to an actual object
                     continue;
                 }
