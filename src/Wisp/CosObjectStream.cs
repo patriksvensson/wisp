@@ -5,8 +5,9 @@ namespace Wisp.Cos;
 public sealed class CosObjectStream : ICosPrimitive
 {
     private readonly CosStream _stream;
-    private readonly List<(int Id, long Offset)> _offsetsByIndex = new();
+    private readonly List<(int Id, long Offset)> _offsetsByIndex = [];
     private readonly Dictionary<int, long> _offsetsById = new();
+    private readonly HashSet<int> _unpackedObjects = [];
     private bool _unpacked;
 
     /// <summary>
@@ -31,18 +32,22 @@ public sealed class CosObjectStream : ICosPrimitive
 
         if (_unpacked)
         {
-            if (_offsetsById.ContainsKey(id.Number))
+            if (!_offsetsById.ContainsKey(id.Number))
+            {
+                throw new InvalidOperationException(
+                    $"Object #{id.Number} does not exist within object stream");
+            }
+
+            if (_unpackedObjects.Contains(id.Number))
             {
                 // Ok, we know the ID, does this object exist in the cache?
                 // Try to get it without resolving (since we don't want a stack overflow).
-                var obj = cache.Get(id, resolve: false);
+                var obj = cache.Get(id, CosResolveFlags.NoResolve);
                 if (obj != null)
                 {
                     return obj;
                 }
             }
-
-            throw new InvalidOperationException("Object does not exist within object stream");
         }
 
         using (var stream = new MemoryStream(bytes))
@@ -53,13 +58,15 @@ public sealed class CosObjectStream : ICosPrimitive
             // Ensure the object exist within the stream
             if (!_offsetsById.TryGetValue(id.Number, out var offset))
             {
-                throw new InvalidOperationException("Object does not exist within object stream");
+                throw new InvalidOperationException(
+                    $"Object #{id.Number} does not exist within object stream");
             }
 
             // Read the object at the correct offset
             parser.Lexer.Reader.Seek(offset, SeekOrigin.Begin);
             var primitive = parser.Parse();
             var obj = new CosObject(id, primitive);
+            _unpackedObjects.Add(id.Number);
 
             return obj;
         }
@@ -78,13 +85,19 @@ public sealed class CosObjectStream : ICosPrimitive
             var parser = new CosParser(stream, true);
             EnsureOffsetsHaveBeenPopulated(parser);
 
+            if (index >= _offsetsByIndex.Count)
+            {
+                throw new InvalidOperationException(
+                    $"Object with index {index} does not exist within object stream");
+            }
+
             // Read the object at the correct offset
             var (number, offset) = _offsetsByIndex[index];
             var id = new CosObjectId(number, 0);
 
             // Ok, we know the ID, does this object exist in the cache?
             // Try to get it without resolving (since we don't want a stack overflow).
-            var obj = cache.Get(id, resolve: false);
+            var obj = cache.Get(id, CosResolveFlags.NoResolve);
             if (obj != null)
             {
                 return obj;
@@ -94,6 +107,7 @@ public sealed class CosObjectStream : ICosPrimitive
             parser.Lexer.Reader.Seek(offset, SeekOrigin.Begin);
             var primitive = parser.Parse();
             obj = new CosObject(id, primitive);
+            _unpackedObjects.Add(id.Number);
 
             return obj;
         }

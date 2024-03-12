@@ -1,35 +1,5 @@
 namespace Wisp.Cos;
 
-internal sealed class CosObjectCacheFrontend : ICosObjectCache, IEnumerable<CosObject>
-{
-    private readonly CosObjectCache _cache;
-
-    public CosObjectCacheFrontend(CosObjectCache cache)
-    {
-        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-    }
-
-    public CosObject? Get(CosObjectId id, bool resolve = true, bool cache = true)
-    {
-        return _cache.Get(id, cache);
-    }
-
-    public void Set(CosObject obj)
-    {
-        _cache.Set(obj);
-    }
-
-    public IEnumerator<CosObject> GetEnumerator()
-    {
-        return _cache.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-}
-
 internal sealed class CosObjectCache : ICosObjectCache
 {
     private readonly CosXRefTable _table;
@@ -43,29 +13,40 @@ internal sealed class CosObjectCache : ICosObjectCache
         _objects = new Dictionary<CosObjectId, CosObject>(CosObjectIdComparer.Shared);
     }
 
-    public CosObject? Get(CosObjectId id, bool resolve = true, bool cache = true)
+    public CosObject? Get(CosObjectId id, CosResolveFlags flags = CosResolveFlags.None)
     {
-        if (_objects.TryGetValue(id, out var obj))
+        var shouldInvalidate = flags.HasFlag(CosResolveFlags.Invalidate);
+        if (!shouldInvalidate)
         {
-            return obj;
+            // Try get the object from caches
+            if (_objects.TryGetValue(id, out var obj))
+            {
+                return obj;
+            }
         }
 
-        if (resolve)
+        // Should we try to resolve the object from the
+        // PDF document stream?
+        var shouldResolve = !flags.HasFlag(CosResolveFlags.NoResolve);
+        if (shouldResolve && _resolver != null)
         {
-            obj = _resolver?.GetObject(this, id);
+            var obj = _resolver?.GetObject(this, id);
             if (obj == null)
             {
                 return null;
             }
 
-            if (cache)
+            // Should we add the resolved object to the cache?
+            var shouldCache = !flags.HasFlag(CosResolveFlags.NoCache);
+            if (shouldCache)
             {
-                // Add the object to the cache
-                _objects.Add(id, obj);
+                _objects.TryAdd(id, obj);
             }
+
+            return obj;
         }
 
-        return obj;
+        return null;
     }
 
     public void Set(CosObject obj)
@@ -142,7 +123,7 @@ internal sealed class CosObjectCache : ICosObjectCache
                 var current = _source.Current;
                 if (current is CosIndirectXRef)
                 {
-                    var obj = _collection.Get(current.Id, cache: false);
+                    var obj = _collection.Get(current.Id, CosResolveFlags.NoCache);
                     if (obj != null)
                     {
                         _current = obj;
@@ -154,28 +135,49 @@ internal sealed class CosObjectCache : ICosObjectCache
     }
 }
 
+[Flags]
+[PublicAPI]
+public enum CosResolveFlags
+{
+    None = 0,
+
+    /// <summary>
+    /// If an objects is cached, skip the cache
+    /// completely when retrieving it.
+    /// Can only be used when working with a loaded document.
+    /// </summary>
+    Invalidate = 1 << 0,
+
+    /// <summary>
+    /// An resolved objects will not be added
+    /// to the object cache.
+    /// Can only be used when working with a loaded document.
+    /// </summary>
+    NoCache = 1 << 1,
+
+    /// <summary>
+    /// If the document is loaded, the object will not
+    /// be resolved from the document stream.
+    /// </summary>
+    NoResolve = 1 << 2,
+}
+
 public interface ICosObjectCache : IEnumerable<CosObject>
 {
-    CosObject? Get(CosObjectId id, bool resolve = true, bool cache = true);
+    CosObject? Get(CosObjectId id, CosResolveFlags flags = CosResolveFlags.None);
     void Set(CosObject obj);
 }
 
 [PublicAPI]
-public static class CosObjectCollectionExtensions
+public static class ICosObjectCacheExtensions
 {
-    public static CosObject? Get(this ICosObjectCache collection, int number, int generation, bool resolve = true, bool cache = true)
+    public static CosObject? Get(this ICosObjectCache collection, int number, int generation, CosResolveFlags flags = CosResolveFlags.None)
     {
-        return collection.Get(new CosObjectId(number, generation), resolve, cache);
+        return collection.Get(new CosObjectId(number, generation), flags);
     }
 
-    public static CosObject? Get(this ICosObjectCache collection, CosDocument owner, int number, int generation,
-        bool resolve = true, bool cache = true)
+    public static CosObject? Get(this ICosObjectCache collection, CosObjectReference reference, CosResolveFlags flags = CosResolveFlags.None)
     {
-        return collection.Get(new CosObjectId(number, generation), resolve, cache);
-    }
-
-    public static CosObject? Get(this ICosObjectCache collection, CosObjectReference reference, bool resolve = true, bool cache = true)
-    {
-        return collection.Get(new CosObjectId(reference.Id.Number, reference.Id.Generation), resolve, cache);
+        return collection.Get(new CosObjectId(reference.Id.Number, reference.Id.Generation), flags);
     }
 }

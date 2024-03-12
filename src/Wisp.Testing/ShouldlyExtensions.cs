@@ -17,6 +17,12 @@ public static class ShouldlyExtensions
         return item;
     }
 
+    public static void ShouldBe(this StringResult result, string expected)
+    {
+        expected = expected.Replace("\r\n", "\n");
+        result.Value.ShouldBe(expected);
+    }
+
     public static CosBoolean ShouldHaveValue(this CosBoolean? obj, bool value)
     {
         obj.ShouldNotBeNull();

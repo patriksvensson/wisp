@@ -4,6 +4,7 @@ namespace Wisp.Cos;
 public sealed class CosParser : IDisposable
 {
     private readonly bool _isStreamObject;
+    private bool _disposed;
 
     public CosLexer Lexer { get; }
 
@@ -23,7 +24,11 @@ public sealed class CosParser : IDisposable
 
     public void Dispose()
     {
-        Lexer.Dispose();
+        if (!_disposed)
+        {
+            Lexer.Dispose();
+            _disposed = true;
+        }
     }
 
     public long Seek(long offset, SeekOrigin origin)

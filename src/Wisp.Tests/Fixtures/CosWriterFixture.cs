@@ -7,7 +7,7 @@ public sealed class CosWriterFixture
     private readonly MemoryStream _stream;
     private readonly CosWriter _writer;
 
-    public string Result => Encoding.ASCII.GetString(_stream.ToArray()).TrimEnd();
+    public StringResult Result => new StringResult(Encoding.ASCII.GetString(_stream.ToArray()));
 
     public CosWriterFixture(CosWriterSettings? settings = null)
     {

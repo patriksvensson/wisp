@@ -1,10 +1,10 @@
 namespace Wisp.Cos;
 
-[PublicAPI]
-public sealed class CosObjectResolver
+internal sealed class CosObjectResolver : IDisposable
 {
     private readonly CosParser _parser;
     private readonly CosXRefTable _xRefTable;
+    private bool _disposed;
 
     public CosObjectResolver(CosParser parser, CosXRefTable xRefTable)
     {
@@ -12,23 +12,21 @@ public sealed class CosObjectResolver
         _xRefTable = xRefTable ?? throw new ArgumentNullException(nameof(xRefTable));
     }
 
-    public CosObject? GetObject(ICosObjectCache owner, CosObjectReference reference)
+    public void Dispose()
     {
-        ArgumentNullException.ThrowIfNull(reference);
-        return GetObject(owner, reference.Id);
+        if (!_disposed)
+        {
+            _disposed = true;
+            _parser.Dispose();
+        }
     }
 
-    public CosObject? GetObject(ICosObjectCache owner, CosObjectId id)
+    public CosObject? GetObject(ICosObjectCache cache, CosObjectId id)
     {
+        ArgumentNullException.ThrowIfNull(cache);
         ArgumentNullException.ThrowIfNull(id);
 
-        var xref = _xRefTable.GetXRef(id);
-        return GetObjectByXRef(owner, xref);
-    }
-
-    private CosObject? GetObjectByXRef(ICosObjectCache owner, CosXRef? xref)
-    {
-        switch (xref)
+        switch (_xRefTable.GetXRef(id))
         {
             case null:
                 return null;
@@ -51,7 +49,7 @@ public sealed class CosObjectResolver
                 Debug.Assert(objectStream != null, "Object was not an object stream");
 
                 // Get the object within the stream
-                return objectStream.GetObjectByIndex(owner, streamXref.Index);
+                return objectStream.GetObjectByIndex(cache, streamXref.Index);
 
             case CosIndirectXRef indirectXRef:
                 if (indirectXRef.Position == null)

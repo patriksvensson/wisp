@@ -1,9 +1,11 @@
 namespace Wisp.Cos;
 
 [PublicAPI]
-public sealed class CosDocument
+public sealed class CosDocument : IDisposable
 {
+    private readonly CosObjectResolver? _resolver;
     private CosInfo? _info;
+    private bool _disposed;
 
     public PdfVersion Version { get; }
     public ICosObjectCache Objects { get; }
@@ -24,17 +26,33 @@ public sealed class CosDocument
         CosXRefTable xRefTable,
         CosTrailer trailer,
         CosInfo? info,
-        CosObjectCache objects)
+        CosObjectCache objects,
+        CosObjectResolver resolver)
     {
         ArgumentNullException.ThrowIfNull(xRefTable);
-        ArgumentNullException.ThrowIfNull(objects);
+        ArgumentNullException.ThrowIfNull(resolver);
 
-        Objects = new CosObjectCacheFrontend(objects);
+        Objects = objects ?? throw new ArgumentNullException(nameof(objects));
         Version = version;
         XRefTable = xRefTable;
         Trailer = trailer ?? throw new ArgumentNullException(nameof(trailer));
 
         _info = info;
+        _resolver = resolver;
+    }
+
+    void IDisposable.Dispose()
+    {
+        if (!_disposed)
+        {
+            _resolver?.Dispose();
+            _disposed = true;
+        }
+    }
+
+    public void Close()
+    {
+        ((IDisposable)this).Dispose();
     }
 
     public static CosDocument Open(Stream stream)

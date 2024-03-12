@@ -34,8 +34,7 @@ public static class CosDocumentReader
                     "Info object was specified but did not exist");
             }
 
-            var infoDictionary = infoObj.Object as CosDictionary;
-            if (infoDictionary == null)
+            if (infoObj.Object is not CosDictionary)
             {
                 throw new InvalidOperationException(
                     "Info object was expected to be a dictionary, but was not");
@@ -46,6 +45,6 @@ public static class CosDocumentReader
 
         return new CosDocument(
             version, xRefTable, trailer,
-            info, objects);
+            info, objects, resolver);
     }
 }

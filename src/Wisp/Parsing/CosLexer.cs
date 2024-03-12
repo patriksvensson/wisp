@@ -3,6 +3,8 @@ namespace Wisp.Cos;
 [PublicAPI]
 public sealed class CosLexer : IDisposable
 {
+    private bool _disposed;
+
     internal IByteStreamReader Reader { get; }
 
     public CosLexer(Stream stream)
@@ -12,7 +14,11 @@ public sealed class CosLexer : IDisposable
 
     public void Dispose()
     {
-        Reader.Dispose();
+        if (!_disposed)
+        {
+            Reader.Dispose();
+            _disposed = true;
+        }
     }
 
     public void EatNewlines()
@@ -193,8 +199,7 @@ public sealed class CosLexer : IDisposable
             }
 
             // Not part of spec but...
-            if (current == '<' || current == '>' || current == '/' ||
-                current == '[' || current == ']')
+            if (current is '<' or '>' or '/' or '[' or ']' or '(' or ')')
             {
                 break;
             }
