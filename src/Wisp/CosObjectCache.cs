@@ -74,7 +74,7 @@ internal sealed class CosObjectCache : ICosObjectCache
 
         if (!_table.Contains(obj.Id))
         {
-            _table.Add(new CosIndirectXRef(obj.Id, -1));
+            _table.Add(new CosIndirectXRef(obj.Id));
         }
     }
 
