@@ -1,4 +1,4 @@
-namespace Wisp.Cos;
+namespace Wisp;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
@@ -15,6 +15,12 @@ public sealed class CosInteger : ICosPrimitive
     public CosInteger(long? value)
     {
         Value = value ?? 0;
+    }
+
+    [DebuggerStepThrough]
+    public void Accept<TContext>(ICosVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitInteger(this, context);
     }
 
     public override string ToString()

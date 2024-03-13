@@ -26,6 +26,32 @@ public sealed class FlateFilter : Filter
         return PngDecoder.Decode(bytes, settings.Columns, settings.Colors, settings.BitsPerComponent);
     }
 
+    public static byte[] Encode(byte[] data, CosCompression compression)
+    {
+        using (var original = new MemoryStream(data))
+        using (var output = new MemoryStream())
+        {
+            // Write the flate header
+            output.Write(new byte[] { 120, 156 });
+
+            var level = compression switch
+            {
+                CosCompression.None => CompressionLevel.NoCompression,
+                CosCompression.Fastest => CompressionLevel.Fastest,
+                CosCompression.Optimal => CompressionLevel.Optimal,
+                CosCompression.Smallest => CompressionLevel.SmallestSize,
+                _ => throw new ArgumentOutOfRangeException(nameof(compression), compression, null),
+            };
+
+            using (var compressor = new DeflateStream(output, level))
+            {
+                original.CopyTo(compressor);
+                compressor.Flush();
+                return output.ToArray();
+            }
+        }
+    }
+
     private static byte[] Deflate(byte[] data)
     {
         if (data.Length < 2)

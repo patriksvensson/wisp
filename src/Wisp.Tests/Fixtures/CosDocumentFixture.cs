@@ -2,12 +2,20 @@ namespace Wisp.Testing.Fixtures;
 
 public abstract class CosDocumentFixture
 {
-    public CosDocument Document { get; set; }
+    public CosDocument Document { get; }
 
-    protected CosDocumentFixture(string path)
+    private CosDocumentFixture(string path)
     {
         var stream = EmbeddedResourceReader.GetStream(path);
         Document = CosDocument.Open(stream);
+    }
+
+    public sealed class Simple : CosDocumentFixture
+    {
+        public Simple()
+            : base("Wisp.Tests/Data/Simple.pdf")
+        {
+        }
     }
 
     public sealed class XRefStream : CosDocumentFixture

@@ -32,9 +32,9 @@ public sealed class CosTrailer : CosDictionary
     /// Gets or sets the catalog dictionary for the document
     /// contained in the file.
     /// </summary>
-    public CosObjectId Root
+    public CosObjectReference Root
     {
-        get => this.GetRequiredObjectId(CosNames.Root);
+        get => this.GetRequiredObjectReference(CosNames.Root);
         set => this.Set(CosNames.Root, value);
     }
 
@@ -50,9 +50,9 @@ public sealed class CosTrailer : CosDictionary
     /// <summary>
     /// Gets or sets the document's information dictionary.
     /// </summary>
-    public CosObjectId? Info
+    public CosObjectReference? Info
     {
-        get => this.GetObjectId(CosNames.Info);
+        get => this.GetObjectReference(CosNames.Info);
         set => this.Set(CosNames.Info, value);
     }
 

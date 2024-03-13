@@ -1,4 +1,4 @@
-namespace Wisp.Cos;
+namespace Wisp;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
@@ -16,6 +16,15 @@ public sealed class CosArray : ICosPrimitive, IEnumerable<ICosPrimitive>
     public CosArray()
     {
         _items = new List<ICosPrimitive>();
+    }
+
+    public CosArray(IEnumerable<ICosPrimitive> items)
+        : this()
+    {
+        foreach (var item in items)
+        {
+            Add(item);
+        }
     }
 
     public void Add(ICosPrimitive item)
@@ -46,6 +55,12 @@ public sealed class CosArray : ICosPrimitive, IEnumerable<ICosPrimitive>
     public override string ToString()
     {
         return $"[Array] Count = {_items.Count}";
+    }
+
+    [DebuggerStepThrough]
+    public void Accept<TContext>(ICosVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitArray(this, context);
     }
 }
 

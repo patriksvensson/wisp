@@ -1,6 +1,7 @@
-namespace Wisp.Cos;
+namespace Wisp;
 
 [PublicAPI]
+[DebuggerDisplay("{ToString(),nq}")]
 public sealed class CosObject : ICosPrimitive
 {
     public CosObjectId Id { get; }
@@ -10,5 +11,17 @@ public sealed class CosObject : ICosPrimitive
     {
         Id = id ?? throw new ArgumentNullException(nameof(id));
         Object = obj ?? throw new ArgumentNullException(nameof(obj));
+    }
+
+    [DebuggerStepThrough]
+    public void Accept<TContext>(ICosVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitObject(this, context);
+    }
+
+    public override string ToString()
+    {
+        var kind = Object.GetType()?.Name ?? "Unknown";
+        return $"[Object] {Id.Number}:{Id.Generation} ({kind})";
     }
 }

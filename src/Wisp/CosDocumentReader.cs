@@ -1,4 +1,4 @@
-namespace Wisp.Cos;
+namespace Wisp;
 
 [PublicAPI]
 public static class CosDocumentReader
@@ -20,12 +20,13 @@ public static class CosDocumentReader
 
         // Create the object resolver
         var resolver = new CosObjectResolver(parser, xRefTable);
+        var objects = new CosObjectCache(xRefTable, resolver);
 
         // Get the document information
         var info = default(CosInfo);
         if (trailer.Info != null)
         {
-            var infoObj = resolver.GetObject(trailer.Info);
+            var infoObj = objects.Get(trailer.Info);
             if (infoObj == null)
             {
                 // TODO: We should remove the info object from the trailer
@@ -33,18 +34,17 @@ public static class CosDocumentReader
                     "Info object was specified but did not exist");
             }
 
-            var infoDictionary = infoObj.Object as CosDictionary;
-            if (infoDictionary == null)
+            if (infoObj.Object is not CosDictionary)
             {
                 throw new InvalidOperationException(
                     "Info object was expected to be a dictionary, but was not");
             }
 
-            info = new CosInfo(trailer.Info, infoDictionary);
+            info = new CosInfo(infoObj);
         }
 
         return new CosDocument(
             version, xRefTable, trailer,
-            info, resolver);
+            info, objects, resolver);
     }
 }

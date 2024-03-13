@@ -1,15 +1,21 @@
-namespace Wisp.Cos;
+namespace Wisp;
 
 [PublicAPI]
 public sealed class CosXRefTable : IEnumerable<CosXRef>
 {
     private readonly Dictionary<CosObjectId, CosXRef> _lookup;
     private readonly List<CosXRef> _references;
+    private int _highestId;
 
     public CosXRefTable()
     {
         _lookup = new Dictionary<CosObjectId, CosXRef>(new CosObjectIdComparer());
         _references = new List<CosXRef>();
+    }
+
+    public CosObjectId GetNextId()
+    {
+        return new CosObjectId(++_highestId, 0);
     }
 
     public CosXRef? GetXRef(CosObjectId key)
@@ -49,6 +55,12 @@ public sealed class CosXRefTable : IEnumerable<CosXRef>
         if (!_lookup.TryAdd(reference.Id, reference))
         {
             return false;
+        }
+
+        // Highest number?
+        if (reference.Id.Number > _highestId)
+        {
+            _highestId = reference.Id.Number;
         }
 
         _references.Add(reference);

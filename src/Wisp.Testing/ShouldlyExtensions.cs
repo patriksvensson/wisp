@@ -17,6 +17,12 @@ public static class ShouldlyExtensions
         return item;
     }
 
+    public static void ShouldBe(this StringResult result, string expected)
+    {
+        expected = expected.Replace("\r\n", "\n");
+        result.Value.ShouldBe(expected);
+    }
+
     public static CosBoolean ShouldHaveValue(this CosBoolean? obj, bool value)
     {
         obj.ShouldNotBeNull();
@@ -71,6 +77,13 @@ public static class ShouldlyExtensions
         obj.ShouldNotBeNull();
         obj.Number.ShouldBe(number);
         obj.Generation.ShouldBe(generation);
+        return obj;
+    }
+
+    public static CosObjectReference ShouldBe(this CosObjectReference? obj, int number, int generation)
+    {
+        obj.ShouldNotBeNull();
+        obj.Id.ShouldBe(number, generation);
         return obj;
     }
 

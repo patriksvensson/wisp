@@ -1,15 +1,14 @@
-namespace Wisp.Cos;
+namespace Wisp;
 
 [PublicAPI]
 public sealed class CosParser : IDisposable
 {
+    private readonly CosLexer _lexer;
     private readonly bool _isStreamObject;
 
-    public CosLexer Lexer { get; }
-
-    public long Position => Lexer.Reader.Position;
-    public long Length => Lexer.Reader.Length;
-    public bool CanRead => Lexer.Reader.CanRead;
+    public long Position => _lexer.Position;
+    public long Length => _lexer.Length;
+    public bool CanRead => _lexer.CanRead;
 
     public CosParser(
         Stream stream,
@@ -17,49 +16,59 @@ public sealed class CosParser : IDisposable
     {
         ArgumentNullException.ThrowIfNull(stream);
 
-        Lexer = new CosLexer(stream);
+        _lexer = new CosLexer(stream);
         _isStreamObject = isStreamObject;
     }
 
     public void Dispose()
     {
-        Lexer.Dispose();
+        _lexer.Dispose();
     }
 
     public long Seek(long offset, SeekOrigin origin)
     {
-        return Lexer.Reader.Seek(offset, origin);
+        return _lexer.Seek(offset, origin);
     }
 
     public int ReadByte()
     {
-        return Lexer.Reader.ReadByte();
+        return _lexer.ReadByte();
     }
 
     public ReadOnlySpan<byte> ReadBytes(int count)
     {
-        return Lexer.Reader.ReadBytes(count);
+        return _lexer.ReadBytes(count);
     }
 
     public CosToken? PeekToken()
     {
-        Lexer.Peek(out var token);
+        _lexer.Peek(out var token);
         return token;
     }
 
     public CosToken ReadToken()
     {
-        return Lexer.Read();
+        return _lexer.Read();
     }
 
-    public ICosPrimitive ParseObject()
+    public bool CheckToken(CosTokenKind kind)
     {
-        while (Lexer.Check(CosTokenKind.Comment))
+        return _lexer.Check(kind);
+    }
+
+    public CosToken ExpectToken(CosTokenKind kind)
+    {
+        return _lexer.Expect(kind);
+    }
+
+    public ICosPrimitive Parse()
+    {
+        while (_lexer.Check(CosTokenKind.Comment))
         {
-            Lexer.Read();
+            _lexer.Read();
         }
 
-        if (!Lexer.Peek(out var token))
+        if (!_lexer.Peek(out var token))
         {
             throw new InvalidOperationException("Reached end of stream");
         }
@@ -81,7 +90,7 @@ public sealed class CosParser : IDisposable
 
     private ICosPrimitive ParseBoolean()
     {
-        var token = Lexer.Expect(CosTokenKind.Boolean);
+        var token = _lexer.Expect(CosTokenKind.Boolean);
         return (token.Text == "true")
             ? new CosBoolean(true)
             : new CosBoolean(false);
@@ -89,33 +98,33 @@ public sealed class CosParser : IDisposable
 
     private ICosPrimitive ParseInteger()
     {
-        var value = Lexer.Expect(CosTokenKind.Integer).ParseInt32();
-        var position = Lexer.Reader.Position;
+        var value = _lexer.Expect(CosTokenKind.Integer).ParseInt32();
+        var position = _lexer.Position;
 
         // Got an integer next?
-        if (Lexer.Peek(out var token) && token.Kind == CosTokenKind.Integer)
+        if (_lexer.Peek(out var token) && token.Kind == CosTokenKind.Integer)
         {
-            var generation = Lexer.Expect(CosTokenKind.Integer).ParseInt32();
+            var generation = _lexer.Expect(CosTokenKind.Integer).ParseInt32();
 
-            if (Lexer.Peek(out token))
+            if (_lexer.Peek(out token))
             {
                 switch (token.Kind)
                 {
                     case CosTokenKind.Reference:
                         // Reference means object ID
-                        Lexer.Expect(CosTokenKind.Reference);
-                        return new CosObjectId(value, generation);
+                        _lexer.Expect(CosTokenKind.Reference);
+                        return new CosObjectReference(new CosObjectId(value, generation));
                     case CosTokenKind.BeginObject:
                         // Object definition
-                        Lexer.Expect(CosTokenKind.BeginObject);
+                        _lexer.Expect(CosTokenKind.BeginObject);
                         return new CosObject(
                             new CosObjectId(value, generation),
-                            ParseObject());
+                            Parse());
                 }
             }
 
             // Rewind the reader
-            Lexer.Reader.Seek(position, SeekOrigin.Begin);
+            _lexer.Seek(position, SeekOrigin.Begin);
         }
 
         return new CosInteger(value);
@@ -123,13 +132,13 @@ public sealed class CosParser : IDisposable
 
     private CosReal ParseReal()
     {
-        var value = Lexer.Expect(CosTokenKind.Real).ParseDouble();
+        var value = _lexer.Expect(CosTokenKind.Real).ParseDouble();
         return new CosReal(value);
     }
 
     private CosNull ParseNull()
     {
-        Lexer.Expect(CosTokenKind.Null);
+        _lexer.Expect(CosTokenKind.Null);
         return CosNull.Shared;
     }
 
@@ -161,7 +170,7 @@ public sealed class CosParser : IDisposable
             return true;
         }
 
-        var token = Lexer.Expect(CosTokenKind.StringLiteral);
+        var token = _lexer.Expect(CosTokenKind.StringLiteral);
         if (token.Lexeme == null)
         {
             throw new InvalidOperationException("String literal token had no byte content");
@@ -186,48 +195,48 @@ public sealed class CosParser : IDisposable
 
     private CosHexString ParseHexStringLiteral()
     {
-        var token = Lexer.Expect(CosTokenKind.HexStringLiteral);
+        var token = _lexer.Expect(CosTokenKind.HexStringLiteral);
         return new CosHexString(token.Lexeme!);
     }
 
     private CosName ParseName()
     {
-        var token = Lexer.Expect(CosTokenKind.Name);
+        var token = _lexer.Expect(CosTokenKind.Name);
         return new CosName(token.Text!);
     }
 
     private ICosPrimitive ParseDictionary()
     {
-        Lexer.Expect(CosTokenKind.BeginDictionary);
+        _lexer.Expect(CosTokenKind.BeginDictionary);
 
         var result = new CosDictionary();
-        while (Lexer.Peek(out var token))
+        while (_lexer.Peek(out var token))
         {
             if (token.Kind == CosTokenKind.EndDictionary)
             {
                 break;
             }
 
-            var temp = ParseObject();
+            var temp = Parse();
             if (temp is not CosName key)
             {
                 throw new InvalidOperationException("Encountered dictionary key that was not a PDF name");
             }
 
-            var value = ParseObject();
+            var value = Parse();
             result.Set(key, value);
         }
 
         if (_isStreamObject)
         {
-            if (Lexer.Reader.CanRead)
+            if (_lexer.CanRead)
             {
-                Lexer.Expect(CosTokenKind.EndDictionary);
+                _lexer.Expect(CosTokenKind.EndDictionary);
             }
         }
         else
         {
-            Lexer.Expect(CosTokenKind.EndDictionary);
+            _lexer.Expect(CosTokenKind.EndDictionary);
         }
 
         // Is there a stream as well?
@@ -248,20 +257,20 @@ public sealed class CosParser : IDisposable
 
     private CosArray ParseArray()
     {
-        Lexer.Expect(CosTokenKind.BeginArray);
+        _lexer.Expect(CosTokenKind.BeginArray);
 
         var result = new CosArray();
-        while (Lexer.Peek(out var token))
+        while (_lexer.Peek(out var token))
         {
             if (token.Kind == CosTokenKind.EndArray)
             {
                 break;
             }
 
-            result.Add(ParseObject());
+            result.Add(Parse());
         }
 
-        Lexer.Expect(CosTokenKind.EndArray);
+        _lexer.Expect(CosTokenKind.EndArray);
 
         return result;
     }
@@ -269,7 +278,7 @@ public sealed class CosParser : IDisposable
     private CosStream? ParseStream(CosDictionary metadata)
     {
         // Not a stream?
-        if (!Lexer.Peek(out var streamToken) || streamToken.Kind != CosTokenKind.BeginStream)
+        if (!_lexer.Peek(out var streamToken) || streamToken.Kind != CosTokenKind.BeginStream)
         {
             return null;
         }
@@ -281,10 +290,10 @@ public sealed class CosParser : IDisposable
         }
 
         // Read the stream data
-        Lexer.Expect(CosTokenKind.BeginStream);
-        Lexer.EatNewlines();
-        var data = Lexer.ReadBytes(length.Value);
-        Lexer.Expect(CosTokenKind.EndStream);
+        _lexer.Expect(CosTokenKind.BeginStream);
+        _lexer.EatNewlines();
+        var data = _lexer.ReadBytes(length.Value);
+        _lexer.Expect(CosTokenKind.EndStream);
 
         return new CosStream(metadata, data.ToArray());
     }

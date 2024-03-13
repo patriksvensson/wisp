@@ -1,4 +1,4 @@
-namespace Wisp.Cos;
+namespace Wisp;
 
 [PublicAPI]
 public abstract class CosXRef
@@ -9,33 +9,37 @@ public abstract class CosXRef
     {
         Id = id ?? throw new ArgumentNullException(nameof(id));
     }
-}
 
-[PublicAPI]
-[DebuggerDisplay("{ToString(),nq}")]
-public sealed class CosFreeXRef : CosXRef
-{
-    public CosFreeXRef(CosObjectId id)
-        : base(id)
-    {
-    }
-
-    public override string ToString()
-    {
-        return $"[XRef] {Id.Number}:{Id.Generation} (free)";
-    }
+    public abstract CosXRef CreateCopy();
 }
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
 public sealed class CosIndirectXRef : CosXRef
 {
-    public long Position { get; }
+    public long? Position { get; set; }
+
+    public CosIndirectXRef(CosObjectId id)
+        : base(id)
+    {
+    }
 
     public CosIndirectXRef(CosObjectId id, long position)
         : base(id)
     {
         Position = position;
+    }
+
+    public override CosXRef CreateCopy()
+    {
+        if (Position != null)
+        {
+            return new CosIndirectXRef(Id, Position.Value);
+        }
+        else
+        {
+            return new CosIndirectXRef(Id);
+        }
     }
 
     public override string ToString()
@@ -58,7 +62,11 @@ public sealed class CosStreamXRef : CosXRef
         Index = index;
     }
 
-    /// <inheritdoc/>
+    public override CosXRef CreateCopy()
+    {
+        return new CosStreamXRef(Id, StreamId, Index);
+    }
+
     public override string ToString()
     {
         var streamId = $"{StreamId.Number}:{StreamId.Generation}";

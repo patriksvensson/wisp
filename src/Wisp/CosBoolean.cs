@@ -1,4 +1,4 @@
-namespace Wisp.Cos;
+namespace Wisp;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
@@ -14,5 +14,11 @@ public sealed class CosBoolean : ICosPrimitive
     public override string ToString()
     {
         return $"[Boolean] {Value}";
+    }
+
+    [DebuggerStepThrough]
+    public void Accept<TContext>(ICosVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitBoolean(this, context);
     }
 }

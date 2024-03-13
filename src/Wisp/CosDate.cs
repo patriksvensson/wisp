@@ -1,6 +1,7 @@
-namespace Wisp.Cos;
+namespace Wisp;
 
 [PublicAPI]
+[DebuggerDisplay("{ToString(),nq}")]
 public sealed class CosDate : ICosPrimitive
 {
     private static readonly string[] _formats =
@@ -42,5 +43,19 @@ public sealed class CosDate : ICosPrimitive
 
         time = null;
         return false;
+    }
+
+    [DebuggerStepThrough]
+    public void Accept<TContext>(ICosVisitor<TContext> visitor, TContext context)
+    {
+        visitor.VisitDate(this, context);
+    }
+
+    public override string ToString()
+    {
+        return "[ObjectID] " +
+               Value.ToString(
+                   "yyyyMMddHHmmsszzz",
+                   CultureInfo.InvariantCulture);
     }
 }
