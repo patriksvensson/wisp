@@ -1,29 +1,29 @@
-﻿namespace Wisp.Cos;
+﻿namespace Wisp;
 
 [PublicAPI]
 public static class CosXRefTableReader
 {
     public static (CosXRefTable XRefTable, CosDictionary Trailer) Read(CosParser parser)
     {
-        parser.Lexer.Expect(CosTokenKind.XRef);
+        parser.ExpectToken(CosTokenKind.XRef);
 
         var table = new CosXRefTable();
 
-        while (parser.Lexer.Reader.CanRead)
+        while (parser.CanRead)
         {
-            if (!parser.Lexer.Check(CosTokenKind.Integer))
+            if (!parser.CheckToken(CosTokenKind.Integer))
             {
                 break;
             }
 
-            var startId = parser.Lexer.Expect(CosTokenKind.Integer).ParseInt32();
-            var count = parser.Lexer.Expect(CosTokenKind.Integer).ParseInt32();
+            var startId = parser.ExpectToken(CosTokenKind.Integer).ParseInt32();
+            var count = parser.ExpectToken(CosTokenKind.Integer).ParseInt32();
 
             foreach (var id in Enumerable.Range(startId, count))
             {
-                var position = parser.Lexer.Expect(CosTokenKind.Integer).ParseInt32();
-                var generation = parser.Lexer.Expect(CosTokenKind.Integer).ParseInt32();
-                var kind = parser.Lexer.Read().Kind;
+                var position = parser.ExpectToken(CosTokenKind.Integer).ParseInt32();
+                var generation = parser.ExpectToken(CosTokenKind.Integer).ParseInt32();
+                var kind = parser.ReadToken().Kind;
 
                 if (position == 0)
                 {

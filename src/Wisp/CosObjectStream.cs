@@ -1,4 +1,4 @@
-namespace Wisp.Cos;
+namespace Wisp;
 
 [PublicAPI]
 [DebuggerDisplay("{ToString(),nq}")]
@@ -24,12 +24,6 @@ public sealed class CosObjectStream : ICosPrimitive
 
     public CosObject GetObject(ICosObjectCache cache, CosObjectId id)
     {
-        var bytes = _stream.GetUnfilteredData();
-        if (bytes == null)
-        {
-            throw new InvalidOperationException("Stream contained no data");
-        }
-
         if (_unpacked)
         {
             if (!_offsetsById.ContainsKey(id.Number))
@@ -50,6 +44,12 @@ public sealed class CosObjectStream : ICosPrimitive
             }
         }
 
+        var bytes = _stream.GetUnfilteredData();
+        if (bytes == null)
+        {
+            throw new InvalidOperationException("Stream contained no data");
+        }
+
         using (var stream = new MemoryStream(bytes))
         {
             var parser = new CosParser(stream, true);
@@ -63,7 +63,7 @@ public sealed class CosObjectStream : ICosPrimitive
             }
 
             // Read the object at the correct offset
-            parser.Lexer.Reader.Seek(offset, SeekOrigin.Begin);
+            parser.Seek(offset, SeekOrigin.Begin);
             var primitive = parser.Parse();
             var obj = new CosObject(id, primitive);
             _unpackedObjects.Add(id.Number);
@@ -95,6 +95,10 @@ public sealed class CosObjectStream : ICosPrimitive
             var (number, offset) = _offsetsByIndex[index];
             var id = new CosObjectId(number, 0);
 
+            // Consider this object to be unpacked
+            // Just in case it's already been cached.
+            _unpackedObjects.Add(id.Number);
+
             // Ok, we know the ID, does this object exist in the cache?
             // Try to get it without resolving (since we don't want a stack overflow).
             var obj = cache.Get(id, CosResolveFlags.NoResolve);
@@ -104,10 +108,9 @@ public sealed class CosObjectStream : ICosPrimitive
             }
 
             // Find the object and parse it
-            parser.Lexer.Reader.Seek(offset, SeekOrigin.Begin);
+            parser.Seek(offset, SeekOrigin.Begin);
             var primitive = parser.Parse();
             obj = new CosObject(id, primitive);
-            _unpackedObjects.Add(id.Number);
 
             return obj;
         }

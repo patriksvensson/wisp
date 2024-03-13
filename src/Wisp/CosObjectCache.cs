@@ -1,4 +1,4 @@
-namespace Wisp.Cos;
+namespace Wisp;
 
 internal sealed class CosObjectCache : ICosObjectCache
 {
@@ -30,8 +30,8 @@ internal sealed class CosObjectCache : ICosObjectCache
         var shouldResolve = !flags.HasFlag(CosResolveFlags.NoResolve);
         if (shouldResolve && _resolver != null)
         {
-            var obj = _resolver?.GetObject(this, id);
-            if (obj == null)
+            var result = _resolver?.GetObject(this, id);
+            if (result == null)
             {
                 return null;
             }
@@ -40,10 +40,15 @@ internal sealed class CosObjectCache : ICosObjectCache
             var shouldCache = !flags.HasFlag(CosResolveFlags.NoCache);
             if (shouldCache)
             {
-                _objects.TryAdd(id, obj);
+                _objects.TryAdd(id, result.Value.Object);
+
+                if (result.Value.Owner != null)
+                {
+                    _objects.TryAdd(result.Value.Owner.Id, result.Value.Owner);
+                }
             }
 
-            return obj;
+            return result.Value.Object;
         }
 
         return null;

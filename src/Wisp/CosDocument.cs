@@ -1,11 +1,10 @@
-namespace Wisp.Cos;
+namespace Wisp;
 
 [PublicAPI]
 public sealed class CosDocument : IDisposable
 {
     private readonly CosObjectResolver? _resolver;
     private CosInfo? _info;
-    private bool _disposed;
 
     public PdfVersion Version { get; }
     public ICosObjectCache Objects { get; }
@@ -43,16 +42,12 @@ public sealed class CosDocument : IDisposable
 
     void IDisposable.Dispose()
     {
-        if (!_disposed)
-        {
-            _resolver?.Dispose();
-            _disposed = true;
-        }
+        Close();
     }
 
     public void Close()
     {
-        ((IDisposable)this).Dispose();
+        _resolver?.Dispose();
     }
 
     public static CosDocument Open(Stream stream)
@@ -60,13 +55,17 @@ public sealed class CosDocument : IDisposable
         return CosDocumentReader.Read(stream);
     }
 
-    public void Save(Stream stream, CosCompression compression = CosCompression.Optimal)
+    public void Save(
+        Stream stream,
+        CosCompression compression = CosCompression.Optimal,
+        bool leaveOpen = false)
     {
         using var writer = new CosWriter(
             this, stream,
             new CosWriterSettings
             {
                 Compression = compression,
+                LeaveStreamOpen = leaveOpen,
             });
 
         CosDocumentWriter.Write(writer);

@@ -20,7 +20,11 @@ public sealed class CosWriter : IDisposable
     public void Dispose()
     {
         _stream.Flush();
-        _stream.Dispose();
+
+        if (!_settings.LeaveStreamOpen)
+        {
+            _stream.Dispose();
+        }
     }
 
     public void Write(byte value)
