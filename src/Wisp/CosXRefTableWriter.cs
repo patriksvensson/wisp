@@ -3,10 +3,10 @@ namespace Wisp;
 internal static class CosXRefTableWriter
 {
     public static long Write(
+        CosDocument document,
         CosWriter writer,
         Dictionary<CosObjectId, long> positions)
     {
-        var document = writer.Document;
         var ids = document.XRefTable.Select(x => x.Id).Order().ToArray();
         var objectId = ids.Max(x => x.Number) + 1;
 
@@ -31,7 +31,7 @@ internal static class CosXRefTableWriter
 
         // Write the stream
         var start = writer.Position;
-        writer.Write(obj);
+        writer.Write(document, obj);
 
         return start;
     }

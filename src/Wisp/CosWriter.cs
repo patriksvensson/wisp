@@ -3,18 +3,15 @@ namespace Wisp;
 [PublicAPI]
 public sealed class CosWriter : IDisposable
 {
-    private readonly CosDocument _document;
     private readonly Stream _stream;
     private readonly CosWriterSettings _settings;
 
-    public CosDocument Document => _document;
     public long Position => _stream.Position;
 
-    public CosWriter(CosDocument document, Stream stream, CosWriterSettings? settings)
+    public CosWriter(Stream stream, CosWriterSettings? settings)
     {
-        _document = document;
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _settings = settings ?? new();
+        _settings = settings ?? new CosWriterSettings();
     }
 
     public void Dispose()
@@ -27,40 +24,40 @@ public sealed class CosWriter : IDisposable
         }
     }
 
-    public void Write(byte value)
+    public void WriteByte(byte value)
     {
         _stream.WriteByte(value);
     }
 
-    public void Write(byte[] value)
-    {
-        _stream.Write(value);
-    }
-
-    public void Write(char value)
+    public void WriteByte(char value)
     {
         _stream.WriteByte((byte)value);
     }
 
-    public void Write(int value)
+    public void WriteBytes(byte[] value)
     {
-        Write(value.ToString(CultureInfo.InvariantCulture));
+        _stream.Write(value);
     }
 
-    public void Write(long value)
+    public void WriteLiteral(int value)
     {
-        Write(value.ToString(CultureInfo.InvariantCulture));
+        WriteLiteral(value.ToString(CultureInfo.InvariantCulture));
     }
 
-    public void Write(string value)
+    public void WriteLiteral(long value)
+    {
+        WriteLiteral(value.ToString(CultureInfo.InvariantCulture));
+    }
+
+    public void WriteLiteral(string value)
     {
         var bytes = ByteEncoding.Shared.GetBytes(value);
         _stream.Write(bytes);
     }
 
-    public void Write(ICosPrimitive value)
+    public void Write(CosDocument owner, ICosPrimitive value)
     {
-        var context = new Visitor.Context(_document, this, _settings);
+        var context = new Visitor.Context(owner, this, _settings);
         value.Accept(Visitor.Shared, context);
     }
 
@@ -77,7 +74,7 @@ public sealed class CosWriter : IDisposable
 
         public override void VisitArray(CosArray obj, Context context)
         {
-            context.Writer.Write('[');
+            context.Writer.WriteByte('[');
 
             foreach (var (_, _, last, item) in obj.Enumerate())
             {
@@ -85,97 +82,97 @@ public sealed class CosWriter : IDisposable
 
                 if (!last)
                 {
-                    context.Writer.Write(' ');
+                    context.Writer.WriteByte(' ');
                 }
             }
 
-            context.Writer.Write(']');
+            context.Writer.WriteByte(']');
         }
 
         public override void VisitBoolean(CosBoolean obj, Context context)
         {
-            context.Writer.Write(obj.Value ? "true" : "false");
+            context.Writer.WriteLiteral(obj.Value ? "true" : "false");
         }
 
         public override void VisitDate(CosDate obj, Context context)
         {
             var timestamp = obj.Value.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture);
             var offset = obj.Value.ToString("zzz", CultureInfo.InvariantCulture);
-            context.Writer.Write("(D:");
-            context.Writer.Write(timestamp + offset.Replace(':', '\''));
-            context.Writer.Write(")");
+            context.Writer.WriteLiteral("(D:");
+            context.Writer.WriteLiteral(timestamp + offset.Replace(':', '\''));
+            context.Writer.WriteLiteral(")");
         }
 
         public override void VisitDictionary(CosDictionary obj, Context context)
         {
-            context.Writer.Write("<<");
-            context.Writer.Write('\n');
+            context.Writer.WriteLiteral("<<");
+            context.Writer.WriteByte('\n');
 
             foreach (var (key, value) in obj)
             {
                 key.Accept(this, context);
-                context.Writer.Write(' ');
+                context.Writer.WriteByte(' ');
                 value.Accept(this, context);
-                context.Writer.Write('\n');
+                context.Writer.WriteByte('\n');
             }
 
-            context.Writer.Write(">>");
+            context.Writer.WriteLiteral(">>");
         }
 
         public override void VisitInteger(CosInteger obj, Context context)
         {
-            context.Writer.Write(obj.Value.ToString(CultureInfo.InvariantCulture));
+            context.Writer.WriteLiteral(obj.Value.ToString(CultureInfo.InvariantCulture));
         }
 
         public override void VisitName(CosName obj, Context context)
         {
-            context.Writer.Write('/');
-            context.Writer.Write(obj.Value);
+            context.Writer.WriteByte('/');
+            context.Writer.WriteLiteral(obj.Value);
         }
 
         public override void VisitNull(CosNull obj, Context context)
         {
-            context.Writer.Write("null");
+            context.Writer.WriteLiteral("null");
         }
 
         public override void VisitReal(CosReal obj, Context context)
         {
-            context.Writer.Write(obj.Value.ToString(CultureInfo.InvariantCulture));
+            context.Writer.WriteLiteral(obj.Value.ToString(CultureInfo.InvariantCulture));
         }
 
         public override void VisitHexString(CosHexString obj, Context context)
         {
-            context.Writer.Write('<');
-            context.Writer.Write(Convert.ToHexString(obj.Value));
-            context.Writer.Write('>');
+            context.Writer.WriteByte('<');
+            context.Writer.WriteLiteral(Convert.ToHexString(obj.Value));
+            context.Writer.WriteByte('>');
         }
 
         public override void VisitObjectId(CosObjectId obj, Context context)
         {
-            context.Writer.Write(obj.Number.ToString(CultureInfo.InvariantCulture));
-            context.Writer.Write(' ');
-            context.Writer.Write(obj.Generation.ToString(CultureInfo.InvariantCulture));
+            context.Writer.WriteLiteral(obj.Number.ToString(CultureInfo.InvariantCulture));
+            context.Writer.WriteByte(' ');
+            context.Writer.WriteLiteral(obj.Generation.ToString(CultureInfo.InvariantCulture));
         }
 
         public override void VisitObjectReference(CosObjectReference obj, Context context)
         {
             obj.Id.Accept(this, context);
-            context.Writer.Write(" R");
+            context.Writer.WriteLiteral(" R");
         }
 
         public override void VisitString(CosString obj, Context context)
         {
-            context.Writer.Write('(');
-            context.Writer.Write(obj.Value);
-            context.Writer.Write(')');
+            context.Writer.WriteByte('(');
+            context.Writer.WriteLiteral(obj.Value);
+            context.Writer.WriteByte(')');
         }
 
         public override void VisitObject(CosObject obj, Context context)
         {
             obj.Id.Accept(this, context);
-            context.Writer.Write(" obj\n");
+            context.Writer.WriteLiteral(" obj\n");
             obj.Object.Accept(this, context);
-            context.Writer.Write("\nendobj");
+            context.Writer.WriteLiteral("\nendobj");
         }
 
         public override void VisitStream(CosStream obj, Context context)
@@ -190,19 +187,19 @@ public sealed class CosWriter : IDisposable
             }
 
             obj.Dictionary.Accept(this, context);
-            context.Writer.Write('\n');
-            context.Writer.Write("stream\n");
-            context.Writer.Write(obj.GetData());
-            context.Writer.Write("\nendstream");
+            context.Writer.WriteByte('\n');
+            context.Writer.WriteLiteral("stream\n");
+            context.Writer.WriteBytes(obj.GetData());
+            context.Writer.WriteLiteral("\nendstream");
         }
 
         public override void VisitObjectStream(CosObjectStream obj, Context context)
         {
             var headerStream = new MemoryStream();
-            var header = new CosWriter(context.Document, headerStream, CosWriterSettings.WithoutCompression());
+            var header = new CosWriter(headerStream, CosWriterSettings.WithoutCompression());
 
             var bodyStream = new MemoryStream();
-            var body = new CosWriter(context.Document, bodyStream, CosWriterSettings.WithoutCompression());
+            var body = new CosWriter(bodyStream, CosWriterSettings.WithoutCompression());
 
             var numbers = obj.GetObjectIds().GroupConsecutive().Flatten().ToArray();
             foreach (var (_, _, last, number) in numbers.Enumerate())
@@ -215,21 +212,21 @@ public sealed class CosWriter : IDisposable
 
                 // Write to the body
                 var start = body.Position;
-                body.Write(embedded.Object);
+                body.Write(context.Document, embedded.Object);
 
                 if (!last)
                 {
-                    body.Write('\n');
+                    body.WriteByte('\n');
                 }
 
                 // Write to the header
-                header.Write(number);
-                header.Write(' ');
-                header.Write(start);
+                header.WriteLiteral(number);
+                header.WriteByte(' ');
+                header.WriteLiteral(start);
 
                 if (!last)
                 {
-                    header.Write(' ');
+                    header.WriteByte(' ');
                 }
             }
 
@@ -248,6 +245,7 @@ public sealed class CosWriter : IDisposable
 
             // Write everything as a stream
             context.Writer.Write(
+                context.Document,
                 new CosStream(
                     metadata,
                     buffer.ToArray()));

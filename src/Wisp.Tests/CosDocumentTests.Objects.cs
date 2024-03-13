@@ -2,23 +2,26 @@ namespace Wisp.Tests;
 
 public sealed partial class CosDocumentTests
 {
-    [Fact]
-    public void Should_Resolve_Indirect_Object_From_Object_Stream()
+    public sealed class Objects
     {
-        // Given
-        var fixture = new CosDocumentFixture.Simple();
-        var document = fixture.Document;
-
-        // When
-        var obj = document.Objects.Get(7, 0);
-
-        // Then
-        obj.ShouldNotBeNull();
-        obj.Object.ShouldBeOfType<CosDictionary>().And(dict =>
+        [Fact]
+        public void Should_Resolve_Indirect_Object_From_Object_Stream()
         {
-            dict.GetInteger(CosNames.Count).ShouldHaveValue(2);
-            dict.GetObjectReference(CosNames.First).ShouldBe(8, 0);
-            dict.GetObjectReference(CosNames.Last).ShouldBe(8, 0);
-        });
+            // Given
+            var fixture = new CosDocumentFixture.Simple();
+            var document = fixture.Document;
+
+            // When
+            var obj = document.Objects.Get(7, 0);
+
+            // Then
+            obj.ShouldNotBeNull();
+            obj.Object.ShouldBeOfType<CosDictionary>().And(dict =>
+            {
+                dict.GetInteger(CosNames.Count).ShouldHaveValue(2);
+                dict.GetObjectReference(CosNames.First).ShouldBe(8, 0);
+                dict.GetObjectReference(CosNames.Last).ShouldBe(8, 0);
+            });
+        }
     }
 }

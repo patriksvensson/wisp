@@ -61,14 +61,14 @@ public sealed class CosDocument : IDisposable
         bool leaveOpen = false)
     {
         using var writer = new CosWriter(
-            this, stream,
+            stream,
             new CosWriterSettings
             {
                 Compression = compression,
                 LeaveStreamOpen = leaveOpen,
             });
 
-        CosDocumentWriter.Write(writer);
+        CosDocumentWriter.Write(this, writer);
     }
 
     private CosInfo CreateInfo()

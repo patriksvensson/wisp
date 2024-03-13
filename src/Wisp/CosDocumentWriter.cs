@@ -2,31 +2,31 @@ namespace Wisp;
 
 public static class CosDocumentWriter
 {
-    public static void Write(CosWriter writer)
+    public static void Write(CosDocument document, CosWriter writer)
     {
         // We explicitly set 1.6 since we're currently saving
         // the xref table as a xref stream.
-        writer.Write($"%PDF-1.6\n");
-        writer.Write("%");
-        writer.Write([128, 129, 130, 131]);
-        writer.Write("\n");
+        writer.WriteLiteral("%PDF-1.6\n");
+        writer.WriteLiteral("%");
+        writer.WriteBytes([128, 129, 130, 131]);
+        writer.WriteLiteral("\n");
 
         // Write objects
         var positions = new Dictionary<CosObjectId, long>(CosObjectIdComparer.Shared);
-        foreach (var obj in writer.Document.Objects)
+        foreach (var obj in document.Objects)
         {
             positions.Add(obj.Id, writer.Position);
-            writer.Write(obj);
-            writer.Write('\n');
+            writer.Write(document, obj);
+            writer.WriteByte('\n');
         }
 
         // Write the xref stream
-        var start = CosXRefTableWriter.Write(writer, positions);
+        var start = CosXRefTableWriter.Write(document, writer, positions);
 
         // Write the end of the file
-        writer.Write('\n');
-        writer.Write("startxref\n");
-        writer.Write(start);
-        writer.Write("\n%%EOF\n");
+        writer.WriteByte('\n');
+        writer.WriteLiteral("startxref\n");
+        writer.WriteLiteral(start);
+        writer.WriteLiteral("\n%%EOF\n");
     }
 }

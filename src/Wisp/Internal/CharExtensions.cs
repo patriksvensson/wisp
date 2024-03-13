@@ -21,7 +21,14 @@ internal static class CharExtensions
     public static bool IsPdfName(this char character)
     {
         // Between 0x21 ('!') and 0x7E ('~')?
-        return character >= 0x21 && character <= 0x7E;
+        var isWithinRange = character >= 0x21 && character <= 0x7E;
+        if (!isWithinRange)
+        {
+            return false;
+        }
+
+        // Not part of spec, but things won't work otherwise
+        return character is not ('<' or '>' or '/' or '[' or ']' or '(' or ')');
     }
 
     public static bool IsPdfLineBreak(this char character)

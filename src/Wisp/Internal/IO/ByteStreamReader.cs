@@ -55,18 +55,6 @@ internal sealed class ByteStreamReader : IByteStreamReader
         return result;
     }
 
-    public ReadOnlySpan<byte> ReadBytes(int position, int count)
-    {
-        if (position + count > _buffer.Length)
-        {
-            throw new InvalidOperationException("Exceeded stream end");
-        }
-
-        var result = _buffer.Slice(position, count).Span;
-
-        return result;
-    }
-
     public long Seek(long offset, SeekOrigin origin)
     {
         switch (origin)
