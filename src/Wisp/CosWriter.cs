@@ -6,6 +6,7 @@ public sealed class CosWriter : IDisposable
     private readonly Stream _stream;
     private readonly CosWriterSettings _settings;
 
+    public CosWriterSettings Settings => _settings;
     public long Position => _stream.Position;
 
     public CosWriter(Stream stream, CosWriterSettings? settings)

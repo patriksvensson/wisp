@@ -5,12 +5,13 @@ internal static class CosXRefTableWriter
     public static long Write(
         CosDocument document,
         CosWriter writer,
+        CosXRefTable xRefTable,
         Dictionary<CosObjectId, long> positions)
     {
-        var ids = document.XRefTable.Select(x => x.Id).Order().ToArray();
+        var ids = xRefTable.Select(x => x.Id).Order().ToArray();
         var objectId = ids.Max(x => x.Number) + 1;
 
-        var triplets = GetEntries(document, ids, positions);
+        var triplets = GetEntries(xRefTable, ids, positions);
         var sizes = triplets.GetSizes();
         var encoded = triplets.Encode(sizes);
 
@@ -37,17 +38,18 @@ internal static class CosXRefTableWriter
     }
 
     private static Entries GetEntries(
-        CosDocument document,
+        CosXRefTable xRefTable,
         CosObjectId[] ids,
         Dictionary<CosObjectId, long> positions)
     {
         var encoded = new List<CosXRef>();
         foreach (var id in ids)
         {
-            var xref = document.XRefTable.GetXRef(id);
+            var xref = xRefTable.GetXRef(id);
             if (xref == null)
             {
-                throw new InvalidOperationException("Could not find xref for object");
+                throw new InvalidOperationException(
+                    $"Could not find xref for object {id}");
             }
 
             xref = xref.CreateCopy();

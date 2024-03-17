@@ -58,6 +58,7 @@ public sealed class CosDocument : IDisposable
     public void Save(
         Stream stream,
         CosCompression compression = CosCompression.Optimal,
+        bool unpack = false,
         bool leaveOpen = false)
     {
         using var writer = new CosWriter(
@@ -65,6 +66,7 @@ public sealed class CosDocument : IDisposable
             new CosWriterSettings
             {
                 Compression = compression,
+                UnpackObjectStreams = unpack,
                 LeaveStreamOpen = leaveOpen,
             });
 

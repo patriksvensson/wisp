@@ -3,7 +3,7 @@ using System.Reflection.Metadata;
 namespace Wisp.Cli;
 
 [UsedImplicitly]
-public sealed class UpdateInfoCommand : Command<UpdateInfoCommand.Setting>
+public sealed class Update : Command<Update.Setting>
 {
     [UsedImplicitly]
     public sealed class Setting : CommandSettings
@@ -20,24 +20,36 @@ public sealed class UpdateInfoCommand : Command<UpdateInfoCommand.Setting>
         [CommandOption("--author <AUTHOR>")]
         public string? Author { get; set; }
 
-        public Setting(string input, string output, string? title, string? author)
+        [CommandOption("--unpack")]
+        public bool Unpack { get; set; }
+
+        public Setting(string input, string output, string? title, string? author, bool unpack)
         {
             Input = input ?? throw new ArgumentNullException(nameof(input));
             Output = output ?? throw new ArgumentNullException(nameof(output));
             Title = title;
             Author = author;
+            Unpack = unpack;
         }
     }
 
     public override int Execute(CommandContext context, Setting settings)
     {
-        // Open and edit the document
         var document = CosDocument.Open(File.OpenRead(settings.Input));
-        document.Info.Title = new CosString(settings.Title ?? string.Empty);
-        document.Info.Author = new CosString(settings.Author ?? string.Empty);
 
-        // Save the document
-        document.Save(File.OpenWrite(settings.Output));
+        if (settings.Title != null)
+        {
+            document.Info.Title = new CosString(settings.Title);
+        }
+
+        if (settings.Author != null)
+        {
+            document.Info.Author = new CosString(settings.Author);
+        }
+
+        document.Save(
+            File.OpenWrite(settings.Output),
+            unpack: settings.Unpack);
 
         return 0;
     }

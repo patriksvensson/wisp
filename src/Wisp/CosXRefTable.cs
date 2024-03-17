@@ -30,6 +30,17 @@ public sealed class CosXRefTable : IEnumerable<CosXRef>
         return _lookup.ContainsKey(id);
     }
 
+    internal CosXRefTable Clone()
+    {
+        var result = new CosXRefTable();
+        foreach (var entry in this)
+        {
+            result.Add(entry);
+        }
+
+        return result;
+    }
+
     internal CosXRefTable Merge(CosXRefTable other)
     {
         ArgumentNullException.ThrowIfNull(other);
@@ -65,6 +76,19 @@ public sealed class CosXRefTable : IEnumerable<CosXRef>
 
         _references.Add(reference);
         return true;
+    }
+
+    internal bool Remove(CosObjectId id)
+    {
+        var reference = _references.FirstOrDefault(x => x.Id.Equals(id));
+        if (reference != null)
+        {
+            _references.Remove(reference);
+            _lookup.Remove(id);
+            return true;
+        }
+
+        return false;
     }
 
     public IEnumerator<CosXRef> GetEnumerator()
