@@ -1,35 +1,45 @@
+using System.ComponentModel;
 using System.Reflection.Metadata;
 
 namespace Wisp.Cli;
 
 [UsedImplicitly]
-public sealed class Update : Command<Update.Setting>
+public sealed class UpdateCommand : Command<UpdateCommand.Setting>
 {
+    private static string[] _compressions = ["none", "fastest", "optimal", "smallest"];
+
     [UsedImplicitly]
     public sealed class Setting : CommandSettings
     {
         [CommandArgument(0, "<INPUT>")]
-        public string Input { get; set; }
+        public string Input { get; set; } = null!;
 
-        [CommandArgument(1, "<OUTPUT>")]
-        public string Output { get; set; }
-
-        [CommandOption("--title <TITLE>")]
-        public string? Title { get; set; }
-
-        [CommandOption("--author <AUTHOR>")]
-        public string? Author { get; set; }
+        [CommandOption("-o|--out <OUTPUT>")]
+        [Description("The output file")]
+        public string Output { get; set; } = null!;
 
         [CommandOption("--unpack")]
+        [Description("Unpacks object streams during write")]
         public bool Unpack { get; set; }
 
-        public Setting(string input, string output, string? title, string? author, bool unpack)
+        [CommandOption("--compression")]
+        [Description("The compression to use: [blue]none[/], [blue]fastest[/], [blue]optimal[/], [blue]smallest[/]")]
+        [DefaultValue("optimal")]
+        public string Compression { get; set; } = null!;
+
+        public override ValidationResult Validate()
         {
-            Input = input ?? throw new ArgumentNullException(nameof(input));
-            Output = output ?? throw new ArgumentNullException(nameof(output));
-            Title = title;
-            Author = author;
-            Unpack = unpack;
+            if (Output == null)
+            {
+                return ValidationResult.Error("The option [blue]--out[/] has not been set");
+            }
+
+            if (!_compressions.Contains(Compression))
+            {
+                return ValidationResult.Error($"Unknown compression [blue]{Compression}[/]");
+            }
+
+            return base.Validate();
         }
     }
 
@@ -37,20 +47,24 @@ public sealed class Update : Command<Update.Setting>
     {
         var document = CosDocument.Open(File.OpenRead(settings.Input));
 
-        if (settings.Title != null)
-        {
-            document.Info.Title = new CosString(settings.Title);
-        }
-
-        if (settings.Author != null)
-        {
-            document.Info.Author = new CosString(settings.Author);
-        }
-
         document.Save(
             File.OpenWrite(settings.Output),
+            compression: GetCompression(settings.Compression),
             unpack: settings.Unpack);
 
+        AnsiConsole.MarkupLine("✅ [green]Done![/]");
         return 0;
+    }
+
+    private static CosCompression GetCompression(string compression)
+    {
+        return compression switch
+        {
+            "none" => CosCompression.None,
+            "fastest" => CosCompression.Fastest,
+            "optimal" => CosCompression.Optimal,
+            "smallest" => CosCompression.Smallest,
+            _ => throw new InvalidOperationException("Unknown compression"),
+        };
     }
 }
