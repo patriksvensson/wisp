@@ -67,7 +67,7 @@ public sealed class CosLexer : IDisposable
 
         try
         {
-            return TryRead(out token);
+            return TryRead(out token, out _);
         }
         finally
         {
@@ -106,22 +106,25 @@ public sealed class CosLexer : IDisposable
     {
         EnsureNotDisposed();
 
-        if (!TryRead(out var token))
+        if (!TryRead(out var token, out var error))
         {
-            throw new InvalidOperationException("Could not read next token from stream");
+            throw new InvalidOperationException($"Could not read next token from stream. Reason: {error}");
         }
 
         return token;
     }
 
-    private bool TryRead([NotNullWhen(true)] out CosToken? token)
+    private bool TryRead([NotNullWhen(true)] out CosToken? token, [NotNullWhen(false)] out string? error)
     {
+        error = null;
+
         EnsureNotDisposed();
         EatWhitespace();
 
         if (!_reader.CanRead)
         {
             token = null;
+            error = "Reached end of stream";
             return false;
         }
 
@@ -174,6 +177,7 @@ public sealed class CosLexer : IDisposable
         }
 
         token = null;
+        error = $"Encountered invalid token '{current}' ({Uri.HexEscape(current)})";
         return false;
     }
 
