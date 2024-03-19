@@ -282,7 +282,7 @@ public sealed class CosLexer : IDisposable
             }
 
             // Escape?
-            if (character == '\\')
+            if (character == '\\' && !escaped)
             {
                 escaped = true;
             }
