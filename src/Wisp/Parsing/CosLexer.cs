@@ -290,16 +290,22 @@ public sealed class CosLexer : IDisposable
             {
                 if (character == '(')
                 {
-                    level++;
+                    if (!escaped)
+                    {
+                        level++;
+                    }
                 }
                 else if (character == ')')
                 {
-                    if (level == 0 && !escaped)
+                    if (!escaped)
                     {
-                        break;
-                    }
+                        if (level == 0)
+                        {
+                            break;
+                        }
 
-                    level--;
+                        level--;
+                    }
                 }
 
                 accumulator.Add((byte)current);

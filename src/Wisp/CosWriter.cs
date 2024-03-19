@@ -164,7 +164,7 @@ public sealed class CosWriter : IDisposable
         public override void VisitString(CosString obj, Context context)
         {
             context.Writer.WriteByte('(');
-            context.Writer.WriteLiteral(obj.Value);
+            context.Writer.WriteLiteral(obj.Value.Replace("(", "\\(").Replace(")", "\\)"));
             context.Writer.WriteByte(')');
         }
 
