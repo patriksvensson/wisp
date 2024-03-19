@@ -3,9 +3,13 @@ namespace Wisp.Cli.Show;
 [UsedImplicitly]
 public sealed class ShowObjectsCommand : ShowCommand<ShowObjectsCommand.Settings>
 {
-    [UsedImplicitly]
+    [UsedImplicitly(ImplicitUseTargetFlags.Members)]
     public sealed class Settings : ShowSettings
     {
+        [CommandOption("-t|--traverse")]
+        [Description("Traverse encountered stream objects")]
+        public bool Traverse { get; set; }
+
         public Settings(string input)
             : base(input)
         {
@@ -33,20 +37,19 @@ public sealed class ShowObjectsCommand : ShowCommand<ShowObjectsCommand.Settings
 
                     if (obj.Object is CosObjectStream objStream)
                     {
-                        var subTable = new Table().NoBorder();
-                        subTable.AddColumn("ID");
-                        subTable.AddColumn("Kind");
-
-                        for (var i = 0; i < objStream.N; i++)
+                        if (settings.Traverse)
                         {
-                            var streamItem = objStream.GetObjectByIndex(document.Objects, i);
-                            table.AddRow(
-                                $"[blue]{streamItem.Id.Number}[/]:[blue]{streamItem.Id.Generation}[/]",
-                                "[italic]" + GetTypeName(streamItem) + "[/]",
-                                $"[gray]Child of[/] [blue]{obj.Id.Number}[/]:[blue]{obj.Id.Generation}[/]");
-
-                            streamItemCount++;
+                            for (var i = 0; i < objStream.N; i++)
+                            {
+                                var streamItem = objStream.GetObjectByIndex(document.Objects, i);
+                                table.AddRow(
+                                    $"[blue]{streamItem.Id.Number}[/]:[blue]{streamItem.Id.Generation}[/]",
+                                    "[italic]" + GetTypeName(streamItem) + "[/]",
+                                    $"[gray]Child of[/] [blue]{obj.Id.Number}[/]:[blue]{obj.Id.Generation}[/]");
+                            }
                         }
+
+                        streamItemCount += objStream.N;
                     }
 
                     count++;
