@@ -11,15 +11,25 @@ public static class Program
         {
             config.AddBranch<OpenSettings>("open", open =>
             {
-                open.AddCommand<SaveCommand>("save");
+                open.AddCommand<SaveCommand>("save")
+                    .WithDescription("Saves the PDF file");
+
                 open.AddBranch<ShowSettings>("show", show =>
                 {
-                    show.AddCommand<ShowXRefTableCommand>("xref");
-                    show.AddCommand<ShowObjectsCommand>("objects");
+                    show.SetDescription("Show different aspects of the PDF file");
+
+                    show.AddCommand<ShowXRefTableCommand>("xref")
+                        .WithDescription("Shows the PDF file's cross reference (xref) table");
+
+                    show.AddCommand<ShowObjectsCommand>("objects")
+                        .WithDescription("Shows all objects in the PDF file");
                 });
             });
 
-            config.SetApplicationName("wisp");
+            config.SetApplicationName("dotnet wisp");
+            config.AddExample("open", "MyFile.pdf", "show", "xref");
+            config.AddExample("open", "MyFile.pdf", "save", "MyNewFile.pdf", "--unpack");
+            config.ValidateExamples();
             config.SetExceptionHandler(ex =>
             {
                 if (ex is CommandRuntimeException)

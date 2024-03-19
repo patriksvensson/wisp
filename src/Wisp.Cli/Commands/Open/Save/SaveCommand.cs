@@ -10,7 +10,7 @@ public sealed class SaveCommand : OpenCommand<SaveCommand.Settings>
     public sealed class Settings : OpenSettings
     {
         [CommandArgument(0, "<OUTPUT>")]
-        [Description("The output file")]
+        [Description("The PDF output file")]
         public string Output { get; }
 
         [CommandOption("--unpack")]

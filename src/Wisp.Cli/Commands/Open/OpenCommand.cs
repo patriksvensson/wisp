@@ -17,6 +17,7 @@ public abstract class OpenCommand<T> : Command<T>
 public abstract class OpenSettings : CommandSettings
 {
     [CommandArgument(0, "<INPUT>")]
+    [Description("The PDF input file")]
     public string Input { get; }
 
     protected OpenSettings(string input)
