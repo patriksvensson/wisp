@@ -208,7 +208,7 @@ public sealed class CosWriter : IDisposable
                 var embedded = obj.GetObject(context.Document.Objects, new CosObjectId(number, 0));
                 if (embedded == null)
                 {
-                    throw new InvalidOperationException("Could not get object stream object during write");
+                    throw new WispException("Could not get object stream object during write");
                 }
 
                 // Write to the body

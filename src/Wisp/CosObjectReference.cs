@@ -72,7 +72,7 @@ public class CosObjectReference<T> : CosObjectReference
     {
         ArgumentNullException.ThrowIfNull(obj);
 
-        Object = obj.Object as T ?? throw new InvalidOperationException(
+        Object = obj.Object as T ?? throw new WispException(
             "Typed object reference was not of the expected type");
     }
 

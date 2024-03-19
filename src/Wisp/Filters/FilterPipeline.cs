@@ -18,12 +18,12 @@ public sealed class FilterPipeline
             var unsupported = _filters.Where(x => !x.Supported).ToArray();
             if (unsupported.Length == 1)
             {
-                throw new InvalidOperationException(
+                throw new WispException(
                     $"Cannot decode data. The filter {unsupported[0]} is not supported");
             }
 
             var unsupportedNames = string.Join(",", unsupported.Select(x => x.Name));
-            throw new InvalidOperationException(
+            throw new WispException(
                 $"Cannot decode data. The following filters are unsupported: {unsupportedNames}");
         }
 
@@ -61,7 +61,7 @@ public sealed class FilterPipeline
                 {
                     CosArray filterArray => CreateFilterPipeline(filterArray),
                     CosName filterName => new FilterPipeline(new[] { CreateFilter(filterName) }),
-                    _ => throw new InvalidOperationException("Invalid filter primitive"),
+                    _ => throw new WispException("Invalid filter primitive"),
                 };
             }
 
@@ -76,7 +76,7 @@ public sealed class FilterPipeline
             {
                 if (filter is not CosName filterName)
                 {
-                    throw new InvalidOperationException("Expected filter name to be a COS name");
+                    throw new WispException("Expected filter name to be a COS name");
                 }
 
                 result.Add(CreateFilter(filterName));
@@ -92,7 +92,7 @@ public sealed class FilterPipeline
                 return filter;
             }
 
-            throw new NotSupportedException($"Unsupported filter '{filterName.Value}'");
+            throw new WispException($"Unsupported filter '{filterName.Value}'");
         }
     }
 }

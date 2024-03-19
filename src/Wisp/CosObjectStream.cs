@@ -28,7 +28,7 @@ public sealed class CosObjectStream : ICosPrimitive
         {
             if (!_offsetsById.ContainsKey(id.Number))
             {
-                throw new InvalidOperationException(
+                throw new WispException(
                     $"Object #{id.Number} does not exist within object stream");
             }
 
@@ -47,7 +47,7 @@ public sealed class CosObjectStream : ICosPrimitive
         var bytes = _stream.GetUnfilteredData();
         if (bytes == null)
         {
-            throw new InvalidOperationException("Stream contained no data");
+            throw new WispException("Stream contained no data");
         }
 
         using (var stream = new MemoryStream(bytes))
@@ -58,7 +58,7 @@ public sealed class CosObjectStream : ICosPrimitive
             // Ensure the object exist within the stream
             if (!_offsetsById.TryGetValue(id.Number, out var offset))
             {
-                throw new InvalidOperationException(
+                throw new WispException(
                     $"Object #{id.Number} does not exist within object stream");
             }
 
@@ -77,7 +77,7 @@ public sealed class CosObjectStream : ICosPrimitive
         var bytes = _stream.GetUnfilteredData();
         if (bytes == null)
         {
-            throw new InvalidOperationException("Stream contained no data");
+            throw new WispException("Stream contained no data");
         }
 
         using (var stream = new MemoryStream(bytes))
@@ -87,7 +87,7 @@ public sealed class CosObjectStream : ICosPrimitive
 
             if (index >= _offsetsByIndex.Count)
             {
-                throw new InvalidOperationException(
+                throw new WispException(
                     $"Object with index {index} does not exist within object stream");
             }
 
@@ -121,7 +121,7 @@ public sealed class CosObjectStream : ICosPrimitive
         var bytes = _stream.GetUnfilteredData();
         if (bytes == null)
         {
-            throw new InvalidOperationException("Stream contained no data");
+            throw new WispException("Object stream contained no data");
         }
 
         if (!_unpacked)
@@ -148,14 +148,14 @@ public sealed class CosObjectStream : ICosPrimitive
         var objectOffset = _stream.Dictionary.GetInt64(CosNames.First);
         if (objectOffset == null)
         {
-            throw new InvalidOperationException("Object stream is missing /First parameter");
+            throw new WispException("Object stream is missing /First parameter");
         }
 
         for (var i = 0; i < N; i++)
         {
             if (!parser.CanRead)
             {
-                throw new InvalidOperationException("Encountered premature end of object stream");
+                throw new WispException("Encountered premature end of object stream");
             }
 
             var id = (int)((CosInteger)parser.Parse()).Value;

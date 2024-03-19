@@ -16,7 +16,7 @@ public sealed class CosHeaderReader
             var index = text.IndexOf("%PDF-", StringComparison.Ordinal);
             if (index == -1)
             {
-                throw new InvalidOperationException("PDF file is missing header");
+                throw new WispException("PDF file is missing header");
             }
 
             var versionNumber = text.Substring(index + 5, 3);
@@ -30,7 +30,7 @@ public sealed class CosHeaderReader
                 "1.5" => PdfVersion.Pdf1_5,
                 "1.6" => PdfVersion.Pdf1_6,
                 "1.7" => PdfVersion.Pdf1_7,
-                _ => throw new NotSupportedException($"PDF version {versionNumber} is not supported"),
+                _ => throw new WispException($"PDF version {versionNumber} is not supported"),
             };
         }
         finally

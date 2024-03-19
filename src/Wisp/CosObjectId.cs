@@ -27,7 +27,7 @@ public sealed class CosObjectId : ICosPrimitive, IEquatable<CosObjectId>, ICompa
                 int.Parse(parts[1].Trim()));
         }
 
-        throw new InvalidOperationException("Could not parse object ID.");
+        throw new WispException("Could not parse object ID.");
     }
 
     public int CompareTo(CosObjectId? other)

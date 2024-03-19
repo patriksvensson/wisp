@@ -15,7 +15,7 @@ public static class CosTrailerReader
             var xrefStart = FindXrefStart(parser);
             if (xrefStart == null)
             {
-                throw new InvalidOperationException("Could not find xref start");
+                throw new WispException("Could not find xref start");
             }
 
             var table = default(CosXRefTable?);
@@ -74,7 +74,7 @@ public static class CosTrailerReader
                 var obj = parser.Parse();
                 if (obj is not CosInteger integer)
                 {
-                    throw new InvalidOperationException("Expected 'startxref' to be an integer");
+                    throw new WispException("Expected 'startxref' to be an integer");
                 }
 
                 found.Add(integer.Value);

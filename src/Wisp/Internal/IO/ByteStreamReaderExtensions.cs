@@ -26,7 +26,7 @@ internal static class ByteStreamReaderExtensions
         var read = ReadChar(reader);
         if (read != expected)
         {
-            throw new InvalidOperationException($"Expected '{expected}' but got '{read}'.");
+            throw new WispException($"Expected '{expected}' but got '{read}'.");
         }
     }
 }

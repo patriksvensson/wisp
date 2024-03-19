@@ -70,7 +70,8 @@ public sealed class CosParser : IDisposable
 
         if (!_lexer.Peek(out var token))
         {
-            throw new InvalidOperationException("Reached end of stream");
+            throw new WispParserException(
+                this, "Reached end of stream");
         }
 
         return token.Kind switch
@@ -84,7 +85,8 @@ public sealed class CosParser : IDisposable
             CosTokenKind.Name => ParseName(),
             CosTokenKind.BeginDictionary => ParseDictionary(),
             CosTokenKind.BeginArray => ParseArray(),
-            _ => throw new InvalidOperationException($"Unexpected token {token.Kind} encountered"),
+            _ => throw new WispParserException(
+                this, $"Unexpected token {token.Kind} encountered"),
         };
     }
 
@@ -173,12 +175,14 @@ public sealed class CosParser : IDisposable
         var token = _lexer.Expect(CosTokenKind.StringLiteral);
         if (token.Lexeme == null)
         {
-            throw new InvalidOperationException("String literal token had no byte content");
+            throw new WispParserException(
+                this, "String literal token had no byte content");
         }
 
         if (!DecodeString(token.Lexeme, out var decoded, out var encoding))
         {
-            throw new InvalidOperationException("Could not decode PDF string");
+            throw new WispParserException(
+                this, "Could not decode PDF string");
         }
 
         // Is the string really a date?
@@ -220,7 +224,8 @@ public sealed class CosParser : IDisposable
             var temp = Parse();
             if (temp is not CosName key)
             {
-                throw new InvalidOperationException("Encountered dictionary key that was not a PDF name");
+                throw new WispParserException(
+                    this, "Encountered dictionary key that was not a PDF name");
             }
 
             var value = Parse();
@@ -286,7 +291,8 @@ public sealed class CosParser : IDisposable
         var length = metadata.GetInt32(CosNames.Length);
         if (length == null)
         {
-            throw new InvalidOperationException("Stream did not have a specified length");
+            throw new WispParserException(
+                this, "Stream did not have a specified length");
         }
 
         // Read the stream data

@@ -43,7 +43,7 @@ public static class CosXRefTableReader
                             position));
                         break;
                     default:
-                        throw new InvalidOperationException("Unknown xref kind encountered");
+                        throw new WispException("Unknown xref kind encountered");
                 }
             }
         }
@@ -72,7 +72,7 @@ public static class CosXRefTableReader
         var primitive = parser.Parse();
         if (primitive is not CosObject obj || obj.Object is not CosStream stream)
         {
-            throw new InvalidOperationException("Expected COS stream");
+            throw new WispException("Expected COS stream");
         }
 
         var table = new CosXRefTable();
@@ -84,7 +84,7 @@ public static class CosXRefTableReader
         {
             if (ids.Count == 0)
             {
-                throw new InvalidOperationException("Cannot read xref stream (no more index)");
+                throw new WispException("Cannot read xref stream (no more index)");
             }
 
             // Get the next object ID.
@@ -117,7 +117,7 @@ public static class CosXRefTableReader
             {
                 // No idea what this is
                 // Corrupted data?
-                throw new InvalidOperationException(
+                throw new WispException(
                     "Unknown xref stream object type");
             }
         }
@@ -130,12 +130,12 @@ public static class CosXRefTableReader
         var sizes = stream.Dictionary.GetArray(CosNames.W);
         if (sizes == null)
         {
-            throw new InvalidOperationException("XRef Stream is missing /W array");
+            throw new WispException("XRef Stream is missing /W array");
         }
 
         if (sizes.Count != 3)
         {
-            throw new InvalidOperationException($"Expected 3 items in /W array in XRef stream. Found {sizes.Count}");
+            throw new WispException($"Expected 3 items in /W array in XRef stream. Found {sizes.Count}");
         }
 
         var w = new int[3];
@@ -145,7 +145,7 @@ public static class CosXRefTableReader
 
         if (w[0] < 0 || w[1] < 0 || w[2] < 0)
         {
-            throw new IOException("/W array in XRef stream is invalid");
+            throw new WispException("/W array in XRef stream is invalid");
         }
 
         return w;
@@ -156,7 +156,7 @@ public static class CosXRefTableReader
         var size = stream.Dictionary.GetInt64(CosNames.Size);
         if (size == null)
         {
-            throw new InvalidOperationException(
+            throw new WispException(
                 "Stream xref table did not have size");
         }
 
@@ -175,7 +175,7 @@ public static class CosXRefTableReader
         {
             if (item is not CosInteger arrayInteger)
             {
-                throw new InvalidOperationException(
+                throw new WispException(
                     "Encountered malformed index array (not an integer)");
             }
 
@@ -184,7 +184,7 @@ public static class CosXRefTableReader
 
         if (indices.Count % 2 != 0)
         {
-            throw new InvalidOperationException(
+            throw new WispException(
                 "Encountered malformed index array (unbalanced)");
         }
 
@@ -206,7 +206,7 @@ public static class CosXRefTableReader
 
         if (sizes.Length != 3)
         {
-            throw new InvalidOperationException("Invalid sizes");
+            throw new WispException("Invalid sizes");
         }
 
         var data = stream.GetUnfilteredData();

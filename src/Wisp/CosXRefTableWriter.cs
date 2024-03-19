@@ -48,7 +48,7 @@ internal static class CosXRefTableWriter
             var xref = xRefTable.GetXRef(id);
             if (xref == null)
             {
-                throw new InvalidOperationException(
+                throw new WispException(
                     $"Could not find xref for object {id}");
             }
 
@@ -71,7 +71,11 @@ internal static class CosXRefTableWriter
         {
             if (xref is CosIndirectXRef indirect)
             {
-                Debug.Assert(indirect.Position != null, "Position should no able to be null for indirect object");
+                if (indirect.Position == null)
+                {
+                    throw new WispException("Position should no able to be null for indirect object");
+                }
+
                 result.Add(new Entry(xref.Id.Number, 1, indirect.Position.Value, xref.Id.Generation));
             }
             else if (xref is CosStreamXRef stream)
@@ -80,7 +84,7 @@ internal static class CosXRefTableWriter
             }
             else
             {
-                throw new InvalidOperationException("Unknown COS xref kind");
+                throw new WispException("Unknown COS xref kind");
             }
         }
 

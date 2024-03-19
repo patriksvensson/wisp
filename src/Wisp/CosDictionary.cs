@@ -53,7 +53,7 @@ public class CosDictionary : ICosPrimitive, IEnumerable<KeyValuePair<CosName, IC
 
         if (!_dictionary.TryAdd(key, value))
         {
-            throw new InvalidOperationException(
+            throw new WispException(
                 "Another item with the same key already exist in the dictionary");
         }
     }
@@ -223,7 +223,7 @@ public static class PdfDictionaryExtensions
         if (obj is not T item)
         {
 #if DEBUG
-            throw new InvalidOperationException(
+            throw new WispException(
                 $"Expected key '{key.Value}' to be of type '{typeof(T).Name}', " +
                 $"but it was of type '{obj.GetType().Name}'");
 #else
@@ -239,12 +239,12 @@ public static class PdfDictionaryExtensions
     {
         if (!dictionary.TryGetValue(key, out var obj))
         {
-            throw new InvalidOperationException($"The key /{key} does not exist in the dictionary");
+            throw new WispException($"The key /{key} does not exist in the dictionary");
         }
 
         if (obj is not T item)
         {
-            throw new InvalidOperationException(
+            throw new WispException(
                 $"Expected required key '{key.Value}' to be of type '{typeof(T).Name}', " +
                 $"but it was of type '{obj.GetType().Name}'");
         }
@@ -258,7 +258,7 @@ public static class PdfDictionaryExtensions
 
         if (value == null)
         {
-            throw new InvalidOperationException(
+            throw new WispException(
                 "Cannot set required key '{key}' to null");
         }
 

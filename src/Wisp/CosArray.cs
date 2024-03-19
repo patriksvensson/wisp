@@ -120,7 +120,7 @@ public static class CosArrayExtensions
         if (obj is not T item)
         {
 #if DEBUG
-            throw new InvalidOperationException(
+            throw new WispException(
                 $"Expected object at #{index} to be of type '{typeof(T).Name}', " +
                 $"but it was of type '{obj.GetType().Name}'");
 #else

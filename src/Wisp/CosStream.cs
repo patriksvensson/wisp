@@ -7,7 +7,7 @@ public sealed class CosStream : ICosPrimitive
     private byte[] _data;
 
     public CosDictionary Dictionary { get; }
-    public long Length => Dictionary.GetInt64(CosNames.Length) ?? throw new InvalidOperationException("/Length missing from stream");
+    public long Length => Dictionary.GetInt64(CosNames.Length) ?? throw new WispException("/Length missing from stream");
     public CosDictionary? DecodeParms => Dictionary.GetDictionary(CosNames.DecodeParms);
 
     public bool IsCompressed => Dictionary.ContainsKey(CosNames.Filter);

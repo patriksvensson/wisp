@@ -30,13 +30,13 @@ public static class CosDocumentReader
             if (infoObj == null)
             {
                 // TODO: We should remove the info object from the trailer
-                throw new InvalidOperationException(
+                throw new WispException(
                     "Info object was specified but did not exist");
             }
 
             if (infoObj.Object is not CosDictionary)
             {
-                throw new InvalidOperationException(
+                throw new WispException(
                     "Info object was expected to be a dictionary, but was not");
             }
 

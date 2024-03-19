@@ -20,7 +20,7 @@ public sealed class FlateFilter : Filter
 
         if (settings.Predictor == 2)
         {
-            throw new NotSupportedException("TIFF predictor not supported");
+            throw new WispException("TIFF predictor not supported");
         }
 
         return PngDecoder.Decode(bytes, settings.Columns, settings.Colors, settings.BitsPerComponent);
@@ -56,7 +56,7 @@ public sealed class FlateFilter : Filter
     {
         if (data.Length < 2)
         {
-            throw new InvalidOperationException("Invalid flate stream");
+            throw new WispException("Invalid flate stream");
         }
 
         var output = new MemoryStream();
@@ -116,7 +116,7 @@ public sealed class FlateFilter : Filter
                 else if (filter == 1)
                 {
                     // SUB
-                    throw new NotSupportedException("Unsupported filter: PngSub");
+                    throw new WispException("Unsupported filter: PngSub");
                 }
                 else if (filter == 2)
                 {
@@ -132,22 +132,22 @@ public sealed class FlateFilter : Filter
                 else if (filter == 3)
                 {
                     // AVERAGE
-                    throw new NotSupportedException("Unsupported filter: PngAverage");
+                    throw new WispException("Unsupported filter: PngAverage");
                 }
                 else if (filter == 4)
                 {
                     // PAETH
-                    throw new NotSupportedException("Unsupported filter: PngPaeth");
+                    throw new WispException("Unsupported filter: PngPaeth");
                 }
                 else if (filter == 5)
                 {
                     // PAETH
-                    throw new NotSupportedException("Unsupported filter: PngOptimum");
+                    throw new WispException("Unsupported filter: PngOptimum");
                 }
                 else
                 {
                     // UNKNOWN
-                    throw new NotSupportedException("Encountered unknown PNG filter during decoding");
+                    throw new WispException("Encountered unknown PNG filter during decoding");
                 }
 
                 // Write the current row to the stream
@@ -159,7 +159,7 @@ public sealed class FlateFilter : Filter
         }
 
         // TODO: Rewrite
-        public static void ReadBytes(BinaryReader reader, byte[] buffer, int count)
+        private static void ReadBytes(BinaryReader reader, byte[] buffer, int count)
         {
             if (count < 0)
             {

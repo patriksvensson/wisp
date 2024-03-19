@@ -46,7 +46,7 @@ internal sealed class ByteStreamReader : IByteStreamReader
     {
         if (_position + count > _buffer.Length)
         {
-            throw new InvalidOperationException("Exceeded stream end");
+            throw new WispException("Exceeded stream end");
         }
 
         var result = _buffer.Slice(_position, count).Span;
@@ -69,7 +69,7 @@ internal sealed class ByteStreamReader : IByteStreamReader
                 _position = _buffer.Length + (int)offset;
                 break;
             default:
-                throw new NotSupportedException("Unknown seek origin");
+                throw new WispException("Unknown seek origin");
         }
 
         return _position;

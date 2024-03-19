@@ -97,15 +97,16 @@ public sealed class CosLexer : IDisposable
             var token = Read();
             if (token.Kind != kind)
             {
-                throw new InvalidOperationException(
-                    $"Expected '{kind}' token in stream but found '{token.Kind}'");
+                throw new WispLexerException(
+                    this, $"Expected '{kind}' token in stream but found '{token.Kind}'");
             }
 
             return token;
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException(
+            throw new WispLexerException(
+                this,
                 $"Expected token '{kind}', but lexer returned an error",
                 ex);
         }
@@ -117,7 +118,7 @@ public sealed class CosLexer : IDisposable
 
         if (!TryRead(out var token, out var error))
         {
-            throw new InvalidOperationException($"Could not read next token from stream. Reason: {error}");
+            throw new WispLexerException(this, $"Could not read next token from stream. Reason: {error}");
         }
 
         return token;
@@ -333,8 +334,8 @@ public sealed class CosLexer : IDisposable
         {
             if (!_reader.CanRead)
             {
-                throw new InvalidOperationException(
-                    "Hex string literal is missing trailing '>'.");
+                throw new WispLexerException(
+                    this, "Hex string literal is missing trailing '>'.");
             }
 
             var current = _reader.PeekChar();
@@ -346,8 +347,8 @@ public sealed class CosLexer : IDisposable
                     break;
                 }
 
-                throw new InvalidOperationException(
-                    $"Malformed hexadecimal literal. Invalid character '{current}'.");
+                throw new WispLexerException(
+                    this, $"Malformed hexadecimal literal. Invalid character '{current}'.");
             }
 
             queue.Enqueue(_reader.ReadChar());
@@ -372,8 +373,8 @@ public sealed class CosLexer : IDisposable
         {
             if (!_reader.CanRead)
             {
-                throw new InvalidOperationException(
-                    "Hex string literal is missing trailing '>'.");
+                throw new WispLexerException(
+                    this, "Hex string literal is missing trailing '>'.");
             }
 
             var current = _reader.PeekChar();
@@ -385,8 +386,8 @@ public sealed class CosLexer : IDisposable
                     break;
                 }
 
-                throw new InvalidOperationException(
-                    $"Malformed hexadecimal literal. Invalid character '{current}'.");
+                throw new WispLexerException(
+                    this, $"Malformed hexadecimal literal. Invalid character '{current}'.");
             }
 
             accumulator.Append(_reader.ReadChar());
@@ -438,7 +439,8 @@ public sealed class CosLexer : IDisposable
             {
                 if (accumulator.Length > 0)
                 {
-                    throw new InvalidOperationException("Encountered malformed integer");
+                    throw new WispLexerException(
+                        this, "Encountered malformed integer");
                 }
 
                 _reader.Discard();
@@ -451,7 +453,8 @@ public sealed class CosLexer : IDisposable
             {
                 if (encounteredPeriod)
                 {
-                    throw new InvalidOperationException("Encountered more than one period");
+                    throw new WispLexerException(
+                        this, "Encountered more than one period");
                 }
 
                 encounteredPeriod = true;
@@ -523,7 +526,8 @@ public sealed class CosLexer : IDisposable
             case "n":
                 return new CosToken(CosTokenKind.XRefIndirect);
             default:
-                throw new InvalidOperationException($"Unknown token '{keyword}'");
+                throw new WispLexerException(
+                    this, $"Unknown token '{keyword}'");
         }
     }
 

@@ -24,7 +24,7 @@ public static class CosTokenExtensions
 
         if (token.Kind != CosTokenKind.Integer)
         {
-            throw new InvalidOperationException("Cannot parse token since it's not an integer.");
+            throw new WispException("Cannot parse token since it's not an integer.");
         }
 
         return token.Text == null
@@ -38,7 +38,7 @@ public static class CosTokenExtensions
 
         if (token.Kind != CosTokenKind.Real)
         {
-            throw new InvalidOperationException("Cannot parse token since it's not a real number.");
+            throw new WispException("Cannot parse token since it's not a real number.");
         }
 
         if (token.Text == null)
