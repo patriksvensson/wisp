@@ -6,11 +6,12 @@ public static class Program
 {
     public static int Main(string[] args)
     {
-        var app = new CommandApp<SaveCommand>();
+        var app = new CommandApp();
         app.Configure(config =>
         {
             config.AddBranch<OpenSettings>("open", open =>
             {
+                open.AddCommand<SaveCommand>("save");
                 open.AddBranch<ShowSettings>("show", show =>
                 {
                     show.AddCommand<ShowXRefTableCommand>("xref");

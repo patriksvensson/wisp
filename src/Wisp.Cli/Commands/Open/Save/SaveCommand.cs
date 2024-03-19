@@ -1,20 +1,17 @@
 namespace Wisp.Cli;
 
 [UsedImplicitly]
-public sealed class SaveCommand : Command<SaveCommand.Setting>
+public sealed class SaveCommand : OpenCommand<SaveCommand.Settings>
 {
     private static readonly string[] _compressions =
         ["none", "fastest", "optimal", "smallest"];
 
-    [UsedImplicitly]
-    public sealed class Setting : CommandSettings
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+    public sealed class Settings : OpenSettings
     {
-        [CommandArgument(0, "<INPUT>")]
-        public string Input { get; set; } = null!;
-
-        [CommandOption("-o|--out <OUTPUT>")]
+        [CommandArgument(0, "<OUTPUT>")]
         [Description("The output file")]
-        public string Output { get; set; } = null!;
+        public string Output { get; }
 
         [CommandOption("--unpack")]
         [Description("Unpacks object streams during write")]
@@ -25,13 +22,14 @@ public sealed class SaveCommand : Command<SaveCommand.Setting>
         [DefaultValue("optimal")]
         public string Compression { get; set; } = null!;
 
+        public Settings(string input, string output)
+            : base(input)
+        {
+            Output = output ?? throw new ArgumentNullException(nameof(output));
+        }
+
         public override ValidationResult Validate()
         {
-            if (Output == null)
-            {
-                return ValidationResult.Error("The option [blue]--out[/] has not been set");
-            }
-
             if (!_compressions.Contains(Compression))
             {
                 return ValidationResult.Error($"Unknown compression [blue]{Compression}[/]");
@@ -41,17 +39,15 @@ public sealed class SaveCommand : Command<SaveCommand.Setting>
         }
     }
 
-    public override int Execute(CommandContext context, Setting settings)
+    protected override void Execute(CommandContext context, Settings settings, CosDocument document)
     {
-        var document = CosDocument.Open(File.OpenRead(settings.Input));
-
         document.Save(
             File.OpenWrite(settings.Output),
             compression: GetCompression(settings.Compression),
             unpack: settings.Unpack);
 
-        AnsiConsole.MarkupLine("✅ [green]Done![/]");
-        return 0;
+        AnsiConsole.WriteLine();
+        AnsiConsole.MarkupLine($"Wrote [italic blue]{settings.Output}[/]");
     }
 
     private static CosCompression GetCompression(string compression)
