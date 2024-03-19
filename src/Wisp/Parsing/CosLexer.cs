@@ -92,14 +92,23 @@ public sealed class CosLexer : IDisposable
     {
         EnsureNotDisposed();
 
-        var token = Read();
-        if (token.Kind != kind)
+        try
+        {
+            var token = Read();
+            if (token.Kind != kind)
+            {
+                throw new InvalidOperationException(
+                    $"Expected '{kind}' token in stream but found '{token.Kind}'");
+            }
+
+            return token;
+        }
+        catch (Exception ex)
         {
             throw new InvalidOperationException(
-                $"Expected '{kind}' token in stream but found '{token.Kind}'");
+                $"Expected token '{kind}', but lexer returned an error",
+                ex);
         }
-
-        return token;
     }
 
     public CosToken Read()
