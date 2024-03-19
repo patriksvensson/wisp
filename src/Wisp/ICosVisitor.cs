@@ -19,3 +19,23 @@ public interface ICosVisitor<in TContext>
     void VisitStream(CosStream obj, TContext context);
     void VisitString(CosString obj, TContext context);
 }
+
+[PublicAPI]
+public interface ICosVisitor<in TContext, out TResult>
+{
+    TResult VisitArray(CosArray obj, TContext context);
+    TResult VisitBoolean(CosBoolean obj, TContext context);
+    TResult VisitDate(CosDate obj, TContext context);
+    TResult VisitDictionary(CosDictionary obj, TContext context);
+    TResult VisitHexString(CosHexString obj, TContext context);
+    TResult VisitInteger(CosInteger obj, TContext context);
+    TResult VisitName(CosName obj, TContext context);
+    TResult VisitNull(CosNull obj, TContext context);
+    TResult VisitObject(CosObject obj, TContext context);
+    TResult VisitObjectId(CosObjectId obj, TContext context);
+    TResult VisitObjectReference(CosObjectReference obj, TContext context);
+    TResult VisitObjectStream(CosObjectStream obj, TContext context);
+    TResult VisitReal(CosReal obj, TContext context);
+    TResult VisitStream(CosStream obj, TContext context);
+    TResult VisitString(CosString obj, TContext context);
+}

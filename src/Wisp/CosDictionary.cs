@@ -110,9 +110,16 @@ public class CosDictionary : ICosPrimitive, IEnumerable<KeyValuePair<CosName, IC
         return GetEnumerator();
     }
 
+    [DebuggerStepThrough]
     public void Accept<TContext>(ICosVisitor<TContext> visitor, TContext context)
     {
         visitor.VisitDictionary(this, context);
+    }
+
+    [DebuggerStepThrough]
+    public TResult Accept<TContext, TResult>(ICosVisitor<TContext, TResult> visitor, TContext context)
+    {
+        return visitor.VisitDictionary(this, context);
     }
 
     [DebuggerStepThrough]

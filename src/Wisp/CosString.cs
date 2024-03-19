@@ -25,6 +25,12 @@ public sealed class CosString : ICosPrimitive
         visitor.VisitString(this, context);
     }
 
+    [DebuggerStepThrough]
+    public TResult Accept<TContext, TResult>(ICosVisitor<TContext, TResult> visitor, TContext context)
+    {
+        return visitor.VisitString(this, context);
+    }
+
     public override string ToString()
     {
         return $"[String] {Value} ({Encoding})";

@@ -29,6 +29,12 @@ public sealed class CosName : ICosPrimitive, IEquatable<CosName>
         visitor.VisitName(this, context);
     }
 
+    [DebuggerStepThrough]
+    public TResult Accept<TContext, TResult>(ICosVisitor<TContext, TResult> visitor, TContext context)
+    {
+        return visitor.VisitName(this, context);
+    }
+
     public override string ToString()
     {
         return $"[Name] {Value}";

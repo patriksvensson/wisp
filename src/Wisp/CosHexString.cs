@@ -17,6 +17,12 @@ public sealed class CosHexString : ICosPrimitive
         visitor.VisitHexString(this, context);
     }
 
+    [DebuggerStepThrough]
+    public TResult Accept<TContext, TResult>(ICosVisitor<TContext, TResult> visitor, TContext context)
+    {
+        return visitor.VisitHexString(this, context);
+    }
+
     public override string ToString()
     {
         var hex = Convert.ToHexString(Value);

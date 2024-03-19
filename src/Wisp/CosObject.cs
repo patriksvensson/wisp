@@ -19,6 +19,12 @@ public sealed class CosObject : ICosPrimitive
         visitor.VisitObject(this, context);
     }
 
+    [DebuggerStepThrough]
+    public TResult Accept<TContext, TResult>(ICosVisitor<TContext, TResult> visitor, TContext context)
+    {
+        return visitor.VisitObject(this, context);
+    }
+
     public override string ToString()
     {
         var kind = Object.GetType()?.Name ?? "Unknown";

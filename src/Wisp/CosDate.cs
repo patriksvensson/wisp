@@ -51,6 +51,12 @@ public sealed class CosDate : ICosPrimitive
         visitor.VisitDate(this, context);
     }
 
+    [DebuggerStepThrough]
+    public TResult Accept<TContext, TResult>(ICosVisitor<TContext, TResult> visitor, TContext context)
+    {
+        return visitor.VisitDate(this, context);
+    }
+
     public override string ToString()
     {
         return "[ObjectID] " +

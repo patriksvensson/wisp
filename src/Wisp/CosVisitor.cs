@@ -84,3 +84,23 @@ public abstract class CosVisitor<TContext> : ICosVisitor<TContext>
         }
     }
 }
+
+[PublicAPI]
+public abstract class CosVisitor<TContext, TResult> : ICosVisitor<TContext, TResult>
+{
+    public abstract TResult VisitArray(CosArray obj, TContext context);
+    public abstract TResult VisitBoolean(CosBoolean obj, TContext context);
+    public abstract TResult VisitDate(CosDate obj, TContext context);
+    public abstract TResult VisitDictionary(CosDictionary obj, TContext context);
+    public abstract TResult VisitHexString(CosHexString obj, TContext context);
+    public abstract TResult VisitInteger(CosInteger obj, TContext context);
+    public abstract TResult VisitName(CosName obj, TContext context);
+    public abstract TResult VisitNull(CosNull obj, TContext context);
+    public abstract TResult VisitObject(CosObject obj, TContext context);
+    public abstract TResult VisitObjectId(CosObjectId obj, TContext context);
+    public abstract TResult VisitObjectReference(CosObjectReference obj, TContext context);
+    public abstract TResult VisitObjectStream(CosObjectStream obj, TContext context);
+    public abstract TResult VisitReal(CosReal obj, TContext context);
+    public abstract TResult VisitStream(CosStream obj, TContext context);
+    public abstract TResult VisitString(CosString obj, TContext context);
+}

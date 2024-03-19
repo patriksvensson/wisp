@@ -21,4 +21,10 @@ public sealed class CosBoolean : ICosPrimitive
     {
         visitor.VisitBoolean(this, context);
     }
+
+    [DebuggerStepThrough]
+    public TResult Accept<TContext, TResult>(ICosVisitor<TContext, TResult> visitor, TContext context)
+    {
+        return visitor.VisitBoolean(this, context);
+    }
 }

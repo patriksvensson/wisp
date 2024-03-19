@@ -23,6 +23,12 @@ public sealed class CosInteger : ICosPrimitive
         visitor.VisitInteger(this, context);
     }
 
+    [DebuggerStepThrough]
+    public TResult Accept<TContext, TResult>(ICosVisitor<TContext, TResult> visitor, TContext context)
+    {
+        return visitor.VisitInteger(this, context);
+    }
+
     public override string ToString()
     {
         return $"[Integer] {Value}";

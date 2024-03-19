@@ -71,6 +71,12 @@ public sealed class CosObjectId : ICosPrimitive, IEquatable<CosObjectId>, ICompa
         visitor.VisitObjectId(this, context);
     }
 
+    [DebuggerStepThrough]
+    public TResult Accept<TContext, TResult>(ICosVisitor<TContext, TResult> visitor, TContext context)
+    {
+        return visitor.VisitObjectId(this, context);
+    }
+
     public override string ToString()
     {
         return $"[ObjectID] {Number}:{Generation}".Trim();

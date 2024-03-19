@@ -1,13 +1,22 @@
-﻿namespace Wisp.Cli;
+﻿using Wisp.Cli.Show;
+
+namespace Wisp.Cli;
 
 public static class Program
 {
     public static int Main(string[] args)
     {
-        var app = new CommandApp<UpdateCommand>();
+        var app = new CommandApp<SaveCommand>();
         app.Configure(config =>
         {
-            config.AddCommand<ReadCommand>("read").IsHidden();
+            config.AddBranch<OpenSettings>("open", open =>
+            {
+                open.AddBranch<ShowSettings>("show", show =>
+                {
+                    show.AddCommand<ShowXRefTableCommand>("xref");
+                    show.AddCommand<ShowObjectsCommand>("objects");
+                });
+            });
 
             config.SetApplicationName("wisp");
             config.SetExceptionHandler(ex =>

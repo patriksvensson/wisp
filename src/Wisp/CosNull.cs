@@ -12,6 +12,12 @@ public sealed class CosNull : ICosPrimitive
         visitor.VisitNull(this, context);
     }
 
+    [DebuggerStepThrough]
+    public TResult Accept<TContext, TResult>(ICosVisitor<TContext, TResult> visitor, TContext context)
+    {
+        return visitor.VisitNull(this, context);
+    }
+
     public override string ToString()
     {
         return "[Null]";

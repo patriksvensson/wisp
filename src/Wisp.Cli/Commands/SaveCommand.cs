@@ -1,12 +1,10 @@
-using System.ComponentModel;
-using System.Reflection.Metadata;
-
 namespace Wisp.Cli;
 
 [UsedImplicitly]
-public sealed class UpdateCommand : Command<UpdateCommand.Setting>
+public sealed class SaveCommand : Command<SaveCommand.Setting>
 {
-    private static string[] _compressions = ["none", "fastest", "optimal", "smallest"];
+    private static readonly string[] _compressions =
+        ["none", "fastest", "optimal", "smallest"];
 
     [UsedImplicitly]
     public sealed class Setting : CommandSettings

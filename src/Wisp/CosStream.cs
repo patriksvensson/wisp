@@ -76,6 +76,12 @@ public sealed class CosStream : ICosPrimitive
         visitor.VisitStream(this, context);
     }
 
+    [DebuggerStepThrough]
+    public TResult Accept<TContext, TResult>(ICosVisitor<TContext, TResult> visitor, TContext context)
+    {
+        return visitor.VisitStream(this, context);
+    }
+
     public override string ToString()
     {
         return $"[Stream] Length = {Length}";

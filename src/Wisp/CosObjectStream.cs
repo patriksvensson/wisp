@@ -174,6 +174,12 @@ public sealed class CosObjectStream : ICosPrimitive
         visitor.VisitObjectStream(this, context);
     }
 
+    [DebuggerStepThrough]
+    public TResult Accept<TContext, TResult>(ICosVisitor<TContext, TResult> visitor, TContext context)
+    {
+        return visitor.VisitObjectStream(this, context);
+    }
+
     public override string ToString()
     {
         return $"[ObjectStream] Objects = {N}, Size = {_stream.Length}";

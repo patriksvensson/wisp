@@ -49,6 +49,12 @@ public class CosObjectReference : ICosPrimitive, IEquatable<CosObjectReference>
         visitor.VisitObjectReference(this, context);
     }
 
+    [DebuggerStepThrough]
+    public TResult Accept<TContext, TResult>(ICosVisitor<TContext, TResult> visitor, TContext context)
+    {
+        return visitor.VisitObjectReference(this, context);
+    }
+
     public override string ToString()
     {
         return $"[ObjectReference] {Id.Number}:{Id.Generation}".Trim();

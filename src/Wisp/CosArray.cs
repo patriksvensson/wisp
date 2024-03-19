@@ -62,6 +62,12 @@ public sealed class CosArray : ICosPrimitive, IEnumerable<ICosPrimitive>
     {
         visitor.VisitArray(this, context);
     }
+
+    [DebuggerStepThrough]
+    public TResult Accept<TContext, TResult>(ICosVisitor<TContext, TResult> visitor, TContext context)
+    {
+        return visitor.VisitArray(this, context);
+    }
 }
 
 [PublicAPI]
