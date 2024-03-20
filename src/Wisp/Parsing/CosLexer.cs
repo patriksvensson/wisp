@@ -23,41 +23,6 @@ public sealed class CosLexer : IDisposable
         }
     }
 
-    public void ReadEndOfLineMarker()
-    {
-        EnsureNotDisposed();
-
-        // PDF Spec - 7.3.8.1, Paragraph 3.
-        // The keyword stream that follows the stream dictionary shall be followed by an end-of-line marker
-        // consisting of either a CARRIAGE RETURN and a LINE FEED or just a LINE FEED, and not by a CARRIAGE
-        // RETURN alone.
-        // See also NOTE 2 in the same section.
-        while (_reader.CanRead)
-        {
-            var current = _reader.ReadChar();
-            if (current == '\n')
-            {
-                return;
-            }
-            else if (current == '\r')
-            {
-                current = _reader.ReadChar();
-                if (current == '\n')
-                {
-                    return;
-                }
-                else
-                {
-                    throw new WispLexerException(this, $"Invalid end-of-line marker. Expected LF, instead got '{current}'");
-                }
-            }
-            else
-            {
-                throw new WispLexerException(this, "Expected an end-of-line marker consisting either of CRLF or a single LF.");
-            }
-        }
-    }
-
     public long Seek(long offset, SeekOrigin origin)
     {
         return _reader.Seek(offset, origin);

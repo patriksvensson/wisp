@@ -297,7 +297,20 @@ public sealed class CosParser : IDisposable
 
         // Read the stream data
         _lexer.Expect(CosTokenKind.BeginStream);
-        _lexer.ReadEndOfLineMarker();
+
+        var current = _lexer.ReadByte();
+        if (current == '\r')
+        {
+            if (_lexer.ReadByte() != '\n')
+            {
+                throw new WispParserException(this, $"Invalid end-of-line marker. Expected LF, instead got '{current}'");
+            }
+        }
+        else if (current != '\n')
+        {
+            throw new WispParserException(this, "Expected an end-of-line marker consisting either of CRLF or a single LF.");
+        }
+
         var data = _lexer.ReadBytes(length.Value);
         _lexer.Expect(CosTokenKind.EndStream);
 
