@@ -313,46 +313,6 @@ public sealed class CosLexer : IDisposable
         return ReadHexStringLiteral();
     }
 
-    private CosToken ReadHexStringLiteral1()
-    {
-        var queue = new Queue<char>();
-        var result = new List<byte>();
-        while (true)
-        {
-            if (!_reader.CanRead)
-            {
-                throw new WispLexerException(
-                    this, "Hex string literal is missing trailing '>'.");
-            }
-
-            var current = _reader.PeekChar();
-            if (!char.IsLetter(current) && !char.IsDigit(current))
-            {
-                if (current == '>')
-                {
-                    _reader.Discard('>');
-                    break;
-                }
-
-                throw new WispLexerException(
-                    this, $"Malformed hexadecimal literal. Invalid character '{current}'.");
-            }
-
-            queue.Enqueue(_reader.ReadChar());
-
-            if (queue.Count == 2)
-            {
-                var first = queue.Dequeue();
-                var second = queue.Dequeue();
-                result.Add((byte)HexUtility.FromHex(first, second));
-            }
-        }
-
-        return new CosToken(
-            CosTokenKind.HexStringLiteral,
-            lexeme: result.ToArray());
-    }
-
     private CosToken ReadHexStringLiteral()
     {
         var accumulator = new StringBuilder();
