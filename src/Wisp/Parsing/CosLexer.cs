@@ -23,25 +23,6 @@ public sealed class CosLexer : IDisposable
         }
     }
 
-    public void EatNewlines()
-    {
-        EnsureNotDisposed();
-
-        while (_reader.CanRead)
-        {
-            var current = _reader.PeekChar();
-            switch (current)
-            {
-                case '\r':
-                case '\n':
-                    _reader.Discard();
-                    break;
-                default:
-                    return;
-            }
-        }
-    }
-
     public long Seek(long offset, SeekOrigin origin)
     {
         return _reader.Seek(offset, origin);
