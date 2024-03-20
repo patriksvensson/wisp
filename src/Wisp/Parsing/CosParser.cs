@@ -297,7 +297,7 @@ public sealed class CosParser : IDisposable
 
         // Read the stream data
         _lexer.Expect(CosTokenKind.BeginStream);
-        _lexer.EatNewlines();
+        _lexer.ReadEndOfLineMarker();
         var data = _lexer.ReadBytes(length.Value);
         _lexer.Expect(CosTokenKind.EndStream);
 
