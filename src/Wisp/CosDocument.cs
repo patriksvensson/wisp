@@ -57,19 +57,16 @@ public sealed class CosDocument : IDisposable
 
     public void Save(
         Stream stream,
-        CosCompression compression = CosCompression.Optimal,
-        bool unpack = false,
-        bool leaveOpen = false)
+        CosWriterSettings? settings = null)
     {
-        using var writer = new CosWriter(
-            stream,
-            new CosWriterSettings
-            {
-                Compression = compression,
-                UnpackObjectStreams = unpack,
-                LeaveStreamOpen = leaveOpen,
-            });
+        settings ??= new CosWriterSettings
+        {
+            Compression = CosCompression.Optimal,
+            UnpackObjectStreams = false,
+            LeaveStreamOpen = false,
+        };
 
+        using var writer = new CosWriter(stream, settings);
         CosDocumentWriter.Write(this, writer);
     }
 

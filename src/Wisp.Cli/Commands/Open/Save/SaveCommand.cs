@@ -43,8 +43,11 @@ public sealed class SaveCommand : OpenCommand<SaveCommand.Settings>
     {
         document.Save(
             File.OpenWrite(settings.Output),
-            compression: GetCompression(settings.Compression),
-            unpack: settings.Unpack);
+            new CosWriterSettings
+            {
+                Compression = GetCompression(settings.Compression),
+                UnpackObjectStreams = settings.Unpack,
+            });
 
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine($"Wrote [italic blue]{settings.Output}[/]");

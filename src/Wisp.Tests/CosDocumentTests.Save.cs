@@ -18,7 +18,11 @@ public sealed partial class CosDocumentTests
 
         // Save the document to a stream
         var stream = new MemoryStream();
-        document.Save(stream, compression, leaveOpen: true);
+        document.Save(stream, new CosWriterSettings
+        {
+            Compression = compression,
+            LeaveStreamOpen = true,
+        });
 
         // Reload the document
         stream.Seek(0, SeekOrigin.Begin);
