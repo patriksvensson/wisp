@@ -163,12 +163,20 @@ public sealed class CosWriter : IDisposable
 
         public override void VisitString(CosString obj, Context context)
         {
-            context.Writer.WriteByte('(');
-            context.Writer.WriteLiteral(obj.Value
+            var text = obj.Value
                 .Replace("\\(", "(")
                 .Replace("\\", "\\\\")
                 .Replace("(", "\\(")
-                .Replace(")", "\\)"));
+                .Replace(")", "\\)");
+
+            context.Writer.WriteByte('(');
+            context.Writer.WriteBytes(obj.Encoding switch
+            {
+                CosStringEncoding.Ascii => Encoding.ASCII.GetBytes(text),
+                CosStringEncoding.Unicode => [..(byte[])[0xFF, 0xFE], .. Encoding.BigEndianUnicode.GetBytes(text)],
+                CosStringEncoding.BigEndianUnicode => [..(byte[])[0xFE, 0xFF], .. Encoding.BigEndianUnicode.GetBytes(text)],
+                _ => throw new WispException("Unknown string encoding"),
+            });
             context.Writer.WriteByte(')');
         }
 

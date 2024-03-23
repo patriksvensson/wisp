@@ -158,7 +158,7 @@ public sealed class CosWriterTests
         var fixture = new CosWriterFixture();
 
         // When
-        fixture.Write(new CosString("Hello World", CosStringEncoding.Raw));
+        fixture.Write(new CosString("Hello World"));
 
         // Then
         fixture.Result.ShouldBe("(Hello World)");

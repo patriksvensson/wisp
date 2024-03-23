@@ -5,15 +5,15 @@ namespace Wisp;
 public sealed class CosString : ICosPrimitive
 {
     public string Value { get; }
-    public CosStringEncoding Encoding { get; }
+    public CosStringEncoding Encoding { get; set; }
 
     public CosString(string value)
     {
         Value = value ?? throw new ArgumentNullException(nameof(value));
-        Encoding = CosStringEncoding.Raw;
+        Encoding = value.All(char.IsAscii) ? CosStringEncoding.Ascii : CosStringEncoding.Unicode;
     }
 
-    public CosString(string value, CosStringEncoding encoding)
+    internal CosString(string value, CosStringEncoding encoding)
     {
         Value = value ?? throw new ArgumentNullException(nameof(value));
         Encoding = encoding;

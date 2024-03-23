@@ -166,9 +166,9 @@ public sealed class CosParser : IDisposable
                     return true;
             }
 
-            // Treat everything else as raw.
-            decoded = Encoding.UTF8.GetString(bytes);
-            encoding = CosStringEncoding.Raw;
+            // Treat everything else as ASCII.
+            decoded = Encoding.ASCII.GetString(bytes);
+            encoding = CosStringEncoding.Ascii;
             return true;
         }
 
