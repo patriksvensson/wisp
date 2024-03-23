@@ -244,6 +244,10 @@ public static class CosSerializer
                                     .Object
                                     .Accept(this, context);
                             }
+                            else
+                            {
+                                context.WriteComment("Omitted by serializer");
+                            }
                         });
                     }
                 });
