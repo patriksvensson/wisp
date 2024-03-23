@@ -8,7 +8,7 @@ public sealed partial class CosDocumentTests
         public void Should_Resolve_Indirect_Object_From_Object_Stream()
         {
             // Given
-            var fixture = new CosDocumentFixture.Simple();
+            var fixture = CosDocumentFixture.Simple.Create();
             var document = fixture.Document;
 
             // When

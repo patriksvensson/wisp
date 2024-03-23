@@ -1,0 +1,503 @@
+﻿<Document Version="1.6">
+  <!--XRef Table-->
+  <XRefTable>
+    <Entry Id="3:0" Position="15" />
+    <Entry Id="25:0" Position="3419" />
+    <Entry Id="27:0" Position="3558" />
+    <Entry Id="29:0" Position="3868" />
+    <Entry Id="30:0" Position="28622" />
+    <Entry Id="7:0" />
+    <Entry Id="8:0" />
+    <Entry Id="9:0" />
+    <Entry Id="10:0" />
+    <Entry Id="11:0" />
+    <Entry Id="12:0" />
+    <Entry Id="13:0" />
+    <Entry Id="14:0" />
+    <Entry Id="15:0" />
+    <Entry Id="16:0" />
+    <Entry Id="17:0" />
+    <Entry Id="18:0" />
+    <Entry Id="19:0" />
+    <Entry Id="20:0" />
+    <Entry Id="21:0" />
+    <Entry Id="22:0" />
+    <Entry Id="23:0" />
+    <Entry Id="26:0" />
+    <Entry Id="32:0" />
+    <Entry Id="33:0" />
+    <Entry Id="34:0" />
+    <Entry Id="35:0" />
+    <Entry Id="36:0" />
+  </XRefTable>
+  <!--Trailer-->
+  <Trailer>
+    <Trailer Count="9">
+      <Item Key="Length">80</Item>
+      <Item Key="ID">
+        <Array Count="2">
+          <Item>
+            <HexString>A3112B77EA7D4BA78E81FE43166E2E51</HexString>
+          </Item>
+          <Item>
+            <HexString>617C8DB4AFBB4F57B2E6DDE44A9716BB</HexString>
+          </Item>
+        </Array>
+      </Item>
+      <Item Key="Info">23 0 R</Item>
+      <Item Key="Root">25 0 R</Item>
+      <Item Key="Type">/XRef</Item>
+      <Item Key="Size">40</Item>
+      <Item Key="Index">
+        <Array Count="14">
+          <Item>0</Item>
+          <Item>1</Item>
+          <Item>3</Item>
+          <Item>1</Item>
+          <Item>7</Item>
+          <Item>17</Item>
+          <Item>25</Item>
+          <Item>3</Item>
+          <Item>29</Item>
+          <Item>2</Item>
+          <Item>32</Item>
+          <Item>5</Item>
+          <Item>38</Item>
+          <Item>1</Item>
+        </Array>
+      </Item>
+      <Item Key="W">
+        <Array Count="3">
+          <Item>1</Item>
+          <Item>2</Item>
+          <Item>1</Item>
+        </Array>
+      </Item>
+      <Item Key="Filter">/FlateDecode</Item>
+    </Trailer>
+  </Trailer>
+  <!--Objects-->
+  <Objects>
+    <!--Object: 3:0-->
+    <Object Id="3:0" Cached="False">
+      <Stream>
+        <Dictionary Count="3">
+          <Item Key="Length">3320</Item>
+          <Item Key="Subtype">/XML</Item>
+          <Item Key="Type">/Metadata</Item>
+        </Dictionary>
+      </Stream>
+    </Object>
+    <!--Object: 25:0-->
+    <Object Id="25:0" Cached="False">
+      <Dictionary Count="7">
+        <Item Key="Metadata">3 0 R</Item>
+        <Item Key="Names">32 0 R</Item>
+        <Item Key="Outlines">7 0 R</Item>
+        <Item Key="Pages">16 0 R</Item>
+        <Item Key="SpiderInfo">22 0 R</Item>
+        <Item Key="StructTreeRoot">10 0 R</Item>
+        <Item Key="Type">/Catalog</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 27:0-->
+    <Object Id="27:0" Cached="False">
+      <Stream>
+        <Dictionary Count="2">
+          <Item Key="Length">235</Item>
+          <Item Key="Filter">/FlateDecode</Item>
+        </Dictionary>
+      </Stream>
+    </Object>
+    <!--Object: 29:0-->
+    <Object Id="29:0" Cached="False">
+      <Stream>
+        <Dictionary Count="3">
+          <Item Key="Length">24662</Item>
+          <Item Key="Filter">/FlateDecode</Item>
+          <Item Key="Length1">53238</Item>
+        </Dictionary>
+      </Stream>
+    </Object>
+    <!--Object: 30:0-->
+    <Object Id="30:0" Cached="False">
+      <Stream>
+        <Dictionary Count="2">
+          <Item Key="Length">357</Item>
+          <Item Key="Filter">/FlateDecode</Item>
+        </Dictionary>
+      </Stream>
+    </Object>
+    <!--Object: 7:0-->
+    <Object Id="7:0" Cached="True">
+      <Dictionary Count="3">
+        <Item Key="Count">2</Item>
+        <Item Key="First">8 0 R</Item>
+        <Item Key="Last">8 0 R</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 8:0-->
+    <Object Id="8:0" Cached="True">
+      <Dictionary Count="5">
+        <Item Key="Count">1</Item>
+        <Item Key="First">9 0 R</Item>
+        <Item Key="Last">9 0 R</Item>
+        <Item Key="Parent">7 0 R</Item>
+        <Item Key="Title">
+          <HexString>4C6F63616CA04469736B</HexString>
+        </Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 9:0-->
+    <Object Id="9:0" Cached="True">
+      <Dictionary Count="4">
+        <Item Key="Dest">
+          <Array Count="5">
+            <Item>26 0 R</Item>
+            <Item>/XYZ</Item>
+            <Item>0</Item>
+            <Item>792</Item>
+            <Item>Null</Item>
+          </Array>
+        </Item>
+        <Item Key="Parent">8 0 R</Item>
+        <Item Key="SE">14 0 R</Item>
+        <Item Key="Title">
+          <HexString>FEFF005000440046005F0054006500730074002E007400780074</HexString>
+        </Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 10:0-->
+    <Object Id="10:0" Cached="True">
+      <Dictionary Count="5">
+        <Item Key="ClassMap">11 0 R</Item>
+        <Item Key="K">12 0 R</Item>
+        <Item Key="ParentTree">13 0 R</Item>
+        <Item Key="ParentTreeNextKey">1</Item>
+        <Item Key="Type">/StructTreeRoot</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 11:0-->
+    <Object Id="11:0" Cached="True">
+      <Dictionary Count="1">
+        <Item Key="SpdrArt">15 0 R</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 12:0-->
+    <Object Id="12:0" Cached="True">
+      <Dictionary Count="3">
+        <Item Key="K">14 0 R</Item>
+        <Item Key="P">10 0 R</Item>
+        <Item Key="S">/Document</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 13:0-->
+    <Object Id="13:0" Cached="True">
+      <Dictionary Count="1">
+        <Item Key="Nums">
+          <Array Count="2">
+            <Item>0</Item>
+            <Item>
+              <Array Count="2">
+                <Item>14 0 R</Item>
+                <Item>14 0 R</Item>
+              </Array>
+            </Item>
+          </Array>
+        </Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 14:0-->
+    <Object Id="14:0" Cached="True">
+      <Dictionary Count="5">
+        <Item Key="C">/SpdrArt</Item>
+        <Item Key="K">
+          <Array Count="2">
+            <Item>0</Item>
+            <Item>1</Item>
+          </Array>
+        </Item>
+        <Item Key="P">12 0 R</Item>
+        <Item Key="Pg">26 0 R</Item>
+        <Item Key="S">/Article</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 15:0-->
+    <Object Id="15:0" Cached="True">
+      <Dictionary Count="1">
+        <Item Key="O">/WebCapture</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 16:0-->
+    <Object Id="16:0" Cached="True">
+      <Dictionary Count="3">
+        <Item Key="Count">1</Item>
+        <Item Key="Kids">
+          <Array Count="1">
+            <Item>26 0 R</Item>
+          </Array>
+        </Item>
+        <Item Key="Type">/Pages</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 17:0-->
+    <Object Id="17:0" Cached="True">
+      <Dictionary Count="1">
+        <Item Key="Names">
+          <Array Count="2">
+            <Item>36 0 R</Item>
+            <Item>20 0 R</Item>
+          </Array>
+        </Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 18:0-->
+    <Object Id="18:0" Cached="True">
+      <Dictionary Count="1">
+        <Item Key="Names">
+          <Array Count="2">
+            <Item>19 0 R</Item>
+            <Item>20 0 R</Item>
+          </Array>
+        </Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 19:0-->
+    <Object Id="19:0" Cached="True">file:///Users/patrik/Desktop/PDF_Test.txt</Object>
+    <!--Object: 20:0-->
+    <Object Id="20:0" Cached="True">
+      <Dictionary Count="7">
+        <Item Key="CT">text/plain</Item>
+        <Item Key="ID">36 0 R</Item>
+        <Item Key="O">
+          <Array Count="1">
+            <Item>26 0 R</Item>
+          </Array>
+        </Item>
+        <Item Key="S">/SPS</Item>
+        <Item Key="SI">21 0 R</Item>
+        <Item Key="T">
+          <HexString>FEFF005000440046005F0054006500730074002E007400780074</HexString>
+        </Item>
+        <Item Key="TS">D:20240227210231Z</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 21:0-->
+    <Object Id="21:0" Cached="True">
+      <Dictionary Count="2">
+        <Item Key="AU">19 0 R</Item>
+        <Item Key="TS">D:20240227210231Z</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 22:0-->
+    <Object Id="22:0" Cached="True">
+      <Dictionary Count="1">
+        <Item Key="V">1.25</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 23:0-->
+    <Object Id="23:0" Cached="True">
+      <Dictionary Count="5">
+        <Item Key="CreationDate">02/27/2024 22:02:31 +01:00</Item>
+        <Item Key="Creator">Adobe Acrobat 23.0</Item>
+        <Item Key="ModDate">02/27/2024 22:02:40 +01:00</Item>
+        <Item Key="Producer">Acrobat Web Capture 15.0</Item>
+        <Item Key="Title">PDF_Test.txt</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 26:0-->
+    <Object Id="26:0" Cached="True">
+      <Dictionary Count="11">
+        <Item Key="Contents">27 0 R</Item>
+        <Item Key="CropBox">
+          <Array Count="4">
+            <Item>0.00</Item>
+            <Item>0.00</Item>
+            <Item>612.00</Item>
+            <Item>792.00</Item>
+          </Array>
+        </Item>
+        <Item Key="Group">35 0 R</Item>
+        <Item Key="ID">36 0 R</Item>
+        <Item Key="MediaBox">
+          <Array Count="4">
+            <Item>0.00</Item>
+            <Item>0.00</Item>
+            <Item>612.00</Item>
+            <Item>792.00</Item>
+          </Array>
+        </Item>
+        <Item Key="PZ">1.00</Item>
+        <Item Key="Parent">16 0 R</Item>
+        <Item Key="Resources">
+          <Dictionary Count="2">
+            <Item Key="Font">
+              <Dictionary Count="1">
+                <Item Key="TT0">34 0 R</Item>
+              </Dictionary>
+            </Item>
+            <Item Key="ProcSet">
+              <Array Count="2">
+                <Item>/PDF</Item>
+                <Item>/Text</Item>
+              </Array>
+            </Item>
+          </Dictionary>
+        </Item>
+        <Item Key="Rotate">0</Item>
+        <Item Key="StructParents">0</Item>
+        <Item Key="Type">/Page</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 32:0-->
+    <Object Id="32:0" Cached="True">
+      <Dictionary Count="2">
+        <Item Key="IDS">17 0 R</Item>
+        <Item Key="URLS">18 0 R</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 33:0-->
+    <Object Id="33:0" Cached="True">
+      <Dictionary Count="14">
+        <Item Key="Ascent">1007</Item>
+        <Item Key="CapHeight">662</Item>
+        <Item Key="Descent">-307</Item>
+        <Item Key="Flags">34</Item>
+        <Item Key="FontBBox">
+          <Array Count="4">
+            <Item>-568</Item>
+            <Item>-307</Item>
+            <Item>2000</Item>
+            <Item>1007</Item>
+          </Array>
+        </Item>
+        <Item Key="FontFamily">Times New Roman</Item>
+        <Item Key="FontFile2">29 0 R</Item>
+        <Item Key="FontName">/YWYTEL+TimesNewRomanPSMT</Item>
+        <Item Key="FontStretch">/Normal</Item>
+        <Item Key="FontWeight">400</Item>
+        <Item Key="ItalicAngle">0</Item>
+        <Item Key="StemV">80</Item>
+        <Item Key="Type">/FontDescriptor</Item>
+        <Item Key="XHeight">448</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 34:0-->
+    <Object Id="34:0" Cached="True">
+      <Dictionary Count="9">
+        <Item Key="BaseFont">/YWYTEL+TimesNewRomanPSMT</Item>
+        <Item Key="Encoding">/WinAnsiEncoding</Item>
+        <Item Key="FirstChar">32</Item>
+        <Item Key="FontDescriptor">33 0 R</Item>
+        <Item Key="LastChar">120</Item>
+        <Item Key="Subtype">/TrueType</Item>
+        <Item Key="ToUnicode">30 0 R</Item>
+        <Item Key="Type">/Font</Item>
+        <Item Key="Widths">
+          <Array Count="89">
+            <Item>250</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>250</Item>
+            <Item>333</Item>
+            <Item>250</Item>
+            <Item>0</Item>
+            <Item>500</Item>
+            <Item>500</Item>
+            <Item>500</Item>
+            <Item>500</Item>
+            <Item>500</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>500</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>278</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>722</Item>
+            <Item>0</Item>
+            <Item>556</Item>
+            <Item>0</Item>
+            <Item>722</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>556</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>611</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>944</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>333</Item>
+            <Item>0</Item>
+            <Item>333</Item>
+            <Item>0</Item>
+            <Item>500</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>500</Item>
+            <Item>444</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>278</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>500</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>333</Item>
+            <Item>389</Item>
+            <Item>278</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>0</Item>
+            <Item>500</Item>
+          </Array>
+        </Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 35:0-->
+    <Object Id="35:0" Cached="True">
+      <Dictionary Count="2">
+        <Item Key="CS">/DeviceRGB</Item>
+        <Item Key="S">/Transparency</Item>
+      </Dictionary>
+    </Object>
+    <!--Object: 36:0-->
+    <Object Id="36:0" Cached="True">
+      <HexString>769B6B5B7B3C9091893C3F4B5ABA38C4</HexString>
+    </Object>
+  </Objects>
+</Document>

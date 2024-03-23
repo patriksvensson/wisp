@@ -50,9 +50,11 @@ public sealed class CosDocument : IDisposable
         _resolver?.Dispose();
     }
 
-    public static CosDocument Open(Stream stream)
+    public static CosDocument Open(
+        Stream stream,
+        CosReaderSettings? settings = null)
     {
-        return CosDocumentReader.Read(stream);
+        return CosDocumentReader.Read(stream, settings);
     }
 
     public void Save(

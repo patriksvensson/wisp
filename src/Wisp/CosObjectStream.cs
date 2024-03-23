@@ -15,7 +15,7 @@ public sealed class CosObjectStream : ICosPrimitive
     /// </summary>
     public int N => _stream.Dictionary.GetInt32(CosNames.N) ?? 0;
 
-    public CosDictionary Metadata => _stream.Dictionary;
+    public CosDictionary Dictionary => _stream.Dictionary;
 
     public CosObjectStream(CosStream stream)
     {
@@ -114,6 +114,28 @@ public sealed class CosObjectStream : ICosPrimitive
 
             return obj;
         }
+    }
+
+    public CosObjectId GetObjectIdByIndex(int index)
+    {
+        var bytes = _stream.GetUnfilteredData();
+        if (bytes == null)
+        {
+            throw new WispException("Stream contained no data");
+        }
+
+        if (!_unpacked)
+        {
+            using (var stream = new MemoryStream(bytes))
+            {
+                var parser = new CosParser(stream, true);
+                EnsureOffsetsHaveBeenPopulated(parser);
+
+                return new CosObjectId(_offsetsByIndex[index].Id, 0);
+            }
+        }
+
+        return new CosObjectId(_offsetsByIndex[index].Id, 0);
     }
 
     internal List<int> GetObjectIds()

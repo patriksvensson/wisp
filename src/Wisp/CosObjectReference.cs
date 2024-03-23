@@ -25,9 +25,9 @@ public class CosObjectReference : ICosPrimitive, IEquatable<CosObjectReference>
             return true;
         }
 
-        if (obj is CosObjectId objectId)
+        if (obj is CosObjectReference objectReference)
         {
-            return Equals(objectId);
+            return Equals(objectReference);
         }
 
         return false;

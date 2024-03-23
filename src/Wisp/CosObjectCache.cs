@@ -13,6 +13,11 @@ internal sealed class CosObjectCache : ICosObjectCache
         _objects = new Dictionary<CosObjectId, CosObject>(CosObjectIdComparer.Shared);
     }
 
+    public bool Contains(CosObjectId id)
+    {
+        return _objects.ContainsKey(id);
+    }
+
     public CosObject? Get(CosObjectId id, CosResolveFlags flags = CosResolveFlags.None)
     {
         var shouldInvalidate = flags.HasFlag(CosResolveFlags.Invalidate);
@@ -167,8 +172,10 @@ public enum CosResolveFlags
     NoResolve = 1 << 2,
 }
 
+[PublicAPI]
 public interface ICosObjectCache : IEnumerable<CosObject>
 {
+    bool Contains(CosObjectId id);
     CosObject? Get(CosObjectId id, CosResolveFlags flags = CosResolveFlags.None);
     void Set(CosObject obj);
 }

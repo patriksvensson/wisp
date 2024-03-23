@@ -33,7 +33,10 @@
     <EmbeddedResource Include="Data\Simple.pdf" />
     <EmbeddedResource Include="Data\XRefStream.pdf" />
     <None Remove="Data\XRefStreamIncremental.pdf" />
-    <EmbeddedResource Include="Data\XRefStreamIncremental.pdf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Expectations\" />
   </ItemGroup>
 
 </Project>
