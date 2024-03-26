@@ -1,3 +1,5 @@
+using Wisp.Security;
+
 namespace Wisp.Tests;
 
 public sealed partial class CosDocumentTests
@@ -38,6 +40,19 @@ public sealed partial class CosDocumentTests
                 {
                     ExpandStreamObjects = false,
                 });
+        }
+
+        [Fact]
+        public void Should_Open_Encrypted_Document()
+        {
+            // Given, When
+            var stream = EmbeddedResourceReader.GetStream(
+                CosDocumentFixture.SimpleEncrypted.Path);
+
+            // When
+            var document = CosDocument.Open(stream);
+
+            // Then
         }
     }
 }

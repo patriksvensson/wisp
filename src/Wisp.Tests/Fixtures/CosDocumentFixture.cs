@@ -27,6 +27,21 @@ public class CosDocumentFixture
         }
     }
 
+    public sealed class SimpleEncrypted : CosDocumentFixture
+    {
+        public const string Path = "Wisp.Tests/Data/Simple_Encrypted.pdf";
+
+        public SimpleEncrypted(CosReaderSettings? settings = null)
+            : base(Path, settings)
+        {
+        }
+
+        public static CosDocumentFixture Create(CosReaderSettings? settings = null)
+        {
+            return new CosDocumentFixture(Path, settings);
+        }
+    }
+
     public sealed class XRefStream : CosDocumentFixture
     {
         [UsedImplicitly]

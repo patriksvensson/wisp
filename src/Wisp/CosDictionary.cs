@@ -132,6 +132,16 @@ public class CosDictionary : ICosPrimitive, IEnumerable<KeyValuePair<CosName, IC
 [PublicAPI]
 public static class PdfDictionaryExtensions
 {
+    public static CosBoolean? GetBoolean(this CosDictionary dictionary, CosName key)
+    {
+        return dictionary.Get<CosBoolean>(key);
+    }
+
+    public static CosBoolean GetRequiredBoolean(this CosDictionary dictionary, CosName key)
+    {
+        return dictionary.GetRequired<CosBoolean>(key);
+    }
+
     public static CosInteger? GetInteger(this CosDictionary dictionary, CosName key)
     {
         return dictionary.Get<CosInteger>(key);

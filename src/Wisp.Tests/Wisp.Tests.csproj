@@ -33,6 +33,8 @@
     <EmbeddedResource Include="Data\Simple.pdf" />
     <EmbeddedResource Include="Data\XRefStream.pdf" />
     <None Remove="Data\XRefStreamIncremental.pdf" />
+    <None Remove="Data\Simple_Encrypted.pdf" />
+    <EmbeddedResource Include="Data\Simple_Encrypted.pdf" />
   </ItemGroup>
 
   <ItemGroup>

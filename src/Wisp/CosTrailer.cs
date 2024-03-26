@@ -41,9 +41,9 @@ public sealed class CosTrailer : CosDictionary
     /// <summary>
     /// Gets or sets the document's encryption dictionary.
     /// </summary>
-    public CosDictionary? Encrypt
+    public CosObjectReference? Encrypt
     {
-        get => this.GetDictionary(CosNames.Encrypt);
+        get => this.GetRequiredObjectReference(CosNames.Encrypt);
         set => this.Set(CosNames.Encrypt, value);
     }
 
