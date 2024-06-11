@@ -173,7 +173,7 @@ public sealed class CosWriter : IDisposable
             context.Writer.WriteBytes(obj.Encoding switch
             {
                 CosStringEncoding.Ascii => Encoding.ASCII.GetBytes(text),
-                CosStringEncoding.Unicode => [..(byte[])[0xFF, 0xFE], .. Encoding.BigEndianUnicode.GetBytes(text)],
+                CosStringEncoding.Unicode => [..(byte[])[0xFF, 0xFE], .. Encoding.Unicode.GetBytes(text)],
                 CosStringEncoding.BigEndianUnicode => [..(byte[])[0xFE, 0xFF], .. Encoding.BigEndianUnicode.GetBytes(text)],
                 _ => throw new WispException("Unknown string encoding"),
             });
