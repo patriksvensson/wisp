@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Wisp.Tests;
 
 public sealed class CosWriterTests
@@ -151,17 +153,50 @@ public sealed class CosWriterTests
         fixture.Result.ShouldBe("32 2 R");
     }
 
-    [Fact]
-    public void Should_Write_Strings_Correctly()
+    [Theory]
+    [MemberData(nameof(Should_Write_Strings_Correctly_Data))]
+    public void Should_Write_Strings_Correctly(string input, byte[] expected)
     {
         // Given
         var fixture = new CosWriterFixture();
 
         // When
-        fixture.Write(new CosString("Hello World"));
+        fixture.Write(new CosString(input));
 
         // Then
-        fixture.Result.ShouldBe("(Hello World)");
+        fixture.RawResult.ShouldBe(expected);
+    }
+
+    public static IEnumerable<object[]> Should_Write_Strings_Correctly_Data()
+    {
+        yield return new object[]
+        {
+            "Hello World",
+            Encoding.ASCII.GetBytes("(Hello World)"),
+        };
+        yield return new object[]
+        {
+            "Parenthesis like ( and ) should be escaped.",
+            Encoding.ASCII.GetBytes("(Parenthesis like \\( and \\) should be escaped.)"),
+        };
+
+        var unicodeChars = "ĀĆĎĒĨĩŏŊ";
+        yield return new object[]
+        {
+            unicodeChars,
+            Convert.FromHexString("28FEFF01000106010E0112015C28015C29014F014A29"),
+        };
+
+        var unicodeAndParenthesis = "ĀĆĎĒĨĩŏŊ and () mixed.";
+        yield return new object[]
+        {
+            unicodeAndParenthesis,
+            Convert.FromHexString(
+                "28FEFF01000106010E0112015C" +
+                "28015C29014F014A0020006100" +
+                "6E00640020005C28005C290020" +
+                "006D0069007800650064002E29"),
+        };
     }
 
     [Fact]

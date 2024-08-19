@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Wisp.Testing;
 
 public static class ShouldlyExtensions
@@ -20,6 +22,11 @@ public static class ShouldlyExtensions
     public static void ShouldBe(this StringResult result, string expected)
     {
         expected = expected.Replace("\r\n", "\n");
+        result.Value.ShouldBe(expected);
+    }
+
+    public static void ShouldBe(this BytesResult result, byte[] expected)
+    {
         result.Value.ShouldBe(expected);
     }
 

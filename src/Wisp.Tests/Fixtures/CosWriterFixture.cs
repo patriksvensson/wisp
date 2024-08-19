@@ -10,6 +10,8 @@ public sealed class CosWriterFixture
 
     public StringResult Result => new StringResult(Encoding.ASCII.GetString(_stream.ToArray()));
 
+    public BytesResult RawResult => new BytesResult(_stream.ToArray());
+
     public CosWriterFixture(CosWriterSettings? settings = null)
     {
         _stream = new MemoryStream();

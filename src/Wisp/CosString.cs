@@ -10,7 +10,7 @@ public sealed class CosString : ICosPrimitive
     public CosString(string value)
     {
         Value = value ?? throw new ArgumentNullException(nameof(value));
-        Encoding = value.All(char.IsAscii) ? CosStringEncoding.Ascii : CosStringEncoding.Unicode;
+        Encoding = value.All(char.IsAscii) ? CosStringEncoding.Ascii : CosStringEncoding.BigEndianUnicode;
     }
 
     internal CosString(string value, CosStringEncoding encoding)

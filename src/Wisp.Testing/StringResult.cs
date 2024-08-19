@@ -1,3 +1,3 @@
-﻿namespace Wisp.Testing;
+namespace Wisp.Testing;
 
 public record StringResult(string Value);

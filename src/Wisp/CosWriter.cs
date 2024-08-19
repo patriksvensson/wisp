@@ -163,20 +163,31 @@ public sealed class CosWriter : IDisposable
 
         public override void VisitString(CosString obj, Context context)
         {
-            var text = obj.Value
-                .Replace("\\(", "(")
-                .Replace("\\", "\\\\")
-                .Replace("(", "\\(")
-                .Replace(")", "\\)");
+            var text = obj.Value;
 
             context.Writer.WriteByte('(');
-            context.Writer.WriteBytes(obj.Encoding switch
+
+            var bytes = obj.Encoding switch
             {
                 CosStringEncoding.Ascii => Encoding.ASCII.GetBytes(text),
-                CosStringEncoding.Unicode => [..(byte[])[0xFF, 0xFE], .. Encoding.Unicode.GetBytes(text)],
-                CosStringEncoding.BigEndianUnicode => [..(byte[])[0xFE, 0xFF], .. Encoding.BigEndianUnicode.GetBytes(text)],
+                CosStringEncoding.Unicode => [.. Encoding.Unicode.Preamble, .. Encoding.Unicode.GetBytes(text)],
+                CosStringEncoding.BigEndianUnicode => [.. Encoding.BigEndianUnicode.Preamble, .. Encoding.BigEndianUnicode.GetBytes(text)],
                 _ => throw new WispException("Unknown string encoding"),
-            });
+            };
+
+            foreach (var b in bytes)
+            {
+                // 0x28 and 0x29 are parenthesis and 0x5C is the escape character,
+                // these bytes need to be escaped within the string.
+                if (b == 0x28 || b == 0x29 || b == 0x5C)
+                {
+                    // 0x5C = \
+                    context.Writer.WriteByte(0x5C);
+                }
+
+                context.Writer.WriteByte(b);
+            }
+
             context.Writer.WriteByte(')');
         }
 
